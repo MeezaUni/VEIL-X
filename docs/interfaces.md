@@ -28,6 +28,21 @@
 | `veilx.sim` | Simulation harness | Synthetic score model with exact population rates; experiments SIM-001…009 |
 | `veilx.evidence` | Integrity registry | Typed evidence records; simulation results can never be presented as measured results |
 
+## Implemented in Phase 1b (real data; still no models)
+
+| Module | Purpose |
+|---|---|
+| `veilx.data.download` | Resumable segmented HTTPS range downloader (206 and Content-Range checks) |
+| `veilx.data.archive` | Archive inspection (size, SHA-256, member pattern, symlink/traversal/type/bomb guards, CRC) and safe wrapped extraction |
+| `veilx.data.paths` | Private data root resolution (`VEILX_DATA_ROOT`); refuses non-ignored in-repo roots |
+| `veilx.data.images` | Full decode, pixel SHA-256, pHash, NCC thumbnails |
+| `veilx.data.dedup` | Duplicate transforms, rule selection and validation, trade-off frontier, review rule, exhaustive candidate search, grouping |
+| `veilx.data.integrity` | Parallel fingerprinting (incl. alpha check), validation sets, duplicate policy, final records |
+| `veilx.occlusion` | F1–F5 generators, engine with provenance (`OcclusionSpec`), stress composition, 7×7 visibility grid, LOFO planner with isolation assertions |
+| `veilx.stats.jackknife` | Delete-one-identity jackknife (linear and logit) for one- and two-identity pair rates |
+| `veilx.training` | Run-config schema with authorisation guard, atomic checkpoint manager, precision helpers (no training) |
+| `scripts/prepare_digiface.py` | Staged real-data pipeline: extract → scan → fingerprint → dedup → pairs → occlusion → summary |
+
 ## Cross-cutting infrastructure (implemented in Phase 0)
 
 | Module | Purpose |

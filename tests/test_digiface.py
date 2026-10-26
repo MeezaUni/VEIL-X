@@ -85,14 +85,35 @@ def test_anomalies_reported(tmp_path: Path) -> None:
     assert counts["empty_identity"] == 1
     assert counts["corrupt_image"] == 1
     assert counts["unexpected_file"] == 1
-    assert counts["duplicate_content"] == 1
+    assert counts["duplicate_content_cross_identity"] == 1
+    assert "duplicate_content" not in counts
     assert counts["non_numeric_identity_dir"] == 1
     assert counts["identity_outside_official_ranges"] == 1
     ids = {r.image_id for r in records}
     assert "digiface1m:100005:2" not in ids  # corrupt excluded
-    assert "digiface1m:100006:4" not in ids  # duplicate excluded
-    assert report.n_images_excluded == 2
+    # same picture under two identities: label ambiguous, BOTH copies excluded
+    assert "digiface1m:100006:4" not in ids and "digiface1m:100000:0" not in ids
+    assert report.n_images_excluded == 3
     validate_image_manifest(records)
+
+
+def test_parallel_and_serial_scans_are_identical(tmp_path: Path) -> None:
+    for ident in ("100000", "100001", "100002"):
+        write_identity(tmp_path, ident, 5)
+    (tmp_path / "100001" / "2.png").write_bytes(b"corrupt")
+    par = DigiFaceAdapter(tmp_path, BANDS, REGISTRY, io_workers=8).scan()
+    ser = DigiFaceAdapter(tmp_path, BANDS, REGISTRY, io_workers=1).scan()
+    assert par[0] == ser[0] and par[1].issues == ser[1].issues
+
+
+def test_same_identity_duplicate_keeps_one_copy(tmp_path: Path) -> None:
+    write_identity(tmp_path, "100000", 5)
+    dup = (tmp_path / "100000" / "0.png").read_bytes()
+    (tmp_path / "100000" / "3.png").write_bytes(dup)
+    records, report = adapter(tmp_path).scan()
+    ids = {r.image_id for r in records}
+    assert "digiface1m:100000:0" in ids and "digiface1m:100000:3" not in ids
+    assert report.count("duplicate_content") == 1 and report.n_images_excluded == 1
 
 
 def test_identity_in_two_parts(tmp_path: Path) -> None:

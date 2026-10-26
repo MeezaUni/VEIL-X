@@ -6,6 +6,103 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-10-26 — Phase 1b: real data, occlusion engine, experiment readiness (no recognition model)
+
+### Session events
+- The session moved machines mid-phase. The working tree was **auto-stashed** ("Teleport
+  auto-stash") and reset to HEAD. All 13 uncommitted Phase 1b files were recovered with
+  `git stash apply`; the stash is kept as a backup until the commit is verified.
+- GitHub DNS resolution failed temporarily, then recovered before any push was needed.
+
+### Data acquisition and preparation (real data; private root outside both git repositories)
+- **Download:** the approved parts only (72-img P1, 5-img P1), via a resumable segmented
+  HTTPS range downloader. The host throttles single connections to about 0.3 MB/s; 32
+  parallel segments reached about 3.4 MiB/s.
+- **Integrity:** sizes match the official Content-Length; SHA-256 recorded; CRC-32 passes
+  for all 310,665 members; 0 members rejected by the safe extractor.
+- **Scan** (Phase 1a adapter, now with parallel I/O):
+  - 2,000 × 72 + 33,333 × 5 images;
+  - **0 anomalies**.
+- **Decode:** all 310,665 images decode; all 112×112 **RGBA** (format detail); alpha = 255
+  everywhere, verified on every image.
+- **Exact pixel duplicates:** 0.
+- **Near-duplicate rule:** rejected by its pre-registered criterion (D-029). The base-rate
+  analysis is in `docs/data_integrity_report.md`.
+- **Splits:**
+  - train 21,057 identities (182,871 images);
+  - val 3,552 (31,495);
+  - cal 3,570 (31,317);
+  - test 7,154 (64,982).
+- **Pairs:**
+  - train 421,140; val 71,040; test_balanced 143,080; test_far 100,000;
+  - cal_independent 2,380 (identity-disjoint); val_independent 2,368.
+  - **Re-running the pair stage reproduced all six digests exactly.**
+- **Occlusion plans:** 6,129,500 occluded samples (5 folds × 7 role sets) + 143,080 stress
+  pairs. Isolation asserted; strata balanced; visibility monotone in level.
+- **Disk:** 13.45 GiB in total (5.90 archives, 5.87 images, about 1.6 manifests/plans,
+  0.1 reports).
+
+### Statistics
+- **SIM-010:** the identity percentile bootstrap undercovers FNMR (93.5%). The logit
+  jackknife (94.8–95.7%) and linear jackknife for impostor rates (96.0–97.5%, conservative)
+  were selected (D-032). The impostor design effect is about 2.
+- **LTT assumptions vs the real pair generator** (`ltt_audit.md` addendum):
+  - `cal_independent` is identity-disjoint and uses one root photo per pair, so the
+    independence check passes.
+  - Equal per-identity genuine weighting (cap 10) keeps the clustered test pairs on the
+    calibration population (D-026).
+  - Clustered train/val/test pairs are correlated evaluation evidence; they never enter
+    calibration.
+
+### Engineering
+- **New modules:** `data.{download,archive,paths,images,dedup,integrity}`, `occlusion`,
+  `stats.jackknife`, `training`.
+- **New scripts:** `prepare_digiface.py`, `fetch_digiface.py`, `parts_benefit.py`,
+  `gpu_smoke_check.py`.
+- **Protocol v0.3.0** with changelog. Evidence types: added `real_data_statistic`
+  (DATA-001…003), SIM-010 and CALC-002.
+- **GPU infrastructure:** validated in a separate `.venv-gpu` (torch 2.11.0+cu128).
+  - RTX 4060 Laptop, 8 GiB, capability 8.9, bf16 supported.
+  - fp16/bf16 autocast and checkpoint round-trip OK.
+  - **No model, no training.**
+
+### Bugs found and fixed (all covered by tests)
+1. **Zip special-file check.** Members storing only permission bits were classed as "special
+   files", so valid archives could be rejected. Fixed by checking the file-type field only.
+2. **Data-root probe.** It used a `.png` name, which is ignored everywhere, so any in-repo
+   folder looked git-ignored. Fixed with an extension-less probe.
+3. **Plan order dependence.** Condition plans depended on input order (contradicting the
+   docstring). Fixed by sorting by `pair_id`.
+4. **Duplicate-label policy.** The adapter kept the first copy of a cross-identity
+   duplicate (ambiguous label) and hid the conflict from the dedup stage. Both copies are now
+   excluded (D-033).
+5. **Ignore rule (again).** The unanchored `data/` ignore rule hid `reports/data/`. The guard
+   test caught it, and an explicit exception was added.
+6. **Performance.** Serial adapter I/O ran at about 125 files/s (antivirus on-access cost);
+   prefetch threads were added. Occlusion grids are now cached; outputs were verified
+   **byte-identical** before and after, and F3 is 4× faster.
+7. **Jackknife test arithmetic** was wrong in the test itself, not the code. Fixed.
+
+### Quality gate (actual, final run before commit)
+| Step | Result |
+|---|---|
+| ruff check / format | PASS / PASS |
+| mypy strict (46 source files) | PASS |
+| pytest | **281 passed**, 0 failed (≈ 62 s), including the end-to-end pipeline integration test on a synthetic fixture |
+| validate_config | PASS (v0.3.0; provisional: clean margin, accepted-error target, dedup threshold) |
+| scan_sensitive | PASS, 0 findings |
+| Real-data reproducibility | 6/6 pair digests identical on re-run |
+
+### Known limitations
+- Template landmarks ignore per-image pose. Accessories in DigiFace renders partly confound F2.
+- The near-duplicate signal is unusable on aligned synthetic renders, so only exact dedup is
+  applied.
+- Paired-difference intervals are not validated. The clean margin and the accepted-error
+  target remain provisional.
+- Additional DigiFace parts are recommended (CALC-002) but not downloaded.
+
+---
+
 ## 2026-10-26 — Phase 1a: evaluation and statistical foundation (no models, no downloads)
 
 ### Git

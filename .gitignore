@@ -38,6 +38,7 @@ pairs/local/
 *.zip
 *.tar
 *.tar.gz
+*.gz
 *.tgz
 *.7z
 *.rar
@@ -47,6 +48,8 @@ pairs/local/
 # Allow-list: source packages whose names collide with the data-directory rules above
 # (code only; image/array/archive extension rules still apply inside them).
 !src/veilx/data/
+# Aggregated, non-identifying real-data statistics (JSON only; reviewed before commit).
+!reports/data/
 
 # ---- Personal documents (defence in depth) ---------------------------
 *.pdf
@@ -109,6 +112,7 @@ __pycache__/
 build/
 dist/
 .venv/
+.venv-*/
 venv/
 env/
 .pytest_cache/

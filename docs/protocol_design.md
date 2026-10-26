@@ -156,7 +156,7 @@ not measurements.
 | Confidence level (1 − δ) | 0.95 | Standard; drives the counts below | Ready to freeze |
 | Accepted-decision error target | 5% | Certifiable with **≥ 59** independent accepted cal pairs at 0 errors, **≥ 93** at 2% observed, **≥ 286** at 3%, **≥ 1,282** at 4%. Applies **per stratum** under stratified calibration | Feasible |
 | FAR operating points | 1%, 0.1% | **Estimation:** feasible (10,000 test impostor pairs for 0.1%). **Certification of sFMR:** 1% needs **≥ 299** independent impostor pairs (0 FM); 0.1% needs **≥ 2,995** (0 FM) or **≥ 4,742** (1 FM). Identity-disjoint matching gives N/3 impostor pairs from N cal identities: DigiFace 72-img P1 → 66; 5-img P1 → 1,111; all three 5-img parts → 3,333 | **1% certifiable** with a 5-img part; **0.1% estimation-only** unless all three 5-img parts are approved |
-| Bootstrap CI | 95%, identity clusters, 2,000 resamples | **Simulated (SIM-001):** identity bootstrap covered FNMR 93.3% and FMR 99.3%, against 83–84% for the pair bootstrap | Identity unit confirmed. A refined two-way scheme is a Phase 1b item |
+| Interval method and level | 95%, identity as resampling/deletion unit | **SIM-010 (Phase 1b):** logit jackknife covers genuine-pair rates 94.8–95.7%; linear jackknife covers impostor-pair rates 96.0–97.5% (conservative); the identity percentile bootstrap undercovers FNMR (93.5%) | **Frozen** in v0.3.0 (level 0.95; methods per statistic). Paired-difference intervals not yet validated |
 | Near-dup threshold | **unset** | Fixed only after the §8 validation | — |
 | Dedup target recall | 0.99 | Measured on synthetic known duplicates (§8) | Provisional |
 
@@ -183,14 +183,28 @@ expected.
    **non-test** side only. Test data are never altered. Report counts.
 5. **Limitation:** dedup detects duplicate *images*, not the same *person* across datasets.
    Identity overlap with backbone pretraining data is a separate, documented confound.
+6. **Phase 1b outcome on DigiFace (D-029):** the procedure was run with pHash + thumbnail NCC.
+   Face-embedding similarity is excluded, because two photos of one person are not duplicates.
+   The best rule reaching 99% recall failed the pre-set same-identity FPR criterion, so **no
+   near-duplicate threshold was adopted**. Exact pixel duplicates: 0. Details:
+   `data_integrity_report.md` §3.
 
 ## 9. Bootstrap resampling unit
 
-Identity-cluster bootstrap: resample test identities with replacement. A genuine pair is kept
-with the multiplicity of its identity. An impostor pair is kept if both identities are drawn,
-with the product of their multiplicities. Method differences (C1, C3-ii) are computed **within
-the same resample**. Percentile intervals at 95% are used, after the Phase 1 coverage
-simulation.
+*Phase 1a design:* identity-cluster bootstrap. Resample test identities with replacement. A
+genuine pair is kept with the multiplicity of its identity. An impostor pair is kept if both
+identities are drawn, with the product of their multiplicities. Method differences (C1, C3-ii)
+are computed **within the same resample**.
+
+**Phase 1b revision (SIM-010, D-032):** the percentile bootstrap undercovered FNMR (93.5%) and
+over-covered FMR (product weights roughly double the variance). Intervals now use the
+**delete-one-identity jackknife**, where deleting an identity removes every pair it appears
+in, on either side:
+- **logit scale** for genuine-pair rates (FNMR/TAR): coverage 94.8–95.7%;
+- **linear scale** for impostor-pair rates (FAR/FMR): coverage 96.0–97.5%, conservative.
+
+Intervals for paired *differences* between methods still need their own coverage study
+before use.
 
 ## 10. Decision rules (unchanged from `evaluation_protocol.md` §1, re-indexed)
 

@@ -3,15 +3,17 @@
 Research code for **risk-controlled two-image (1:1) face verification under occlusion**.
 Non-commercial academic research only.
 
-> **Status: Phase 1a complete (evaluation and statistical foundation).** No face-recognition
-> model, no dataset and no model weights are in this repository. **No real measured results
-> exist.** Numbers in `docs/` and `reports/` fall into four categories, each tracked in
+> **Status: Phase 1b complete (real data, occlusion engine, experiment readiness).** No face-
+> recognition model has been run and **no model-performance results exist**. Dataset images,
+> manifests and weights are never in this repository: they live in a private data root
+> (`VEILX_DATA_ROOT`). Numbers in `docs/` and `reports/` fall into categories tracked in
 > `reports/evidence_registry.yaml`:
 > - cited prior work;
-> - registered *provisional* constants;
+> - registered constants (frozen or *provisional*);
 > - exact calculations;
-> - **SIMULATED** results on synthetic scores, which are never evidence of face-recognition
->   performance.
+> - **SIMULATED** results on synthetic scores (never face-recognition evidence);
+> - **real-data statistics** about the prepared DigiFace subset (counts and integrity, never
+>   model performance).
 
 ## Research questions (approved)
 
@@ -26,28 +28,35 @@ Frozen pretrained backbones: AdaFace IR101 (primary) and ArcFace (secondary). Ch
 families: masks, sunglasses, hands/objects, random patches, extreme lighting. Lighting is
 interpreted separately.
 
-## What exists (Phase 1a)
+## What exists (Phases 1a + 1b)
 
 | Area | Module | Notes |
 |---|---|---|
-| Dataset adapter | `veilx.data.digiface` | DigiFace-1M layout, integrity and anomaly report. Tested on synthetic noise fixtures only |
+| Dataset adapter | `veilx.data.digiface` | DigiFace-1M layout, integrity and anomaly report. Run on the approved real subset: 310,665 images, 0 anomalies |
+| Real-data pipeline | `scripts/prepare_digiface.py`, `veilx.data.{download,archive,images,dedup,integrity}` | Verified download, safe extraction, fingerprints, validated dedup, pair sets, occlusion plans (`docs/data_integrity_report.md`) |
+| Occlusion engine | `veilx.occlusion` | Masks, sunglasses, hands/objects, random patches, extreme lighting (non-physical); stress combinations; leave-one-family-out plans with isolation checks |
 | Pairs | `veilx.pairs` | Identity-disjoint (independent) or clustered pairs. Explicit infeasibility; independence accounting |
 | Metrics | `veilx.metrics` | ROC-AUC, EER, TAR@FAR (benchmark and deployment), selective metrics, AUGRC/AURC, ECE/Brier/reliability. See `docs/metrics.md` |
-| Uncertainty | `veilx.stats.bootstrap` | Identity-cluster bootstrap |
+| Uncertainty | `veilx.stats.jackknife`, `veilx.stats.bootstrap` | Delete-one-identity jackknife (selected by SIM-010); identity bootstrap kept for comparison |
 | Risk control | `veilx.selective` | Audited Learn-then-Test (`docs/ltt_audit.md`), empirical-only calibrator, stratified LTT |
-| Simulations | `veilx.sim`, `reports/simulations/` | 9 deterministic synthetic experiments (`docs/simulation_findings.md`) |
+| Simulations | `veilx.sim`, `reports/simulations/` | 10 deterministic synthetic experiments (`docs/simulation_findings.md`) |
+| Training infrastructure | `veilx.training`, `configs/experiments/` | Run configs, checkpoints, mixed precision; **training not authorised** (double guard) |
 | Integrity | `veilx.evidence`, `reports/evidence_registry.yaml` | Keeps published, calculated, simulated, measured and hypothesised results separate |
 
 ## Repository layout
 
 ```
-configs/   research_protocol.yaml (versioned protocol v0.2.0, provisional), datasets.yaml
-docs/      research, protocol, audit, metric and decision documents; development log
-reports/   simulations/*.json (SIMULATED), evidence_registry.yaml
-scripts/   quality_gate, validate_config, feasibility_report, run_simulations, scan_sensitive
-src/veilx/ config, data (manifest, splits, png, digiface), pairs, metrics, stats, selective,
-           sim, evidence, interfaces, provenance, logging, seeding, guards, errors
-tests/     unit, property, integrity and simulation tests (no real data, no models)
+configs/   research_protocol.yaml (protocol v0.3.0), datasets.yaml, experiments/ (templates)
+docs/      research, protocol (+ changelog), audit, metrics, data-integrity and decision docs
+reports/   simulations/*.json (SIMULATED), data/*.json (aggregated real-data statistics),
+           evidence_registry.yaml
+scripts/   quality_gate, validate_config, feasibility_report, run_simulations, scan_sensitive,
+           fetch_digiface, prepare_digiface, parts_benefit
+src/veilx/ config, data (manifest, splits, png, images, archive, download, paths, digiface,
+           dedup, integrity), pairs, occlusion, metrics, stats, selective, sim, training,
+           evidence, interfaces, provenance, logging, seeding, guards, errors
+tests/     unit, property, integrity, simulation and pipeline-integration tests (synthetic
+           fixtures only; no real images, no models)
 ```
 
 ## Setup and checks (Windows PowerShell, uv)
@@ -62,6 +71,17 @@ uv pip install --python .venv\Scripts\python.exe -e . pytest ruff mypy types-PyY
 
 Run `scripts\scan_sensitive.py` before every commit. It refuses images, arrays, manifests
 (`.jsonl`), archives, weights, documents, secrets, large files and absolute user paths.
+
+### Real-data preparation (approved DigiFace subset; private data root)
+
+```powershell
+$env:VEILX_DATA_ROOT = "<folder outside any git repository>"
+.venv\Scripts\python.exe scripts\fetch_digiface.py         # approved parts only, ~5.9 GiB
+.venv\Scripts\python.exe scripts\prepare_digiface.py extract scan fingerprint dedup pairs occlusion summary
+```
+
+Only aggregated, non-identifying statistics are written inside the repository
+(`reports/data/`). Everything listing images, identities or pairs stays in the data root.
 
 ## Privacy and licensing
 

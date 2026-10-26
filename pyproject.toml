@@ -10,10 +10,13 @@ dependencies = [
     "numpy>=1.26,<3",
     "pydantic>=2.6,<3",
     "PyYAML>=6.0,<7",
+    "pillow>=10.0",
 ]
 
-# Phase 0 deliberately has no torch / onnxruntime / insightface dependency; they are added
-# only after the separate go-ahead for model weights and datasets.
+[project.optional-dependencies]
+# Phase 2 (not yet authorised for training): GPU stack used by veilx.training. Install with the
+# CUDA wheel index, e.g.  uv pip install -e .[gpu] --index-url https://download.pytorch.org/whl/cu128
+gpu = ["torch>=2.4"]
 
 [dependency-groups]
 dev = [

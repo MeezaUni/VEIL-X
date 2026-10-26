@@ -150,7 +150,32 @@ Done:
 Not done, because it was deliberately deferred: running the adapter on real DigiFace data,
 which needs the download go-ahead. See `DEVELOPMENT_LOG.md`.
 
-## 4b. Proposed Phase 1b: real-data plumbing, still no recognition model
+## 4c. Phase 1b status (2026-10-26): complete, no recognition model
+
+Done:
+- Approved DigiFace subset downloaded, verified and safely extracted.
+- Real-data scan, fingerprints and exact deduplication. The near-duplicate rule was evaluated
+  and rejected by its pre-set criterion.
+- Final manifest and identity-disjoint splits.
+- Pair sets, including the independent calibration set.
+- Occlusion engine (F1–F5 + stress) and LOFO condition plans with severity and visibility
+  records.
+- Interval-method study (SIM-010) and protocol v0.3.0.
+- GPU training infrastructure behind an authorisation guard.
+
+See `data_integrity_report.md` and `DEVELOPMENT_LOG.md`.
+
+## 4d. Proposed Phase 2 (requires separate authorisation)
+1. Download the detector and backbone weights (InsightFace, AdaFace IR101): licence-check,
+   checksum, record.
+2. Frozen-backbone embedding extraction for clean and occluded variants, rendered on the fly
+   from the condition plans, with recipe hashes verified. Cache embeddings privately.
+3. Raw-backbone baselines (R-Ada, R-Arc) on Test-ID and Test-OOD with the jackknife intervals.
+   C3-i (H2a) is then measurable with the LTT calibrator on `cal_independent`.
+4. Re-check clean-margin power with real score distributions; validate paired-difference
+   intervals (SIM-011).
+
+## 4b. Phase 1b proposal (kept for traceability)
 1. After the download go-ahead: run the adapter on the DigiFace subset. Freeze the manifest and
    the split counts.
 2. Build pair lists, including identity-disjoint calibration sets. Record their checksums.

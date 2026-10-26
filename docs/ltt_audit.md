@@ -115,6 +115,18 @@ Because the order never depends on calibration data, validity is unaffected.
 the target. It is always labelled `guarantee_valid=False`, and it is the only acceptable
 option whenever A2 or A7 cannot be met.
 
+## 8. Phase 1b addendum: assumptions re-checked against the implemented pair generation
+
+| Assumption | Real implementation (DigiFace, protocol v0.3.0) | Status |
+|---|---|---|
+| A2 independence | `cal_independent`: 1,190 genuine + 1,190 impostor pairs over 3,570 identities, each identity used once (`identity_disjoint: true`), one root photo per pair (content-hash keys) | Holds *given* identities that are i.i.d. draws from the identity population; identities are selected by a hash split, which is random with respect to content but is a finite-population sample |
+| Class-conditional binomial | Fixed 50/50 class counts. Valid for sFMR and sFNMR separately (accepted impostors and accepted genuines are i.i.d. within class) | Holds |
+| Pooled (mixture) estimand | Requires Bernoulli class assignment; `cal_independent` uses fixed counts | **Not valid on this set.** The pooled error is reported but not certified, as designed |
+| A7 acceptance locality | Occlusion conditions are assigned per pair from seeds derived from the pair id; co-visibility depends only on the pair | Holds. Strata edges and the candidate order must come from `val` / `val_independent` (separate identities) |
+| A1 exchangeability (Test-ID) | Clustered test pairs use the same identity-uniform weighting as calibration (genuine cap 10 for every identity; D-026) and the same seen-family plan generator | Holds as population equality. Test pairs are **correlated evaluation evidence** (jackknife intervals), never calibration evidence |
+| A1 under held-out families | Test-OOD plans force the held-out family | **Violated by design.** No guarantee claimed; violation is measured (H2a) |
+| Cross-part mixture | Calibration and test both mix 72- and 5-image identities in hash-split proportions (cal 3,570 ids; test 7,154 ids) | Same mixture up to sampling variation |
+
 ## 7. Open items
 - Re-check §3.2 equation numbering against the arXiv PDF (PUB-001 caveat).
 - The Hoeffding–Bentkus p-value is not implemented. For {0,1} losses the exact binomial is

@@ -30,16 +30,31 @@ Status values: **approved** (by PI), **provisional** (registered, may change via
 | D-023 | 2026-10-26 | Manifest `sha256` = hash of file bytes (integrity). The pixel-level hash for dedup is computed later (Phase 1b) | design | Avoids an image-decoding dependency in Phase 1a |
 | D-024 | 2026-10-26 | Operating points refuse to run with fewer than 10/FAR impostors unless the caller passes an explicit, documented override | design | "No silent operating points" requirement |
 | D-025 | 2026-10-26 | Protocol v0.2.0 (provisional): adds `candidate_ordering: validation_only` and assumption A7 (acceptance locality); controlled risk changed per D-019 | provisional | Audit outcome |
+| D-026 | 2026-10-26 | Genuine-pair cap 20 → **10 per identity** for every split: 72- and 5-image identities get equal weight, so clustered test pairs estimate the same identity-uniform population that the independent calibration set samples | design | LTT exchangeability (A1) across two DigiFace parts |
+| D-027 | 2026-10-26 | DigiFace archives fetched by a resumable segmented HTTPS range downloader (host throttles single connections); integrity = official size + CRC-32 + full decode; SHA-256 recorded as trust-on-first-download (no published checksum) | design | Phase 1b download |
+| D-028 | 2026-10-26 | Private data root outside both git repositories (`VEILX_DATA_ROOT`); in-repo roots allowed only if git-ignored (`resolve_data_root`) | design | Privacy |
+| D-029 | 2026-10-26 | Near-duplicate rule **not adopted**: the 99%-recall pHash+NCC rule fails the same-identity FPR criterion (2.95%/2.35%), and exhaustive review-rule candidates (676,350) are non-duplicates (base-rate effect). Only exact pixel dedup is applied (0 found); the threshold stays unset | approved by procedure (pre-registered criterion) | `data_integrity_report.md` §3 |
+| D-030 | 2026-10-26 | Occlusion placement uses the ArcFace 5-point template (DigiFace verified 112×112 template-aligned by a mean-image check); no landmark detector in Phase 1b | design | `data_integrity_report.md` §2 |
+| D-031 | 2026-10-26 | Severity = covered fraction of a template face-region ellipse; visibility = 1 − severity; lighting (F5) masks mark destroyed pixels and are flagged non-physical | design | Protocol v0.3.0 `occlusion` |
+| D-032 | 2026-10-26 | Interval methods per statistic: genuine-pair rates → delete-one-identity **logit jackknife**; impostor-pair rates → **linear jackknife** (conservative). The Phase 1a identity percentile bootstrap is retired for FNMR (93.5% coverage) | design (validated by SIM-010) | `simulation_findings.md` |
+| D-033 | 2026-10-26 | Cross-identity exact duplicates exclude **both** copies (ambiguous label); same-identity duplicates keep one. The adapter and the dedup stage now apply the same policy | design | Integration test exposed the inconsistency |
+| D-034 | 2026-10-26 | Constants frozen in v0.3.0: confidence level 0.95, cost ratio 10:1, FAR points {1%, 0.1% estimation-only}, CI level 0.95. Still provisional: clean margin 0.5 pp, accepted-error target 5%, dedup recall target | approved (PI) / provisional | PI brief 2026-10-26 |
+| D-035 | 2026-10-26 | New evidence category `real_data_statistic` for dataset facts, separate from model results; its statements may not contain performance terms (schema-enforced) | design | Research integrity |
+| D-036 | 2026-10-26 | GPU training infrastructure prepared (run-config schema, checkpoint manager, mixed precision) behind a double authorisation guard (config flag **and** environment variable); no training performed | design | Phase 1b authorisation scope |
 
-## Pending PI decisions (updated after Phase 1a)
-1. Download go-ahead: DigiFace 72-img P1 + 5-img P1 (~5.9 GiB). Optionally all three 5-img
-   parts (+6.3 GiB) to certify FMR at 0.1%.
-2. Accept FAR 0.1% as estimation-only (no certified sFMR at 0.1%) under the recommended
-   subset?
-3. ROF: ethics/legal confirmation (web-collected real faces; pickle loading in an isolated
-   process).
-4. Kaggle dataset: provide its licence text/metadata if visible to you, or confirm exclusion.
-5. Freeze the constants marked "ready to freeze" in `protocol_design.md` §7 (cost ratio,
-   confidence level)?
-6. Approve D-019, so the primary estimand becomes class-conditional sFMR/sFNMR, and the 0.5 pp
-   clean margin given SIM-006, which needs about 3,000 clean test identities.
+## Pending PI decisions (updated after Phase 1b)
+1. **Optional extra data (recommendation, not downloaded):** DigiFace 5-image parts P2+P3
+   (+6.3 GiB). They triple independent calibration capacity (1,177 → 3,399 impostor pairs) and
+   would make 0.1% selective FMR certifiable, but only with zero false matches. They also
+   triple per-stratum capacity for visibility-stratified calibration (CALC-002). The 72-image
+   parts P2–P5 (+11 GiB) matter only for later training diversity.
+2. ROF: ethics/legal confirmation (still not authorised).
+3. Kaggle dataset: still blocked (HTTP 404).
+4. Accepted-decision error target (5%) and clean margin (0.5 pp): confirm or revise after
+   Phase 2 real-score power checks.
+5. Phase 2 authorisation (frozen-backbone embedding extraction; detector/backbone weight
+   downloads).
+
+Resolved since Phase 1a: the download go-ahead (D-027), FAR 0.1% estimation-only (D-034),
+frozen confidence level and cost ratio (D-034), and the class-conditional estimand (D-019,
+approved).

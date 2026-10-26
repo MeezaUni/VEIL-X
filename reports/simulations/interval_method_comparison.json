@@ -1,0 +1,289 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "interval_method_comparison",
+  "params": {
+    "acceptance_rule": "coverage >= 0.94 in every condition (MC se ~0.007 at 1000 reps)",
+    "genuine_per_identity": 6,
+    "impostor_pairs_per_identity": 20,
+    "model": {
+      "covis_a": 4.0,
+      "covis_b": 1.5,
+      "genuine_slope": 3.0,
+      "impostor_slope": 0.0,
+      "mu_genuine": 5.0,
+      "mu_impostor": 0.0,
+      "noise_slope": 0.5,
+      "sigma_identity_genuine": 0.8,
+      "sigma_identity_impostor": 0.5,
+      "sigma_noise": 1.0
+    },
+    "n_boot": 500,
+    "nominal": 0.95,
+    "reps": 1000
+  },
+  "results": {
+    "G=150,fmr@FAR=0.01": {
+      "design_effect": 2.0632327950846467,
+      "methods": {
+        "identity_percentile": {
+          "coverage": 0.99,
+          "mc_se": 0.003146426544510456,
+          "mean_width": 0.014121904371045697
+        },
+        "identity_percentile_inflated": {
+          "coverage": 0.99,
+          "mc_se": 0.003146426544510456,
+          "mean_width": 0.014169214065946055
+        },
+        "jackknife_logit": {
+          "coverage": 0.986,
+          "mc_se": 0.0037153734670958734,
+          "mean_width": 0.014044950533249617
+        },
+        "jackknife_t": {
+          "coverage": 0.97,
+          "mc_se": 0.0053944415837044735,
+          "mean_width": 0.01265751697538655
+        },
+        "pair_percentile": {
+          "coverage": 0.836,
+          "mc_se": 0.011709141727727102,
+          "mean_width": 0.007077059562944471
+        }
+      },
+      "naive_binomial_variance": 3.2999999999999997e-06,
+      "true_sampling_variance": 6.808668223779334e-06,
+      "truth": 0.009999999999999998,
+      "variance_ratio_estimate_over_true": {
+        "identity_percentile": 1.9703331175907925,
+        "jackknife_t": 1.5640627721845084
+      }
+    },
+    "G=150,fnmr@FAR=0.01": {
+      "design_effect": 1.7728727603060546,
+      "methods": {
+        "identity_percentile": {
+          "coverage": 0.935,
+          "mc_se": 0.0077958322198467015,
+          "mean_width": 0.07279877777777775
+        },
+        "identity_percentile_inflated": {
+          "coverage": 0.937,
+          "mc_se": 0.007683163410991592,
+          "mean_width": 0.07304266046351858
+        },
+        "jackknife_logit": {
+          "coverage": 0.948,
+          "mc_se": 0.007021111023192843,
+          "mean_width": 0.07457107734619396
+        },
+        "jackknife_t": {
+          "coverage": 0.944,
+          "mc_se": 0.007270763371201131,
+          "mean_width": 0.07445289895254656
+        },
+        "pair_percentile": {
+          "coverage": 0.853,
+          "mc_se": 0.011197812286335219,
+          "mean_width": 0.05502168402909328
+        }
+      },
+      "naive_binomial_variance": 0.00020005835685774157,
+      "true_sampling_variance": 0.000354678011344678,
+      "truth": 0.2355241432038973,
+      "variance_ratio_estimate_over_true": {
+        "identity_percentile": 0.9778000054345214,
+        "jackknife_t": 1.0045871233399288
+      }
+    },
+    "G=50,fmr@FAR=0.01": {
+      "design_effect": 2.0977789911123246,
+      "methods": {
+        "identity_percentile": {
+          "coverage": 0.982,
+          "mc_se": 0.004204283529925166,
+          "mean_width": 0.02321604625857782
+        },
+        "identity_percentile_inflated": {
+          "coverage": 0.982,
+          "mc_se": 0.004204283529925166,
+          "mean_width": 0.02345174820254422
+        },
+        "jackknife_logit": {
+          "coverage": 0.988,
+          "mc_se": 0.003443254274665176,
+          "mean_width": 0.032077108169209854
+        },
+        "jackknife_t": {
+          "coverage": 0.961,
+          "mc_se": 0.006122009474020767,
+          "mean_width": 0.021768124007418493
+        },
+        "pair_percentile": {
+          "coverage": 0.812,
+          "mc_se": 0.01235540367612487,
+          "mean_width": 0.011991737460271662
+        }
+      },
+      "naive_binomial_variance": 9.899999999999998e-06,
+      "true_sampling_variance": 2.076801201201201e-05,
+      "truth": 0.009999999999999998,
+      "variance_ratio_estimate_over_true": {
+        "identity_percentile": 1.863283244254855,
+        "jackknife_t": 1.5761541310580645
+      }
+    },
+    "G=50,fnmr@FAR=0.01": {
+      "design_effect": 1.6815513176386767,
+      "methods": {
+        "identity_percentile": {
+          "coverage": 0.935,
+          "mc_se": 0.0077958322198467015,
+          "mean_width": 0.12484049999999997
+        },
+        "identity_percentile_inflated": {
+          "coverage": 0.937,
+          "mc_se": 0.007683163410991592,
+          "mean_width": 0.12610794873817022
+        },
+        "jackknife_logit": {
+          "coverage": 0.957,
+          "mc_se": 0.006414904519944161,
+          "mean_width": 0.13131425709367753
+        },
+        "jackknife_t": {
+          "coverage": 0.951,
+          "mc_se": 0.006826346021115546,
+          "mean_width": 0.13067537648710503
+        },
+        "pair_percentile": {
+          "coverage": 0.857,
+          "mc_se": 0.011070275515993268,
+          "mean_width": 0.09483966104756132
+        }
+      },
+      "naive_binomial_variance": 0.0006001750705732247,
+      "true_sampling_variance": 0.0010092251807362917,
+      "truth": 0.2355241432038973,
+      "variance_ratio_estimate_over_true": {
+        "identity_percentile": 1.018058044384001,
+        "jackknife_t": 1.0593272875560402
+      }
+    },
+    "G=500,fmr@FAR=0.001": {
+      "design_effect": 1.160606452298142,
+      "methods": {
+        "identity_percentile": {
+          "coverage": 0.991,
+          "mc_se": 0.0029864694875387575,
+          "mean_width": 0.0021106526331027826
+        },
+        "identity_percentile_inflated": {
+          "coverage": 0.991,
+          "mc_se": 0.0029864694875387575,
+          "mean_width": 0.002112766457000717
+        },
+        "jackknife_logit": {
+          "coverage": 0.996,
+          "mc_se": 0.0019959959919799443,
+          "mean_width": 0.0023093848354037694
+        },
+        "jackknife_t": {
+          "coverage": 0.96,
+          "mc_se": 0.00619677335393187,
+          "mean_width": 0.0018064182761482702
+        },
+        "pair_percentile": {
+          "coverage": 0.904,
+          "mc_se": 0.009315793041926167,
+          "mean_width": 0.0011955281975577835
+        }
+      },
+      "naive_binomial_variance": 9.990000000000019e-08,
+      "true_sampling_variance": 1.159445845845846e-07,
+      "truth": 0.0010000000000000018,
+      "variance_ratio_estimate_over_true": {
+        "identity_percentile": 2.610355211118627,
+        "jackknife_t": 1.8979669262448338
+      }
+    },
+    "G=500,fmr@FAR=0.01": {
+      "design_effect": 1.9063485303485306,
+      "methods": {
+        "identity_percentile": {
+          "coverage": 0.987,
+          "mc_se": 0.0035820385257559714,
+          "mean_width": 0.007721334437267531
+        },
+        "identity_percentile_inflated": {
+          "coverage": 0.987,
+          "mc_se": 0.0035820385257559714,
+          "mean_width": 0.0077290673730436325
+        },
+        "jackknife_logit": {
+          "coverage": 0.986,
+          "mc_se": 0.0037153734670958734,
+          "mean_width": 0.007039708872832591
+        },
+        "jackknife_t": {
+          "coverage": 0.975,
+          "mc_se": 0.004937104414532877,
+          "mean_width": 0.006829350043861591
+        },
+        "pair_percentile": {
+          "coverage": 0.842,
+          "mc_se": 0.011534123287012326,
+          "mean_width": 0.003845066342753918
+        }
+      },
+      "naive_binomial_variance": 9.899999999999998e-07,
+      "true_sampling_variance": 1.887285045045045e-06,
+      "truth": 0.009999999999999998,
+      "variance_ratio_estimate_over_true": {
+        "identity_percentile": 2.0780032779814728,
+        "jackknife_t": 1.619078706666229
+      }
+    },
+    "G=500,fnmr@FAR=0.01": {
+      "design_effect": 1.781700800223693,
+      "methods": {
+        "identity_percentile": {
+          "coverage": 0.949,
+          "mc_se": 0.006956938982052382,
+          "mean_width": 0.04008472499999999
+        },
+        "identity_percentile_inflated": {
+          "coverage": 0.95,
+          "mc_se": 0.006892024376045114,
+          "mean_width": 0.04012486995247498
+        },
+        "jackknife_logit": {
+          "coverage": 0.955,
+          "mc_se": 0.00655553201502365,
+          "mean_width": 0.0406351215075592
+        },
+        "jackknife_t": {
+          "coverage": 0.956,
+          "mc_se": 0.006485676526007139,
+          "mean_width": 0.04061578650207006
+        },
+        "pair_percentile": {
+          "coverage": 0.856,
+          "mc_se": 0.011102432165971564,
+          "mean_width": 0.030040407505873088
+        }
+      },
+      "naive_binomial_variance": 6.0017507057322465e-05,
+      "true_sampling_variance": 0.00010693324035146257,
+      "truth": 0.2355241432038973,
+      "variance_ratio_estimate_over_true": {
+        "identity_percentile": 0.9806963390719223,
+        "jackknife_t": 1.0002367279872193
+      }
+    }
+  },
+  "scale": "full",
+  "seed": 1010,
+  "sim_version": "1.0.0"
+}

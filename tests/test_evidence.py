@@ -63,6 +63,28 @@ def test_type_rules() -> None:
         )
 
 
+def test_data_statistics_are_not_performance_claims() -> None:
+    for r in REGISTRY.of_type(EvidenceType.DATA_STATISTIC):
+        assert (ROOT / str(r.artefact)).is_file(), r.id
+    with pytest.raises(ValueError, match="performance"):
+        EvidenceRecord(
+            id="DATA-999",
+            type=EvidenceType.DATA_STATISTIC,
+            title="t",
+            statement="the backbone reaches TAR@FAR 0.99 on the test split",
+            source="x",
+            artefact="reports/data/x.json",
+            created="2026-10-26",
+        )
+
+
+def test_public_data_summary_has_no_identifiers() -> None:
+    text = (ROOT / "reports" / "data" / "digiface_phase1b_summary.json").read_text(encoding="utf-8")
+    assert "digiface1m:" not in text and "relpath" not in text and "pair_id" not in text
+    data = json.loads(text)
+    assert data["evidence_type"] == "real_data_preparation_statistics"
+
+
 def test_simulation_statements_match_reports() -> None:
     """Spot-check that registry statements quote the committed numbers."""
     shift = json.loads((SIM_DIR / "guarantee_under_shift.json").read_text(encoding="utf-8"))

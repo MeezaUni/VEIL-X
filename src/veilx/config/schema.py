@@ -193,11 +193,26 @@ class MetricSection(_Strict):
     ]
 
 
+IntervalMethod = Literal[
+    "identity_percentile", "identity_percentile_inflated", "jackknife_t", "jackknife_logit"
+]
+
+
 class BootstrapSection(_Strict):
     unit: Literal["identity"]
     resamples: int = Field(ge=1000)
     paired_differences: Literal[True]
     validated_by_simulation_before_use: Literal[True]
+    interval_method: IntervalMethod | None = None
+    interval_method_by_statistic: dict[str, IntervalMethod] | None = None
+    interval_method_validation: str | None = None
+
+    @model_validator(mode="after")
+    def _method_needs_validation(self) -> BootstrapSection:
+        chosen = self.interval_method or self.interval_method_by_statistic
+        if chosen and not self.interval_method_validation:
+            raise ValueError("an interval method may only be selected with a validation record")
+        return self
 
 
 class ConstantSpec(_Strict):
@@ -243,8 +258,9 @@ class ConstantsSection(_Strict):
 
 
 class NearDuplicateSection(_Strict):
-    method: Literal["phash_and_embedding_cosine"]
-    threshold: float | None
+    method: Literal["phash_and_embedding_cosine", "phash_hamming_and_thumbnail_ncc"]
+    threshold: float | None  # Hamming maximum for the pHash method
+    ncc_min: float | None = None
     validated_on_split: Literal["train", "val"] | None
     validation_record: str | None
     target_duplicate_recall: ConstantSpec
@@ -258,6 +274,12 @@ class NearDuplicateSection(_Strict):
                 "near-duplicate threshold cannot be fixed without validated_on_split "
                 "and validation_record (non-test data only)"
             )
+        if (
+            self.method == "phash_hamming_and_thumbnail_ncc"
+            and self.threshold is not None
+            and self.ncc_min is None
+        ):
+            raise ValueError("the pHash+NCC rule needs both threshold (Hamming) and ncc_min")
         return self
 
 
@@ -271,6 +293,46 @@ class TestAccessSection(_Strict):
     require_final_flag: Literal[True]
     run_log: str
     real_benchmarks_final_only: Literal[True]
+
+
+class DataPreparationSection(_Strict):
+    """Verified facts about the prepared training/evaluation source (Phase 1b)."""
+
+    dataset_id: Literal["digiface1m"]
+    parts: tuple[str, ...]
+    archive_sha256: dict[str, str]
+    archive_bytes: dict[str, int]
+    checksum_source: str
+    image_size: tuple[int, int]
+    alignment: str
+    images_scanned: int
+    images_final: int
+    identities_final: int
+    identities_per_split: dict[SplitName, int]
+    images_per_split: dict[SplitName, int]
+    genuine_pairs_per_identity_cap: int = Field(ge=1)
+    far_estimation_impostor_pairs: int = Field(ge=1)
+    summary_report: str
+
+
+class OcclusionSection(_Strict):
+    generator_version: str
+    landmark_source: Literal["arcface_template"]
+    severity_levels: tuple[Literal["low", "medium", "high"], ...]
+    severity_definition: str = Field(min_length=20)
+    visibility_definition: str = Field(min_length=20)
+    level_parameters: dict[str, str]
+    lighting_note: str = Field(min_length=20)
+    stress_combinations: tuple[str, ...]
+
+
+class CalibrationPlanSection(_Strict):
+    pairing: Literal["identity_disjoint_matching"]
+    calibration_identities: int = Field(ge=1)
+    independent_genuine_pairs: int = Field(ge=1)
+    independent_impostor_pairs: int = Field(ge=1)
+    best_certifiable_fmr_zero_errors: float = Field(gt=0, lt=1)
+    note: str
 
 
 # --------------------------------------------------------------------------- root
@@ -295,6 +357,9 @@ class ResearchProtocol(_Strict):
     constants: ConstantsSection
     deduplication: DeduplicationSection
     test_access: TestAccessSection
+    data_preparation: DataPreparationSection | None = None
+    occlusion: OcclusionSection | None = None
+    calibration_plan: CalibrationPlanSection | None = None
 
     @field_validator("challenge_families")
     @classmethod

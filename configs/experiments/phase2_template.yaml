@@ -1,0 +1,26 @@
+# Template for a future Phase 2/3 run. NOT AUTHORISED: `authorized` must stay false until the
+# PI authorises Phase 2, and launching additionally requires VEILX_PHASE2_AUTHORIZED=1.
+schema_version: 1
+run_id: template-fusion-head-f1-heldout
+phase: phase2
+authorized: false
+purpose: "Template only: fit a small fusion/abstention head on frozen-backbone features."
+seed: 20261026
+device: cuda
+backbone_id: adaface_ir101_webface4m
+backbone_frozen: true
+heldout_family: F1_mask
+train_pairs: pairs/train.jsonl
+val_pairs: pairs/val.jsonl
+batch_size: 512
+grad_accumulation: 1
+max_epochs: 20
+learning_rate: 0.001
+precision:
+  mode: fp16
+  allow_tf32: false
+  deterministic: true
+checkpoint:
+  directory: checkpoints/template-fusion-head-f1-heldout
+  keep_last: 3
+  save_every_steps: 1000

@@ -25,6 +25,7 @@ import json
 import re
 from collections import Counter
 from collections.abc import Iterator, Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -53,6 +54,7 @@ IssueKind = Literal[
     "unexpected_file",
     "corrupt_image",
     "duplicate_content",
+    "duplicate_content_cross_identity",
     "unreadable_file",
 ]
 
@@ -109,11 +111,15 @@ class DigiFaceAdapter:
         registry: DatasetRegistry,
         *,
         verify_png: bool = True,
+        io_workers: int = 16,
     ) -> None:
         self.root = root
         self.bands = dict(bands)
         self.registry = registry
         self.verify_png = verify_png
+        self.io_workers = io_workers
+        self._prefetched: dict[Path, tuple[IssueKind | Literal["ok"], str, str]] = {}
+        self._ambiguous: set[str] = set()
         self._cache: tuple[list[ImageRecord], DigiFaceScanReport] | None = None
 
     # -- DatasetAdapter -------------------------------------------------------------------
@@ -179,11 +185,26 @@ class DigiFaceAdapter:
         content_owner: dict[str, str] = {}
         per_identity: Counter[int] = Counter()
         split_ids: Counter[str] = Counter()
+        processed: list[str] = []
+        self._ambiguous = set()
 
         dirs = self._identity_dirs(report)
         report.n_identity_dirs = len(dirs)
         # Sort numerically for deterministic output regardless of part ordering.
         dirs.sort(key=lambda t: (int(t[0].name) if _ID_RE.match(t[0].name) else -1, t[0].name))
+        # Prefetch per-file checks with a thread pool (file I/O dominates on real data); results
+        # are consumed in the same deterministic order as the serial path.
+        self._prefetched = {}
+        if self.io_workers > 1:
+            files = [
+                f
+                for d, _, _ in dirs
+                if _ID_RE.match(d.name)
+                for f in d.iterdir()
+                if _IMG_RE.match(f.name)
+            ]
+            with ThreadPoolExecutor(max_workers=self.io_workers) as pool:
+                self._prefetched = dict(zip(files, pool.map(self._read_check, files), strict=True))
 
         for ident_dir, part, part_range in dirs:
             name = ident_dir.name
@@ -212,9 +233,17 @@ class DigiFaceAdapter:
                     ScanIssue("identity_outside_part_range", identity_id, f"in {part}")
                 )
 
-            kept = self._scan_identity(
-                ident_dir, identity_id, expected, report, content_owner, records
-            )
+            self._scan_identity(ident_dir, identity_id, expected, report, content_owner, records)
+            processed.append(identity_id)
+
+        # Cross-identity duplicates: drop the first copy too (its label is ambiguous), then derive
+        # per-identity statistics from the final records.
+        if self._ambiguous:
+            report.n_images_excluded += sum(r.image_id in self._ambiguous for r in records)
+            records = [r for r in records if r.image_id not in self._ambiguous]
+        kept_by_id = Counter(r.identity_id for r in records)
+        for identity_id in processed:
+            kept = kept_by_id.get(identity_id, 0)
             per_identity[kept] += 1
             if kept == 0:
                 report.issues.append(ScanIssue("empty_identity", identity_id, "no valid images"))
@@ -230,6 +259,18 @@ class DigiFaceAdapter:
         report.images_per_identity_histogram = dict(sorted(per_identity.items()))
         report.split_identity_counts = dict(sorted(split_ids.items()))
         return records, report
+
+    def _read_check(self, path: Path) -> tuple[IssueKind | Literal["ok"], str, str]:
+        """(status, detail, sha256) for one file; I/O-bound, safe to run in threads."""
+        try:
+            data = path.read_bytes()
+        except OSError as exc:
+            return "unreadable_file", exc.__class__.__name__, ""
+        if self.verify_png:
+            chk = check_png_bytes(data)
+            if not chk.ok:
+                return "corrupt_image", chk.error or "invalid PNG", ""
+        return "ok", "", hashlib.sha256(data).hexdigest()
 
     def _scan_identity(
         self,
@@ -260,36 +301,37 @@ class DigiFaceAdapter:
                 )
         split = assign_split(self.dataset_id, identity_id, self.bands)
         kept = 0
-        for idx in sorted(indices):
-            path = indices[idx]
-            try:
-                data = path.read_bytes()
-            except OSError as exc:
-                report.issues.append(
-                    ScanIssue(
-                        "unreadable_file", identity_id, f"{path.name}: {exc.__class__.__name__}"
-                    )
-                )
+        paths = [indices[idx] for idx in sorted(indices)]
+        checked = [
+            self._prefetched.pop(p) if p in self._prefetched else self._read_check(p) for p in paths
+        ]
+        for idx, path, (status, detail, digest) in zip(
+            sorted(indices), paths, checked, strict=True
+        ):
+            if status != "ok":
+                report.issues.append(ScanIssue(status, identity_id, f"{path.name}: {detail}"))
                 report.n_images_excluded += 1
                 continue
-            if self.verify_png:
-                chk = check_png_bytes(data)
-                if not chk.ok:
-                    report.issues.append(
-                        ScanIssue("corrupt_image", identity_id, f"{path.name}: {chk.error}")
-                    )
-                    report.n_images_excluded += 1
-                    continue
-            digest = hashlib.sha256(data).hexdigest()
             image_id = f"{self.dataset_id}:{identity_id}:{idx}"
             if digest in content_owner:
-                report.issues.append(
-                    ScanIssue(
-                        "duplicate_content",
-                        identity_id,
-                        f"{path.name} duplicates {content_owner[digest]}; excluded",
+                owner = content_owner[digest]
+                if owner.split(":")[1] == identity_id:  # redundant copy within one identity
+                    report.issues.append(
+                        ScanIssue(
+                            "duplicate_content",
+                            identity_id,
+                            f"{path.name} duplicates {owner}; excluded",
+                        )
                     )
-                )
+                else:  # the same picture under two identities: its label is ambiguous
+                    report.issues.append(
+                        ScanIssue(
+                            "duplicate_content_cross_identity",
+                            identity_id,
+                            f"{path.name} duplicates {owner}; both excluded",
+                        )
+                    )
+                    self._ambiguous.add(owner)
                 report.n_images_excluded += 1
                 continue
             content_owner[digest] = image_id

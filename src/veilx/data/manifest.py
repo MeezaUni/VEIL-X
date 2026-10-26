@@ -41,6 +41,11 @@ class OcclusionSpec(_Record):
     geometry: dict[str, float] = Field(default_factory=dict)
     seed: int = Field(ge=0)
     generator_version: str
+    severity_level: Literal["low", "medium", "high"] | None = None
+    severity: float | None = Field(default=None, ge=0.0, le=1.0)  # occluded face fraction
+    visibility_ratio: float | None = Field(default=None, ge=0.0, le=1.0)
+    physical: bool | None = None  # False for photometric (lighting) challenges
+    recipe_sha256: str | None = None  # hash of (source pixels, family, params, version)
 
     @field_validator("family")
     @classmethod
@@ -60,6 +65,8 @@ class ImageRecord(_Record):
     source_image_id: str | None = None
     occlusion: OcclusionSpec | None = None
     real_occlusion_label: str | None = None  # e.g. ROF "masked"/"sunglasses"/"neutral"
+    pixel_sha256: str | None = None  # hash of decoded pixels (exact-duplicate key)
+    source_group: str | None = None  # root-photo group after exact/near-duplicate merging
 
     @field_validator("image_id", "dataset_id", "identity_id")
     @classmethod

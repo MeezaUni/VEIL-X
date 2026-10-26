@@ -115,7 +115,9 @@ def source_keys(images: Sequence[ImageRecord]) -> dict[str, str]:
             if root.image_id in seen:
                 break  # defensive: cycles are rejected by manifest validation anyway
             seen.add(root.image_id)
-        out[r.image_id] = root.sha256
+        # Most specific provenance available: validated duplicate group > decoded-pixel hash >
+        # file-bytes hash.
+        out[r.image_id] = root.source_group or root.pixel_sha256 or root.sha256
     return out
 
 

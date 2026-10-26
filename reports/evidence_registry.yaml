@@ -2,6 +2,7 @@
 # Types: published_result | mathematical_calculation | synthetic_simulation |
 #        real_measured_model_result | unverified_hypothesis
 # There are NO real_measured_model_result entries: no face-recognition model has been run.
+# real_data_statistic entries describe the prepared dataset only (never model performance).
 schema_version: 1
 records:
   # ------------------------------------------------------------------ published
@@ -101,6 +102,42 @@ records:
     statement: "Simulated: the one-sided 95% Clopper-Pearson upper bound covered the true rate in >= 96.5% of 4,000 draws for each tested (n, p)."
     source: "veilx.sim.experiments.binomial_bound_sanity"
     artefact: "reports/simulations/binomial_bound_sanity.json"
+    created: "2026-10-26"
+  - id: SIM-010
+    type: synthetic_simulation
+    title: "Interval methods for genuine (one-identity) and impostor (two-identity) pair rates"
+    statement: "Simulated (1,000 reps, nominal 95%): the identity percentile bootstrap covered FNMR in only 93.5% (G=50,150); the delete-one-identity logit jackknife covered 94.8-95.7%; for FMR the linear jackknife covered 96.0-97.5% (conservative) versus 98-99% for product-weight bootstrap and 81-90% for the pair bootstrap. Impostor design effect ~2 at FAR 1%."
+    source: "veilx.sim.experiments.interval_method_comparison"
+    artefact: "reports/simulations/interval_method_comparison.json"
+    created: "2026-10-26"
+    caveats: "Synthetic score model with strong identity effects; paired-difference intervals not studied."
+  - id: CALC-002
+    type: mathematical_calculation
+    title: "Benefit of additional DigiFace parts"
+    statement: "Exact Clopper-Pearson bounds from the protocol bands: adding 5-image parts P2+P3 raises independent calibration impostor pairs from 1,177 to 3,399, lowering the best certifiable selective FMR (0 false matches) from 0.25% to 0.09%."
+    source: "scripts/parts_benefit.py"
+    artefact: "scripts/parts_benefit.py"
+    created: "2026-10-26"
+  - id: DATA-001
+    type: real_data_statistic
+    title: "DigiFace-1M approved subset: integrity and counts"
+    statement: "Both approved archives matched the official sizes and passed CRC-32; 310,665 images (2,000 identities x 72, 33,333 identities x 5) decoded without error, all 112x112 RGBA with fully opaque alpha; zero layout anomalies and zero exact pixel duplicates."
+    source: "scripts/prepare_digiface.py"
+    artefact: "reports/data/digiface_phase1b_summary.json"
+    created: "2026-10-26"
+  - id: DATA-002
+    type: real_data_statistic
+    title: "Near-duplicate validation outcome on DigiFace"
+    statement: "The 99%-recall pHash+NCC rule flagged 2.95% (train) / 2.35% (val) of same-identity photo pairs and was rejected; a strict review rule nominated 676,350 cross-image pairs, and the closest inspected candidates were different synthetic people. Near-duplicate threshold left unset."
+    source: "scripts/prepare_digiface.py"
+    artefact: "reports/data/digiface_phase1b_summary.json"
+    created: "2026-10-26"
+  - id: DATA-003
+    type: real_data_statistic
+    title: "Identity splits and pair sets"
+    statement: "Identity-disjoint splits train/val/cal/test = 21,057/3,552/3,570/7,154 identities; independent calibration set of 1,190 genuine + 1,190 impostor identity-disjoint pairs; 100,000-pair impostor estimation set over 7,154 test identities."
+    source: "scripts/prepare_digiface.py"
+    artefact: "reports/data/digiface_phase1b_summary.json"
     created: "2026-10-26"
   # ------------------------------------------------------------------ hypotheses
   - id: HYP-001

@@ -5,6 +5,17 @@
 > **Nothing has been downloaded.** Sizes come from HTTP `HEAD` requests or repository
 > metadata. **Not legal advice.** Each licence is re-read at download time.
 
+## 0. Phase 1b status (2026-10-26)
+
+- **DigiFace-1M approved subset downloaded and verified:** 72-img P1 + 5-img P1, 5.90 GiB of
+  archives. 310,665 images and 35,333 identities. Sizes match, CRC passes, every image
+  decodes, and there are no anomalies or exact duplicates. Full report:
+  `data_integrity_report.md`.
+- Additional parts were **not downloaded**. Their benefit is quantified for approval in
+  `decision_log.md` (pending item 1, CALC-002).
+- ROF, MLFW, CPLFW, XQLFW and LFW: **not downloaded** (not authorised or unresolved).
+  Kaggle: still HTTP 404.
+
 ## 1. The assigned Kaggle dataset: `trainingdatapro/human-face-images`
 
 | Check | Finding | Evidence |

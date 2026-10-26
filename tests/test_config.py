@@ -42,6 +42,45 @@ def test_registered_constants_match_approved_values() -> None:
     assert c.bootstrap_ci_level.value == 0.95
 
 
+def test_v030_real_data_sections_and_frozen_constants() -> None:
+    proto = load_protocol(PROTOCOL)
+    assert proto.protocol_version == "0.3.0"
+    dp = proto.data_preparation
+    assert dp is not None and dp.images_final == 310_665 and dp.identities_final == 35_333
+    assert sum(dp.identities_per_split.values()) == dp.identities_final
+    assert sum(dp.images_per_split.values()) == dp.images_final
+    assert proto.pairs.genuine_pairs_per_identity_cap == dp.genuine_pairs_per_identity_cap == 10
+    cp = proto.calibration_plan
+    assert cp is not None and cp.independent_genuine_pairs + 2 * cp.independent_impostor_pairs <= (
+        cp.calibration_identities
+    )
+    c = proto.constants
+    assert c.confidence_level.status is ConstantStatus.FROZEN
+    assert c.cost_ratio_false_match_to_false_non_match.status is ConstantStatus.FROZEN
+    assert c.clean_noninferiority_margin_pp.status is ConstantStatus.PROVISIONAL
+    assert c.accepted_decision_error_target.status is ConstantStatus.PROVISIONAL
+    assert proto.deduplication.near_duplicate.threshold is None  # validation failed: stays unset
+    assert proto.bootstrap.interval_method_by_statistic == {
+        "genuine_pair_rates": "jackknife_logit",
+        "impostor_pair_rates": "jackknife_t",
+    }
+
+
+def test_interval_method_needs_validation_record(mutable_protocol: dict[str, Any]) -> None:
+    mutable_protocol["bootstrap"]["interval_method_validation"] = None
+    with pytest.raises(ValueError, match="validation record"):
+        _validate(mutable_protocol)
+
+
+def test_phash_rule_needs_both_thresholds(mutable_protocol: dict[str, Any]) -> None:
+    nd = mutable_protocol["deduplication"]["near_duplicate"]
+    nd.update(threshold=14, validated_on_split="val", validation_record="x", ncc_min=None)
+    with pytest.raises(ValueError, match="ncc_min"):
+        _validate(mutable_protocol)
+    nd["ncc_min"] = 0.9
+    _validate(mutable_protocol)
+
+
 def test_lighting_is_flagged_non_physical() -> None:
     proto = load_protocol(PROTOCOL)
     lighting = proto.challenge_families[-1]
@@ -113,11 +152,13 @@ def test_isolation_scope_must_cover_required_stages(mutable_protocol: dict[str, 
 def test_dedup_threshold_cannot_be_fixed_without_validation(
     mutable_protocol: dict[str, Any],
 ) -> None:
-    mutable_protocol["deduplication"]["near_duplicate"]["threshold"] = 0.9
+    nd = mutable_protocol["deduplication"]["near_duplicate"]
+    nd["threshold"] = 14
+    nd["ncc_min"] = 0.9
     with pytest.raises(ValueError, match="validation"):
         _validate(mutable_protocol)
-    mutable_protocol["deduplication"]["near_duplicate"]["validated_on_split"] = "val"
-    mutable_protocol["deduplication"]["near_duplicate"]["validation_record"] = "docs/dedup.md"
+    nd["validated_on_split"] = "val"
+    nd["validation_record"] = "docs/dedup.md"
     _validate(mutable_protocol)
 
 

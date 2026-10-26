@@ -26,7 +26,7 @@ datasets:
       - "Synthetic rendering: domain gap to real photographs"
       - "Rendered faces may resemble real people (README disclaimer)"
       - "Whether DigiFace was used to train any chosen backbone checkpoint: not verified"
-    notes: "Phase 1 subset proposal: 72-img part P1 (2,000 IDs) + 5-img part P1 (~33,333 IDs) for identity-disjoint calibration capacity. Download requires separate go-ahead."
+    notes: "Phase 1b (2026-10-26): approved subset 72-img P1 (2,000 IDs) + 5-img P1 (33,333 IDs) downloaded and verified (310,665 images, 0 anomalies); see docs/data_integrity_report.md. Further parts not downloaded (pending approval)."
 
   - id: rof
     name: "Real World Occluded Faces (ROF), BIOSIG 2021"

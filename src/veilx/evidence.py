@@ -6,6 +6,8 @@ Categories (never interchangeable):
 * ``mathematical_calculation``   — exact calculation (e.g. binomial sample-size bounds);
 * ``synthetic_simulation``       — Monte Carlo on synthetic scores; never face-recognition evidence;
 * ``real_measured_model_result`` — measured on real data with a real model (needs full provenance);
+* ``real_data_statistic``        — measured facts about prepared data (counts, integrity, splits);
+  never a statement about model performance;
 * ``unverified_hypothesis``      — a claim not yet tested.
 
 The registry lives in ``reports/evidence_registry.yaml``; tests check that every simulation report
@@ -33,7 +35,11 @@ class EvidenceType(StrEnum):
     CALCULATION = "mathematical_calculation"
     SIMULATION = "synthetic_simulation"
     MEASURED = "real_measured_model_result"
+    DATA_STATISTIC = "real_data_statistic"  # facts about prepared data; never model performance
     HYPOTHESIS = "unverified_hypothesis"
+
+
+_PERFORMANCE_WORDS = ("tar@", "tar ", "far ", "eer", "auc", "accuracy", "fnmr", "fmr ")
 
 
 class EvidenceRecord(BaseModel):
@@ -62,6 +68,12 @@ class EvidenceRecord(BaseModel):
             missing = REQUIRED_MEASURED_PROVENANCE - set(self.provenance)
             if missing:
                 raise ValueError(f"{self.id}: measured results need provenance {sorted(missing)}")
+        if self.type is EvidenceType.DATA_STATISTIC:
+            if not (self.artefact or "").startswith("reports/data/"):
+                raise ValueError(f"{self.id}: data statistics live in reports/data/")
+            text = f" {self.statement.lower()} "
+            if any(w in text for w in _PERFORMANCE_WORDS):
+                raise ValueError(f"{self.id}: data statistics may not state model performance")
         return self
 
 

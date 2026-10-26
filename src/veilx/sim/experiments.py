@@ -40,6 +40,7 @@ from veilx.sim.model import (
 )
 from veilx.stats.bootstrap import bootstrap_ci, weighted_rate
 from veilx.stats.feasibility import clopper_pearson_upper
+from veilx.stats.jackknife import jackknife_interval
 
 Scale = Literal["quick", "full"]
 SIM_VERSION = "1.0.0"
@@ -652,7 +653,130 @@ def binomial_bound_sanity(scale: Scale = "full", seed: int = 909) -> dict[str, A
     return _wrap("binomial_bound_sanity", scale, seed, {"reps": reps}, out)
 
 
+# --------------------------------------------------------------------------- E10 interval methods
+
+
+def _inflated(res_lo: float, res_hi: float, est: float, g: int) -> tuple[float, float]:
+    f = math.sqrt(g / (g - 1))
+    return est + f * (res_lo - est), est + f * (res_hi - est)
+
+
+def interval_method_comparison(scale: Scale = "full", seed: int = 1010) -> dict[str, Any]:
+    """Coverage of five 95% interval methods for FNMR (one-identity pairs) and FMR (two-identity
+    impostor pairs) under strong identity effects, versus the number of test identities.
+
+    Methods: pair percentile bootstrap, identity percentile bootstrap (product weights for
+    impostors), identity bootstrap with sqrt(G/(G-1)) inflation, delete-one-identity jackknife
+    (t), and the same jackknife on the logit scale. Also reports the impostor design effect
+    (true variance of FMR-hat / naive binomial variance) quantifying two-identity dependence.
+    """
+    reps, n_boot = (1000, 500) if scale == "full" else (60, 150)
+    sizes = [50, 150, 500] if scale == "full" else [50, 150]
+    model = BASE.with_(sigma_identity_genuine=0.8, sigma_identity_impostor=0.5)
+    g_per_id, imp_per_id = 6, 20
+    conditions = [("fnmr", 0.01), ("fmr", 0.01), ("fmr", 0.001)]
+    out: dict[str, Any] = {}
+    for g_ids in sizes:
+        for stat_name, far in conditions:
+            if far == 0.001 and g_ids < 500:
+                continue  # expected false matches would be < 10: not estimable (protocol rule)
+            t = population_threshold_at_far(model, far)
+            tr = rule_truth(model, ThresholdRule(t, t))
+            truth = tr.err_g / tr.acc_g if stat_name == "fnmr" else tr.err_i / tr.acc_i
+            hits: dict[str, int] = dict.fromkeys(
+                (
+                    "pair_percentile",
+                    "identity_percentile",
+                    "identity_percentile_inflated",
+                    "jackknife_t",
+                    "jackknife_logit",
+                ),
+                0,
+            )
+            widths: dict[str, list[float]] = {k: [] for k in hits}
+            ests: list[float] = []
+            var_est: dict[str, list[float]] = {
+                k: [] for k in ("jackknife_t", "identity_percentile")
+            }
+            for rep in range(reps):
+                rng = make_rng(seed, "e10", g_ids, stat_name, str(far), rep)
+                n_g, n_i = g_ids * g_per_id, g_ids * imp_per_id
+                sp = sample_pairs(
+                    model,
+                    n_g + n_i,
+                    rng,
+                    genuine_fraction=n_g / (n_g + n_i),
+                    design="clustered",
+                    n_identities=g_ids,
+                    genuine_per_identity=g_per_id,
+                )
+                g, acc = sp.labels == 1, sp.scores >= t
+                num, den = (g & ~acc, g) if stat_name == "fnmr" else (~g & acc, ~g)
+                stat = weighted_rate(num, den)
+                ivs: dict[str, tuple[float, float]] = {}
+                units: tuple[Literal["pair", "identity"], ...] = ("pair", "identity")
+                for u in units:
+                    unit = u
+                    r = bootstrap_ci(
+                        stat,
+                        n_pairs=sp.labels.size,
+                        unit=u,
+                        n_boot=n_boot,
+                        rng=make_rng(seed, "e10b", g_ids, stat_name, str(far), rep, unit),
+                        id_a=sp.id_a,
+                        id_b=sp.id_b,
+                    )
+                    ivs[f"{unit}_percentile"] = (r.ci_low, r.ci_high)
+                    if unit == "identity":
+                        ivs["identity_percentile_inflated"] = _inflated(
+                            r.ci_low, r.ci_high, r.estimate, g_ids
+                        )
+                        var_est["identity_percentile"].append(
+                            ((r.ci_high - r.ci_low) / (2 * 1.96)) ** 2
+                        )
+                for scale_name, key in (("linear", "jackknife_t"), ("logit", "jackknife_logit")):
+                    j = jackknife_interval(num, den, sp.id_a, sp.id_b, scale=scale_name)
+                    ivs[key] = (j.ci_low, j.ci_high)
+                    if key == "jackknife_t":
+                        var_est["jackknife_t"].append(j.se**2)
+                        ests.append(j.estimate)
+                for k, (lo, hi) in ivs.items():
+                    hits[k] += int(lo <= truth <= hi)
+                    widths[k].append(hi - lo)
+            true_var = float(np.var(ests, ddof=1))
+            n_den = (g_ids * g_per_id) if stat_name == "fnmr" else (g_ids * imp_per_id)
+            res: dict[str, Any] = {
+                "truth": truth,
+                "methods": {
+                    k: {
+                        "coverage": hits[k] / reps,
+                        "mc_se": _mc_se(hits[k] / reps, reps),
+                        "mean_width": float(np.mean(widths[k])),
+                    }
+                    for k in hits
+                },
+                "true_sampling_variance": true_var,
+                "naive_binomial_variance": truth * (1 - truth) / n_den,
+                "design_effect": true_var / (truth * (1 - truth) / n_den),
+                "variance_ratio_estimate_over_true": {
+                    k: float(np.mean(v)) / true_var for k, v in var_est.items()
+                },
+            }
+            out[f"G={g_ids},{stat_name}@FAR={far}"] = res
+    params = {
+        "model": asdict(model),
+        "reps": reps,
+        "n_boot": n_boot,
+        "genuine_per_identity": g_per_id,
+        "impostor_pairs_per_identity": imp_per_id,
+        "nominal": 0.95,
+        "acceptance_rule": "coverage >= 0.94 in every condition (MC se ~0.007 at 1000 reps)",
+    }
+    return _wrap("interval_method_comparison", scale, seed, params, out)
+
+
 EXPERIMENTS: dict[str, Callable[..., dict[str, Any]]] = {
+    "interval_method_comparison": interval_method_comparison,
     "bootstrap_coverage": bootstrap_coverage,
     "independence_vs_correlation": independence_vs_correlation,
     "calibration_sample_size": calibration_sample_size,
