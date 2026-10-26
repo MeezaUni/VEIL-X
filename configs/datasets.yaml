@@ -1,0 +1,182 @@
+# =============================================================================
+# VEIL-X dataset registry — validated by src/veilx/config/schema.py (DatasetRegistry)
+# Human-readable companion: docs/dataset_feasibility.md
+# access_status: confirmed | conditional | unresolved | blocked
+# Only "confirmed" datasets are returned by DatasetRegistry.usable_for(role).
+# Nothing here has been downloaded. Sizes come from HTTP HEAD / repository metadata only.
+# =============================================================================
+schema_version: 1
+checked_on: "2026-10-26"
+datasets:
+  - id: digiface1m
+    name: "DigiFace-1M (Microsoft, WACV 2023)"
+    url: "https://github.com/microsoft/DigiFace1M"
+    licence: "Research Use of Data Agreement v1.0 (R-UDA): non-commercial research; redistribution only with attribution and R-UDA binding"
+    licence_source: "https://raw.githubusercontent.com/microsoft/DigiFace1M/main/LICENSE"
+    licence_verified_on: "2026-10-26"
+    access_status: confirmed
+    identity_labels: "yes"
+    n_identities: 110000
+    n_images: 1220000
+    images_per_identity: "72 (IDs 0-9,999, 5 parts of 2,000) or 5 (IDs 100,000-199,998, 3 parts of ~33,333)"
+    download_size: "72-img parts 2.73-2.74 GiB each; 5-img parts 3.16-3.17 GiB each; ~23.2 GiB total (HTTP HEAD, 2026-10-26)"
+    roles: [train, val, cal, test_synth, visibility_training]
+    test_only: false
+    contamination_risks:
+      - "Synthetic rendering: domain gap to real photographs"
+      - "Rendered faces may resemble real people (README disclaimer)"
+      - "Whether DigiFace was used to train any chosen backbone checkpoint: not verified"
+    notes: "Phase 1 subset proposal: 72-img part P1 (2,000 IDs) + 5-img part P1 (~33,333 IDs) for identity-disjoint calibration capacity. Download requires separate go-ahead."
+
+  - id: rof
+    name: "Real World Occluded Faces (ROF), BIOSIG 2021"
+    url: "https://github.com/ekremerakin/RealWorldOccludedFaces"
+    licence: "Repository: MIT (copyright M. E. Erakin 2021). Images collected via Google Image Search; image copyright not granted by the MIT licence"
+    licence_source: "https://github.com/ekremerakin/RealWorldOccludedFaces/blob/main/LICENSE"
+    licence_verified_on: "2026-10-26"
+    access_status: conditional
+    conditions:
+      - "PI/institution confirms that non-commercial academic evaluation on web-collected images of real people is ethically and legally acceptable (e.g. ethics office or supervisor sign-off)"
+      - "Images ship inside pickle files: load only with a restricted unpickler in an isolated process, never plain pickle.load on untrusted data"
+      - "Test-only: no tuning, threshold or design decision may use ROF"
+    identity_labels: "yes"
+    n_identities: 180
+    n_images: 5559
+    images_per_identity: "All 180 have neutral images; 70 have masked + sunglasses; 110 sunglasses only (3,195 neutral / 1,686 sunglasses / 678 masked)"
+    download_size: "Repository ~4.8 MB (GitHub API size field)"
+    roles: [test_real]
+    test_only: true
+    contamination_risks:
+      - "Collected with a VGGFace2-like pipeline: identities may overlap backbone pretraining data"
+      - "Small: identity-cluster CIs will be wide (180 / 70 units)"
+    notes: "Primary real-occlusion test if conditions are met."
+
+  - id: mlfw
+    name: "MLFW: Masked LFW (BUPT)"
+    url: "http://whdeng.cn/mlfw"
+    licence: "Not retrieved (page did not render for automated fetch on 2026-10-26)"
+    licence_source: "unresolved"
+    licence_verified_on: null
+    access_status: unresolved
+    identity_labels: "yes"
+    images_per_identity: "Derived from CALFW; 6,000-pair protocol reported in literature (count unverified)"
+    roles: [test_real]
+    test_only: true
+    contamination_risks:
+      - "LFW-derived celebrity identities: likely overlap with backbone pretraining data"
+      - "Synthetic masks (not real occlusion)"
+    notes: "Manual licence check required in a browser."
+
+  - id: cplfw
+    name: "Cross-Pose LFW (CPLFW)"
+    url: "http://whdeng.cn/CPLFW/index.html"
+    licence: "No licence text on project page (checked 2026-10-26)"
+    licence_source: "http://whdeng.cn/CPLFW/index.html"
+    licence_verified_on: null
+    access_status: unresolved
+    identity_labels: "yes"
+    images_per_identity: "3,000 positive pairs + same-gender/race negative pairs; 10-fold protocol; pairs_CPLFW.txt"
+    roles: [test_real]
+    test_only: true
+    contamination_risks:
+      - "LFW-derived celebrity identities: likely overlap with backbone pretraining data"
+    notes: "Pose self-occlusion stress test, not one of the five challenge families."
+
+  - id: xqlfw
+    name: "Cross-Quality LFW (XQLFW), FG 2021"
+    url: "https://martlgap.github.io/xqlfw"
+    licence: "No explicit licence on project page (checked 2026-10-26); see GitHub repo martlgap/xqlfw"
+    licence_source: "https://martlgap.github.io/xqlfw"
+    licence_verified_on: null
+    access_status: unresolved
+    identity_labels: "yes"
+    n_identities: 3743
+    n_images: 7263
+    images_per_identity: "6,000 pairs (3,000 genuine / 3,000 impostor, same gender and race)"
+    roles: [test_real]
+    test_only: true
+    contamination_risks:
+      - "LFW-derived; synthetic degradation"
+    notes: "Quality-shift control, not an occlusion family."
+
+  - id: lfw
+    name: "Labeled Faces in the Wild"
+    url: "https://vis-www.cs.umass.edu/lfw/"
+    licence: "No formal licence located; site disclaimer restricts interpretation (not for vetting commercial systems)"
+    licence_source: "unresolved (official host unreachable from this environment on 2026-10-26)"
+    licence_verified_on: null
+    access_status: unresolved
+    identity_labels: "yes"
+    n_identities: null
+    n_images: null
+    roles: [none]
+    test_only: true
+    contamination_risks: ["Celebrity identities likely in backbone pretraining data"]
+    notes: "Not approved for use; listed because MLFW/CPLFW/XQLFW derive from it."
+
+  - id: celeba
+    name: "CelebA"
+    url: "https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html"
+    licence: "Non-commercial research only; no redistribution; identity labels released upon request"
+    licence_source: "https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html"
+    licence_verified_on: "2026-10-26"
+    access_status: conditional
+    conditions:
+      - "Optional only; not a project dependency"
+      - "Identity labels must be obtained through the official request route"
+    identity_labels: "unknown"
+    n_identities: 10177
+    n_images: 202599
+    roles: [none]
+    test_only: false
+    contamination_risks: ["Celebrity identities likely in backbone pretraining data"]
+
+  - id: kaggle_trainingdatapro_human_face_images
+    name: "Kaggle trainingdatapro/human-face-images (assigned)"
+    url: "https://www.kaggle.com/datasets/trainingdatapro/human-face-images"
+    licence: "Unknown: dataset page returned HTTP 404 on 2026-10-26 (control Kaggle pages returned 200); public API returned 403 without credentials"
+    licence_source: "unresolved"
+    licence_verified_on: null
+    access_status: blocked
+    identity_labels: "unknown"
+    roles: [none]
+    test_only: false
+    contamination_risks:
+      - "Provider publishes free samples of commercial datasets; terms of this item unknown"
+    notes: "Cannot be assessed or used until the owner page is reachable and its licence and identity labelling are confirmed. Never usable for verification without identity labels."
+
+  - id: faceocc
+    name: "FaceOcc (occlusion masks)"
+    url: "https://arxiv.org/abs/2201.08425"
+    licence: "Not retrieved"
+    licence_source: "unresolved"
+    licence_verified_on: null
+    access_status: unresolved
+    identity_labels: "no"
+    roles: [none]
+    test_only: false
+    contamination_risks: ["Contains masks, glasses and hands: would leak held-out families into visibility training"]
+    notes: "Excluded from the leave-one-family-out protocol."
+
+  - id: ms1m_vggface2
+    name: "MS-Celeb-1M / VGGFace2 and derivatives"
+    url: "https://exposing.ai/about/news/"
+    licence: "Withdrawn by creators"
+    licence_source: "public reporting"
+    licence_verified_on: null
+    access_status: blocked
+    identity_labels: "yes"
+    roles: [none]
+    test_only: false
+    notes: "Never used for VEIL-X training or evaluation."
+
+  - id: ijb
+    name: "IARPA Janus Benchmarks (IJB-B/C/S)"
+    url: "https://www.nist.gov/"
+    licence: "Restricted access; assumed unavailable (project brief)"
+    licence_source: "project brief"
+    licence_verified_on: null
+    access_status: blocked
+    identity_labels: "yes"
+    roles: [none]
+    test_only: true

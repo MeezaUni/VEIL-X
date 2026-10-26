@@ -1,0 +1,75 @@
+[project]
+name = "veilx"
+version = "0.0.1"
+description = "VEIL-X: research scaffold for risk-controlled two-image face verification under occlusion (non-commercial academic research)."
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = { text = "Code: MIT. Data and pretrained weights carry their own non-commercial terms; see docs/dataset_feasibility.md." }
+authors = [{ name = "VEIL-X contributors" }]
+dependencies = [
+    "numpy>=1.26,<3",
+    "pydantic>=2.6,<3",
+    "PyYAML>=6.0,<7",
+]
+
+# Phase 0 deliberately has no torch / onnxruntime / insightface dependency; they are added
+# only after the separate go-ahead for model weights and datasets.
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+    "mypy>=1.10",
+    "types-PyYAML",
+]
+
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/veilx"]
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "structural: scaffold / schema / protocol-structure tests (no data, no models)",
+]
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PTH", "S"]
+ignore = [
+    "S101",  # assert is fine in tests
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "PLR2004"]
+"scripts/**" = ["S603", "S607"]
+"src/veilx/provenance.py" = ["S603", "S607"]
+
+# ---------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["veilx"]
+plugins = ["pydantic.mypy"]
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+# Optional at runtime (seeded only if installed); not a Phase 0 dependency.
+module = ["torch"]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true

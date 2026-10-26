@@ -1,0 +1,208 @@
+# =============================================================================
+# VEIL-X research protocol — versioned, validated by src/veilx/config/schema.py
+# Human-readable companion: docs/protocol_design.md
+#
+# status: provisional  -> constants may still change (each change logged in docs/decision_log.md)
+# status: frozen       -> schema refuses any remaining provisional constant
+# Values marked provisional were proposed by the PI on 2026-10-26 and await feasibility
+# sign-off (see scripts/feasibility_report.py and docs/protocol_design.md section 7).
+# =============================================================================
+schema_version: 1
+protocol_id: veilx-c3c1
+protocol_version: 0.1.0
+status: provisional
+
+project:
+  name: VEIL-X
+  usage: non-commercial-academic-research
+  scope: one-to-one-verification-only
+
+seeds:
+  global_seed: 20261026
+  experiment_seeds: [0, 1, 2]
+
+backbones:
+  primary:
+    id: adaface_ir101_webface4m
+    family: adaface
+    frozen: true
+    weights_licence: "Code MIT; WebFace-trained weights: no commercial use (model card / repo)"
+    weights_status: not_downloaded
+  secondary:
+    id: arcface_iresnet_insightface
+    family: arcface
+    frozen: true
+    weights_licence: "InsightFace pretrained models: non-commercial research only"
+    weights_status: not_downloaded
+
+detector:
+  id: insightface_scrfd
+  weights_licence: "InsightFace pretrained models: non-commercial research only"
+  failure_policy_selective: abstain          # counted as ABSTAIN in selective metrics
+  failure_policy_score: forced_non_match     # score = -inf in ROC/TAR metrics
+  report_failure_rate_per_family: true
+
+challenge_families:
+  - id: F1_mask
+    label: "Face masks (lower face)"
+    physical_occlusion: true
+    interpretation: occlusion
+    real_counterparts: [rof_masked, mlfw]
+  - id: F2_sunglasses
+    label: "Sunglasses (upper face)"
+    physical_occlusion: true
+    interpretation: occlusion
+    real_counterparts: [rof_sunglasses]
+  - id: F3_hand_object
+    label: "Hands and handheld objects"
+    physical_occlusion: true
+    interpretation: occlusion
+    real_counterparts: []
+  - id: F4_random_patch
+    label: "Random geometric patches"
+    physical_occlusion: true
+    interpretation: occlusion
+    real_counterparts: []
+  - id: F5_extreme_lighting
+    label: "Extreme lighting (shadow, saturation, underexposure)"
+    physical_occlusion: false
+    interpretation: separate_photometric      # reported and interpreted separately
+    real_counterparts: []
+
+heldout:
+  scheme: leave_one_family_out
+  isolation_scope:
+    - feature_selection
+    - model_fitting
+    - threshold_selection
+    - hyperparameter_optimization
+    - calibration
+    - visibility_estimator_training
+    - occluder_asset_selection
+    - deduplication_threshold_validation
+
+splits:
+  unit: identity
+  hash_function: sha256
+  key_template: "{dataset}:{identity_id}"
+  bands:            # half-open [lo, hi) over bucket = sha256(key)[:8] mod 100
+    train: [0, 60]
+    val: [60, 70]
+    cal: [70, 80]
+    test: [80, 100]
+  variants_inherit_source_split: true
+
+pairs:
+  strata:
+    - clean_clean
+    - clean_occluded
+    - occluded_occluded_same_family
+    - occluded_occluded_cross_family
+  genuine_fraction_constructed_sets: 0.5
+  genuine_pairs_per_identity_cap: 20
+  min_impostor_pairs_factor: 10             # >= 10 / FAR impostor pairs per reported FAR
+  primary_calibration_pairing: identity_disjoint_matching
+  sensitivity_calibration_pairing: [one_pair_per_identity_pair, all_pairs]
+  official_benchmark_pairs: report_as_is_and_separately
+
+calibration:
+  method: learn_then_test
+  prediction_target: >-
+    For a calibration pair, the loss is 1 if the system ACCEPTS the pair (outputs MATCH or
+    NON-MATCH rather than ABSTAIN) and that decision disagrees with the ground-truth
+    same-identity label, else 0; the controlled quantity is the error rate among accepted
+    pairs. The score fed to the decision rule is the calibrated p(match) of the arm under
+    test (raw cosine for raw-backbone arms). Alignment failures are abstentions.
+  controlled_risk: selective_error_among_accepted
+  secondary_controlled_risks: [selective_fmr, selective_fnmr]
+  pvalue: binomial_exact
+  fwer_procedure: fixed_sequence
+  lambda_grid: tau_low_tau_high_cmin
+  stratification_arms: [global, visibility_strata, oracle_family]
+  assumptions:
+    - "A1 Exchangeability: calibration and test pairs are i.i.d. draws from the same distribution. Holds by construction only for Test-ID (seen families, disjoint identities of the same source). It does NOT hold for held-out families, real-occlusion sets (ROF) or other benchmarks."
+    - "A2 Independence: calibration pairs are mutually independent. Enforced by an identity-disjoint matching (each identity appears in at most one calibration pair)."
+    - "A3 Calibration isolation: the score function, fusion model, visibility estimator, quality model and lambda grid are fixed using train/val only, before the calibration data are examined."
+    - "A4 Composition: the selective error among accepted pairs depends on the genuine:impostor mix. The guarantee applies to the calibration composition (genuine fraction 0.5) and is not claimed for other mixes; class-conditional sFMR/sFNMR are reported alongside."
+    - "A5 Marginal validity: the guarantee is marginal over pairs, not conditional on identity, stratum or family, except per-stratum guarantees under stratified calibration, each with its own sample-size check."
+    - "A6 Multiple testing: lambda values are tested in a pre-specified fixed sequence (or Bonferroni), controlling family-wise error over the grid."
+  guarantee_scope_statement: >-
+    Finite-sample risk control is claimed only under A1-A6, i.e. for test data exchangeable
+    with the calibration data. On held-out challenge families and on real-occlusion
+    benchmarks the guarantee is not claimed; the realised error versus target is measured
+    and reported as an empirical outcome (hypothesis H2a).
+
+metrics:
+  primary_selective_metric: augrc
+  report:
+    - tar_at_far
+    - roc_auc
+    - eer
+    - risk_coverage_curve
+    - aurc
+    - augrc
+    - selective_fmr
+    - selective_fnmr
+    - coverage_overall_genuine_impostor
+    - guarantee_violation_ratio
+    - ece
+    - brier
+    - alignment_failure_rate
+    - latency_p50_p95_p99
+  tar_at_far_modes: [benchmark_threshold_on_test, deployment_threshold_from_cal]
+
+bootstrap:
+  unit: identity
+  resamples: 2000
+  paired_differences: true
+  validated_by_simulation_before_use: true
+
+constants:
+  clean_noninferiority_margin_pp:
+    value: 0.5
+    status: provisional
+    rationale: "Max tolerated drop in clean-pair TAR@FAR=1% (percentage points) for H4."
+    feasibility: "Detectability depends on clean test-pair count; to be checked by simulation in Phase 1."
+  cost_ratio_false_match_to_false_non_match:
+    value: 10
+    status: provisional
+    rationale: "Cost-weighted selective risk and tie-breaking among LTT-valid operating points."
+    feasibility: "Reporting weight only; no sample-size implication."
+  confidence_level:
+    value: 0.95
+    status: provisional
+    rationale: "1 - delta for Learn-then-Test risk control."
+    feasibility: "See feasibility report sections A-C."
+  accepted_decision_error_target:
+    value: 0.05
+    status: provisional
+    rationale: "Initial target for error among accepted decisions (controlled risk)."
+    feasibility: "Certifiable with identity-disjoint DigiFace calibration sets; see report section B/C."
+  far_operating_points:
+    value: [0.01, 0.001]
+    status: provisional
+    rationale: "Operating points for TAR@FAR and selective FMR reporting."
+    feasibility: "FAR=0.01 certifiable from >=299 independent impostor pairs with 0 FM; FAR=0.001 needs >=2,995 (report section A) - estimation only unless a large-ID calibration source is used."
+  bootstrap_ci_level:
+    value: 0.95
+    status: provisional
+    rationale: "Two-sided identity-cluster bootstrap confidence intervals."
+    feasibility: "Interval validity to be checked by simulation before use (bootstrap.validated_by_simulation_before_use)."
+
+deduplication:
+  exact: sha256_of_decoded_pixels
+  near_duplicate:
+    method: phash_and_embedding_cosine
+    threshold: null                 # NOT fixed: set only after validation on non-test data
+    validated_on_split: null
+    validation_record: null
+    target_duplicate_recall:
+      value: 0.99
+      status: provisional
+      rationale: "Recall on synthetic known-duplicate positives built from train/val images."
+  removal_side: non_test
+
+test_access:
+  require_final_flag: true
+  run_log: results/test_runs.jsonl
+  real_benchmarks_final_only: true

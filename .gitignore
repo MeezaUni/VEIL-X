@@ -1,0 +1,128 @@
+# =====================================================================
+# VEIL-X .gitignore — privacy-first. Biometric data never enters git.
+# =====================================================================
+
+# ---- Datasets, biometric media, derived biometric data ---------------
+data/
+datasets/
+raw/
+cache/
+embeddings/
+manifests/local/
+pairs/local/
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.gif
+*.tif
+*.tiff
+*.webp
+*.heic
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.npy
+*.npz
+*.zarr/
+*.parquet
+*.h5
+*.hdf5
+*.lmdb
+*.rec
+*.idx
+*.pkl
+*.pickle
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# Allow-list: small synthetic, non-biometric test fixtures only
+!tests/fixtures/synthetic/**
+# Allow-list: source packages whose names collide with the data-directory rules above
+# (code only; image/array/archive extension rules still apply inside them).
+!src/veilx/data/
+
+# ---- Personal documents (defence in depth) ---------------------------
+*.pdf
+*.docx
+*.doc
+*.xlsx
+*.xls
+*.pptx
+*.ppt
+*.lnk
+*.url
+# Allow docs written for this project as Markdown only (docs/*.md is not ignored).
+
+# ---- Model weights and checkpoints -----------------------------------
+weights/
+checkpoints/
+models/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.safetensors
+*.bin
+*.engine
+*.tflite
+*.pb
+
+# ---- Experiment outputs and artefacts --------------------------------
+results/
+outputs/
+artifacts/
+runs/
+logs/
+mlruns/
+wandb/
+figures/generated/
+*.log
+
+# ---- Credentials, secrets and local configuration --------------------
+.env
+.env.*
+*.env
+.kaggle/
+kaggle.json
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*
+secrets*
+configs/local/
+*.local.yaml
+*.local.yml
+
+# ---- Python / tooling caches -----------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+
+# ---- Editors / OS / agent tooling ------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+.remember/
+.claude/
