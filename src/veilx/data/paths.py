@@ -38,8 +38,23 @@ class DataLayout:
     def private_reports(self) -> Path:  # private reports (may list image ids)
         return self.root / "reports"
 
+    @property
+    def models(self) -> Path:  # third-party model weights (licence-restricted; never committed)
+        return self.root / "models"
+
+    @property
+    def embeddings(self) -> Path:  # extracted embeddings (biometric templates; private)
+        return self.root / "embeddings"
+
     def ensure(self) -> DataLayout:
-        for p in (self.raw, self.extracted, self.manifests, self.private_reports):
+        for p in (
+            self.raw,
+            self.extracted,
+            self.manifests,
+            self.private_reports,
+            self.models,
+            self.embeddings,
+        ):
             p.mkdir(parents=True, exist_ok=True)
         return self
 

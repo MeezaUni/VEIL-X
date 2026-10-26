@@ -1,0 +1,106 @@
+{
+  "evidence_type": "mathematical_calculation",
+  "protocol_version": "0.4.0",
+  "confidence": 0.95,
+  "targets": [
+    0.05,
+    0.01,
+    0.001
+  ],
+  "calibration_identities": 10227,
+  "identity_disjoint": true,
+  "global": {
+    "genuine": {
+      "n": 3409,
+      "best_certifiable_rate_zero_errors": 0.0008783855608292317,
+      "max_errors_still_certifiable": {
+        "0.05": 149,
+        "0.01": 24,
+        "0.001": 0
+      }
+    },
+    "impostor": {
+      "n": 3409,
+      "best_certifiable_rate_zero_errors": 0.0008783855608292317,
+      "max_errors_still_certifiable": {
+        "0.05": 149,
+        "0.01": 24,
+        "0.001": 0
+      }
+    }
+  },
+  "zero_error_n_needed": {
+    "0.05": 59,
+    "0.01": 299,
+    "0.001": 2995
+  },
+  "zero_error_n_needed_per_stratum_delta_over_3": {
+    "0.05": 80,
+    "0.01": 408,
+    "0.001": 4093
+  },
+  "stratified_approx": {
+    "clean": {
+      "genuine": {
+        "n": 852,
+        "best_certifiable_rate_zero_errors": 0.004794040463595446,
+        "max_errors_still_certifiable": {
+          "0.05": 29,
+          "0.01": 2,
+          "0.001": null
+        }
+      },
+      "impostor": {
+        "n": 852,
+        "best_certifiable_rate_zero_errors": 0.004794040463595446,
+        "max_errors_still_certifiable": {
+          "0.05": 29,
+          "0.01": 2,
+          "0.001": null
+        }
+      }
+    },
+    "vis_high": {
+      "genuine": {
+        "n": 1278,
+        "best_certifiable_rate_zero_errors": 0.0031985860791191216,
+        "max_errors_still_certifiable": {
+          "0.05": 47,
+          "0.01": 5,
+          "0.001": null
+        }
+      },
+      "impostor": {
+        "n": 1278,
+        "best_certifiable_rate_zero_errors": 0.0031985860791191216,
+        "max_errors_still_certifiable": {
+          "0.05": 47,
+          "0.01": 5,
+          "0.001": null
+        }
+      }
+    },
+    "vis_low": {
+      "genuine": {
+        "n": 1278,
+        "best_certifiable_rate_zero_errors": 0.0031985860791191216,
+        "max_errors_still_certifiable": {
+          "0.05": 47,
+          "0.01": 5,
+          "0.001": null
+        }
+      },
+      "impostor": {
+        "n": 1278,
+        "best_certifiable_rate_zero_errors": 0.0031985860791191216,
+        "max_errors_still_certifiable": {
+          "0.05": 47,
+          "0.01": 5,
+          "0.001": null
+        }
+      }
+    }
+  },
+  "far_0.1pct_certifiable": true,
+  "note": "Upper bounds at full coverage. A selective rule accepts only part of each class, so certified rates are worse. FAR 0.1 % remains estimation-only by protocol (D-034) even when zero-error capacity is reached: one false match would break it."
+}

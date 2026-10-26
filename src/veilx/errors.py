@@ -35,5 +35,10 @@ class InsufficientSamplesError(VeilxError):
     """A metric or operating point is requested that the available samples cannot support."""
 
 
+class ModelLoadError(VeilxError):
+    """A checkpoint does not match its pinned hash or its architecture (missing, unexpected
+    or mis-shaped tensors); loading never proceeds with a partial match."""
+
+
 class InfeasibleRequestError(VeilxError):
     """A requested construction (e.g. N independent pairs) cannot be satisfied by the data."""

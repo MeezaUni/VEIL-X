@@ -6,7 +6,7 @@
 # Nothing here has been downloaded. Sizes come from HTTP HEAD / repository metadata only.
 # =============================================================================
 schema_version: 1
-checked_on: "2026-10-26"
+checked_on: "2026-10-27"
 datasets:
   - id: digiface1m
     name: "DigiFace-1M (Microsoft, WACV 2023)"
@@ -101,18 +101,40 @@ datasets:
 
   - id: lfw
     name: "Labeled Faces in the Wild"
-    url: "https://vis-www.cs.umass.edu/lfw/"
-    licence: "No formal licence located; site disclaimer restricts interpretation (not for vetting commercial systems)"
-    licence_source: "unresolved (official host unreachable from this environment on 2026-10-26)"
+    url: "http://vis-www.cs.umass.edu/lfw/"
+    licence: "No formal licence located. The creators state LFW was published to help research advance face verification, not to vet commercial algorithms. No grant of redistribution rights to third parties found."
+    licence_source: "Official host vis-www.cs.umass.edu returns NXDOMAIN from the authoritative cs.umass.edu nameserver (checked 2026-10-27, SOA serial 2026102601); author page people.cs.umass.edu/~elm still links only to that host"
     licence_verified_on: null
-    access_status: unresolved
+    access_status: blocked
+    conditions:
+      - "Original authorised distribution unreachable (host removed from DNS)"
+      - "Third-party mirrors (Kaggle jessicali9530/lfw-dataset, figshare via scikit-learn) have no established redistribution rights; not used (Phase 2 brief: no unauthorised mirrors)"
     identity_labels: "yes"
-    n_identities: null
-    n_images: null
+    n_identities: 5749
+    n_images: 13233
     roles: [none]
     test_only: true
-    contamination_risks: ["Celebrity identities likely in backbone pretraining data"]
-    notes: "Not approved for use; listed because MLFW/CPLFW/XQLFW derive from it."
+    contamination_risks: ["Celebrity identities likely in backbone pretraining data (WebFace4M is a web scrape of celebrities)"]
+    notes: "Counts are the published LFW figures (13,233 images / 5,749 people). Phase 2 real-world benchmark blocked; see docs/real_world_benchmark.md for the exact user action that would unblock it."
+
+  - id: kaggle_jessicali9530_lfw
+    name: "Kaggle mirror: Labelled Faces in the Wild (LFW) Dataset (deep-funneled), version 4"
+    url: "https://www.kaggle.com/datasets/jessicali9530/lfw-dataset"
+    licence: "Kaggle field 'Other (specified in description)'; the description specifies no licence, only acknowledgements to the LFW authors and a pointer to the original site"
+    licence_source: "Kaggle API /datasets/view/jessicali9530/lfw-dataset (metadata only, no download), checked 2026-10-27"
+    licence_verified_on: "2026-10-27"
+    access_status: blocked
+    conditions:
+      - "Rights of the uploader to redistribute LFW not established; provenance not verifiable against an official checksum (official host offline)"
+      - "Kaggle CLI credentials not configured on this machine (would also be required)"
+    identity_labels: "yes"
+    n_identities: 5749
+    n_images: 13233
+    download_size: "117,149,434 bytes (Kaggle totalBytes)"
+    roles: [none]
+    test_only: true
+    contamination_risks: ["Same as lfw"]
+    notes: "Resolved as the sole data source of the user-referenced notebook kaggle.com/code/vividharawat/vggface-on-lfw (Kaggle kernel metadata: datasetDataSources = [jessicali9530/lfw-dataset]). Files: lfw-deepfunneled.zip, pairs.csv, people.csv, match/mismatch DevTrain/DevTest csv, lfw_allnames.csv, lfw_readme.csv. Last updated 2018-05-17. Not downloaded."
 
   - id: celeba
     name: "CelebA"

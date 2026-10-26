@@ -1,0 +1,156 @@
+{
+  "evidence_type": "real_measured_model_result",
+  "scope": "model verification on DigiFace validation pairs (not an evaluation result)",
+  "split": "val",
+  "preprocess_default": {
+    "input_size": 112,
+    "channel_order": "RGB",
+    "mean": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "std": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "alignment_template": [
+      [
+        38.2946,
+        51.6963
+      ],
+      [
+        73.5318,
+        51.5014
+      ],
+      [
+        56.0252,
+        71.7366
+      ],
+      [
+        41.5493,
+        92.3655
+      ],
+      [
+        70.7299,
+        92.2041
+      ]
+    ],
+    "flip_tta": false
+  },
+  "results": [
+    {
+      "backbone_id": "adaface_ir101_webface4m",
+      "spec_fingerprint": "13c7662136a8555a",
+      "load_seconds": 2.63,
+      "weights_tensor_fingerprint": "cdccdbc7e87facd609b81d677e9e5a673037ce8826e388bcb9ea1c89283df67f",
+      "n_parameters": 65150912,
+      "reference_equality": {
+        "random_cpu_max_abs_diff": 0.0,
+        "random_cuda_max_abs_diff": 0.0,
+        "random_cpu_vs_cuda_max_abs_diff": 0.0017712116241455078,
+        "real_cpu_max_abs_diff": 0.0,
+        "real_cuda_max_abs_diff": 0.0,
+        "real_cpu_vs_cuda_max_abs_diff": 0.0023714303970336914
+      },
+      "channel_order_val_auc": {
+        "RGB": 0.9988145361590972,
+        "BGR": 0.9981663140588576,
+        "n_pairs": 20000,
+        "n_genuine": 9982
+      },
+      "determinism_cuda_fp32_bit_identical": true,
+      "precision_agreement": {
+        "bf16": {
+          "min_cosine_to_fp32": 0.9941253662109375,
+          "mean_cosine_to_fp32": 0.9999054670333862,
+          "max_abs_pair_score_diff": 0.011241018772125244,
+          "val_auc": 0.9988124161522284
+        },
+        "fp16": {
+          "min_cosine_to_fp32": 0.9998866319656372,
+          "mean_cosine_to_fp32": 0.9999973177909851,
+          "max_abs_pair_score_diff": 0.002737671136856079,
+          "val_auc": 0.9988141761579308
+        }
+      },
+      "throughput_cuda": {
+        "fp32_images_per_s_batch256": 244.1,
+        "fp32_peak_mem_mib": 3441.7,
+        "bf16_images_per_s_batch256": 337.0,
+        "bf16_peak_mem_mib": 2265.7
+      }
+    },
+    {
+      "backbone_id": "arcface_ir101_webface4m",
+      "spec_fingerprint": "af47f6fe5e21db0a",
+      "load_seconds": 4.01,
+      "weights_tensor_fingerprint": "4d3b595e46b48fe502b3337a5d7035aeced4e79ad4fb42980245b6296be1c128",
+      "n_parameters": 65156160,
+      "reference_equality": {
+        "random_cpu_max_abs_diff": 0.0,
+        "random_cuda_max_abs_diff": 0.0,
+        "random_cpu_vs_cuda_max_abs_diff": 0.0011142417788505554,
+        "real_cpu_max_abs_diff": 0.0,
+        "real_cuda_max_abs_diff": 0.0,
+        "real_cpu_vs_cuda_max_abs_diff": 0.0031309127807617188
+      },
+      "channel_order_val_auc": {
+        "RGB": 0.9980924338194855,
+        "BGR": 0.9973214613215347,
+        "n_pairs": 20000,
+        "n_genuine": 9982
+      },
+      "determinism_cuda_fp32_bit_identical": true,
+      "precision_agreement": {
+        "bf16": {
+          "min_cosine_to_fp32": 0.9962005019187927,
+          "mean_cosine_to_fp32": 0.9998935461044312,
+          "max_abs_pair_score_diff": 0.009625256061553955,
+          "val_auc": 0.9980929638212028
+        },
+        "fp16": {
+          "min_cosine_to_fp32": 0.999849796295166,
+          "mean_cosine_to_fp32": 0.9999971389770508,
+          "max_abs_pair_score_diff": 0.0019471347332000732,
+          "val_auc": 0.9980917738173471
+        }
+      },
+      "throughput_cuda": {
+        "fp32_images_per_s_batch256": 320.9,
+        "fp32_peak_mem_mib": 3441.7,
+        "bf16_images_per_s_batch256": 532.9,
+        "bf16_peak_mem_mib": 2265.7
+      }
+    }
+  ],
+  "provenance": {
+    "veilx_version": "0.0.1",
+    "timestamp_utc": "2026-10-26T19:21:36.208526+00:00",
+    "git": {
+      "commit": "b0f389a12c8b0ff18f5ce268adcc64ba9e57eb1d",
+      "dirty": true,
+      "repo_is_project_root": true
+    },
+    "python": "3.12.14",
+    "implementation": "CPython",
+    "os": "Windows",
+    "packages": {
+      "numpy": "2.5.4",
+      "pydantic": "2.14.1",
+      "PyYAML": "6.0.3",
+      "torch": "2.11.0+cu128",
+      "onnxruntime": null,
+      "insightface": null
+    },
+    "configs": {},
+    "seed": null,
+    "argv": [
+      "scripts/verify_models.py",
+      "--pairs",
+      "20000"
+    ],
+    "extra": {}
+  }
+}

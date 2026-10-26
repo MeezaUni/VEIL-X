@@ -1,4 +1,6 @@
-"""Phase 1b DigiFace preparation pipeline (private data stays under VEILX_DATA_ROOT).
+"""DigiFace preparation pipeline (Phase 1b; Phase 2 expansion, protocol 0.4.0).
+
+Private data stays under VEILX_DATA_ROOT.
 
 Stages (run in order; each writes its outputs to the private data root):
 
@@ -27,7 +29,7 @@ from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -61,19 +63,28 @@ from veilx.occlusion.plan import (
 )
 from veilx.pairs import PairSpec, build_pairs
 from veilx.pairs.builder import source_keys
+from veilx.seeding import make_rng
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = Path(os.environ.get("VEILX_PUBLIC_REPORTS", ROOT / "reports" / "data"))
 APPROVED_PARTS: dict[str, int] = {
     "subjects_0-1999_72_imgs.zip": 2_938_553_163,
     "subjects_100000-133332_5_imgs.zip": 3_399_664_847,
+    "subjects_133333-166665_5_imgs.zip": 3_398_240_548,  # Phase 2 expansion (protocol 0.4.0)
+    "subjects_166666-199998_5_imgs.zip": 3_400_932_852,  # Phase 2 expansion (protocol 0.4.0)
 }
 MEMBER_RE = re.compile(r"\d{1,6}/\d{1,3}\.png")
-GENUINE_CAP = 10  # equal per-identity weight for 72- and 5-image identities (D-026)
-FAR_IMPOSTORS = int(os.environ.get("VEILX_FAR_IMPOSTORS", "100000"))
 DEDUP_N_TRAIN = int(os.environ.get("VEILX_DEDUP_N_TRAIN", "4000"))
 DEDUP_N_VAL = int(os.environ.get("VEILX_DEDUP_N_VAL", "2000"))
 PROTO = load_protocol(ROOT / "configs" / "research_protocol.yaml")
+assert PROTO.data_preparation is not None
+# Per pair-set genuine caps: equal per-identity weight inside every set (D-026, D-038).
+GENUINE_CAPS: dict[str, int] = dict(PROTO.data_preparation.genuine_pairs_per_identity_cap)
+FAR_IMPOSTORS = int(
+    os.environ.get("VEILX_FAR_IMPOSTORS", str(PROTO.data_preparation.far_estimation_impostor_pairs))
+)
+OCCLUSION_SETS: tuple[str, ...] = PROTO.data_preparation.occlusion_plan_sets
+STRESS_MAX_PAIRS = PROTO.data_preparation.stress_max_pairs
 REGISTRY = load_dataset_registry(ROOT / "configs" / "datasets.yaml")
 SEED = PROTO.seeds.global_seed
 
@@ -197,7 +208,17 @@ def stage_dedup() -> None:
         "train_rule": asdict(rv_train) if rv_train else None,
         "val_eval": asdict(rv_val) if rv_val else None,
     }
-    if rv_train is not None:
+    if os.environ.get("VEILX_NEAR_DUP_REVIEW", "1") == "0":
+        # The Phase 1b review showed the nominated candidates are dominated by non-duplicates
+        # (base-rate effect, D-031); re-running the exhaustive search is optional (D-038).
+        review |= {
+            "n_candidates": None,
+            "by_relation": {},
+            "candidates_file": None,
+            "status": "skipped (VEILX_NEAR_DUP_REVIEW=0): exhaustive review search not re-run; "
+            "near-duplicate rule remains unvalidated and is not applied",
+        }
+    elif rv_train is not None:
         ok_idx = np.flatnonzero(table.ok)
         cands = candidate_pairs(
             table.phash[ok_idx],
@@ -292,7 +313,7 @@ def stage_pairs() -> None:
         (SplitName.VAL, "val"),
         (SplitName.TEST, "test_balanced"),
     ):
-        cap = _genuine_capacity(by_split[split], GENUINE_CAP)
+        cap = _genuine_capacity(by_split[split], GENUINE_CAPS[tag])
         plans.append(
             (
                 tag,
@@ -303,7 +324,7 @@ def stage_pairs() -> None:
                     0.5,
                     split,
                     SEED,
-                    genuine_cap_per_identity=GENUINE_CAP,
+                    genuine_cap_per_identity=GENUINE_CAPS[tag],
                     pair_id_prefix=tag,
                 ),
             )
@@ -396,14 +417,10 @@ def stage_occlusion() -> None:
     shape = (int(np.median(table.height[table.ok])), int(np.median(table.width[table.ok])))
     recs = {k: (r.relpath, r.pixel_sha256 or r.sha256) for k, r in final.items()}
     families = list(PROTO.family_ids)
+    # Which role/pair-set combinations get LOFO plans is fixed by the protocol (0.4.0: train
+    # plans deferred to Phase 3, test_far kept clean-only; D-038).
     role_sets: list[tuple[Role, str]] = [
-        ("train", "train"),
-        ("val", "val"),
-        ("cal", "cal_independent"),
-        ("test_id", "test_balanced"),
-        ("test_ood", "test_balanced"),
-        ("test_id", "test_far"),
-        ("test_ood", "test_far"),
+        (cast(Role, r), t) for r, t in (x.split(":", 1) for x in OCCLUSION_SETS)
     ]
     out_dir = layout.manifests / "occlusion"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -478,6 +495,12 @@ def stage_occlusion() -> None:
                     flush=True,
                 )
     stress_pairs = list(read_jsonl(layout.manifests / "pairs" / "test_balanced.jsonl", PairRecord))
+    if STRESS_MAX_PAIRS is not None and len(stress_pairs) > STRESS_MAX_PAIRS:
+        # exploratory only: a seeded identity-agnostic subsample of test pairs
+        pick = make_rng(SEED, "stress_subsample").choice(
+            len(stress_pairs), STRESS_MAX_PAIRS, replace=False
+        )
+        stress_pairs = [stress_pairs[i] for i in sorted(pick.tolist())]
     stress = plan_stress(stress_pairs, global_seed=SEED)
     with gzip.open(
         out_dir / "stress__test_balanced.jsonl.gz", "wt", encoding="utf-8", newline="\n"
@@ -599,8 +622,9 @@ def stage_summary() -> None:
         },
         "occlusion": occl,
     }
-    _dump(PUBLIC / "digiface_phase1b_summary.json", summary)
-    print("wrote public summary digiface_phase1b_summary.json")
+    name = Path(PROTO.data_preparation.summary_report).name  # type: ignore[union-attr]
+    _dump(PUBLIC / name, summary)
+    print(f"wrote public summary {name}")
 
 
 STAGES = {

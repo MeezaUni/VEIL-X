@@ -16,7 +16,9 @@ dependencies = [
 [project.optional-dependencies]
 # Phase 2 (not yet authorised for training): GPU stack used by veilx.training. Install with the
 # CUDA wheel index, e.g.  uv pip install -e .[gpu] --index-url https://download.pytorch.org/whl/cu128
-gpu = ["torch>=2.4"]
+gpu = ["torch>=2.4", "safetensors>=0.4", "huggingface_hub>=0.24"]
+# Figures for reports (scripts/make_figures.py); not needed by the library or the tests.
+viz = ["matplotlib>=3.8"]
 
 [dependency-groups]
 dev = [
@@ -69,8 +71,13 @@ warn_unused_configs = true
 
 [[tool.mypy.overrides]]
 # Optional at runtime (seeded only if installed); not a Phase 0 dependency.
-module = ["torch"]
+module = ["torch", "safetensors.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# torch is optional (GPU environment only); without it nn.Module resolves to Any.
+module = ["veilx.models.architectures"]
+disallow_subclassing_any = false
 
 [tool.pydantic-mypy]
 init_forbid_extra = true

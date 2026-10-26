@@ -22,6 +22,24 @@ STEPS: list[tuple[str, list[str]]] = [
     ("privacy scan", [PY, "scripts/scan_sensitive.py"]),
 ]
 
+# torch-dependent tests are skipped in the CPU-only environment (and in CI); when the local
+# GPU environment exists they are run there as an extra step.
+_GPU_PY = next(
+    (
+        p
+        for p in (
+            ROOT / ".venv-gpu" / "Scripts" / "python.exe",
+            ROOT / ".venv-gpu" / "bin" / "python",
+        )
+        if p.exists()
+    ),
+    None,
+)
+if _GPU_PY is not None:
+    STEPS.append(
+        ("pytest (torch)", [str(_GPU_PY), "-m", "pytest", "-q", "tests/test_models_torch.py"])
+    )
+
 
 def main() -> int:
     failed: list[str] = []

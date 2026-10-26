@@ -19,6 +19,7 @@ import numpy as np
 import pytest
 from PIL import Image
 
+from veilx.config import load_protocol
 from veilx.data.images import encode_png_rgb
 from veilx.data.manifest import ImageRecord, PairRecord, read_jsonl
 
@@ -125,7 +126,9 @@ def test_occlusion_plans_respect_heldout_isolation(prepared: tuple[Path, Path]) 
     data, _ = prepared
     odir = data / "manifests" / "occlusion"
     files = sorted(odir.glob("F*__*.jsonl.gz"))
-    assert len(files) == 5 * 7
+    dp = load_protocol(ROOT / "configs" / "research_protocol.yaml").data_preparation
+    assert dp is not None
+    assert len(files) == 5 * len(dp.occlusion_plan_sets)
     for f in files:
         heldout, role, _ = f.name.removesuffix(".jsonl.gz").split("__")
         with gzip.open(f, "rt", encoding="utf-8") as fh:
@@ -145,7 +148,9 @@ def test_occlusion_plans_respect_heldout_isolation(prepared: tuple[Path, Path]) 
 
 def test_public_summary_contains_no_identifiers(prepared: tuple[Path, Path]) -> None:
     _, public = prepared
-    text = (public / "digiface_phase1b_summary.json").read_text(encoding="utf-8")
+    dp = load_protocol(ROOT / "configs" / "research_protocol.yaml").data_preparation
+    assert dp is not None
+    text = (public / Path(dp.summary_report).name).read_text(encoding="utf-8")
     summary = json.loads(text)
     assert summary["final_manifest"]["images_per_part"]
     assert "digiface1m:" not in text and "relpath" not in text and "pair_id" not in text

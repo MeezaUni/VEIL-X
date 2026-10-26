@@ -6,6 +6,68 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-10-27 — Phase 2 (milestone 1): data expansion, frozen backbones, LFW status, evaluation plan
+
+No test-split access has happened at this milestone. Nothing was trained or fine-tuned.
+
+### Gate 0 (preflight)
+- Repository root, remote and branch confirmed; `main` clean at b0f389a, equal to the remote.
+- Stash `stash@{0}` (Teleport auto-stash) preserved: not applied, not dropped.
+- Private data root outside the repository (`VEILX_DATA_ROOT`); about 282 GiB free.
+- RTX 4060 Laptop (8 GiB, sm 8.9); `.venv-gpu` torch 2.11.0+cu128, CUDA OK.
+
+### DigiFace expansion (protocol v0.4.0)
+- Downloaded 5-image P2 and P3 from the official host:
+  - sizes equal Content-Length; CRC-32 OK; 166,665 members each;
+  - SHA-256 recorded (`1d99a951…`, `a70f53ae…`).
+- `scripts/prepare_digiface.py extract scan fingerprint dedup pairs occlusion summary`:
+  - scan 580 s, fingerprint 222 s, dedup 44 s, pairs 76 s; occlusion about 20 min;
+  - 643,995 images / 101,999 identities; 0 anomalies, 0 decode failures, 0 exact duplicates;
+  - the near-duplicate rule was rejected again.
+- All 310,665 Phase 1b images keep their split and pixel hash (checked against the archive).
+  The Phase 1b manifests are archived, not overwritten.
+- Pair caps and plan sets changed (D-038).
+  - Calibration: 3,409 + 3,409 identity-disjoint pairs.
+  - Capacity: best certifiable sFMR 0.088 %; 0.1 % stays estimation-only (CALC-003).
+
+### Models (D-037, D-040)
+- `scripts/fetch_models.py`: CVLface AdaFace IR-101 and ArcFace IR-101 (WebFace4M).
+  - Pinned HF commits; safetensors only; SHA-256 equal to the Hub LFS record.
+  - Weights stay in `<data_root>/models`.
+- `veilx.models`: strict loader, inference-only re-implementations, numpy preprocessing,
+  fp32/fp16/bf16 extractor.
+- `scripts/verify_models.py` on 20,000 val pairs:
+  - output equals the authors' own modules (max diff 0.0);
+  - CUDA output deterministic;
+  - RGB ahead of BGR for both backbones (config agrees);
+  - fp16 vs fp32 max pair-score diff ≤ 0.003; fp16 chosen.
+- Found a gitignore trap again: the `models/` and `embeddings/` rules hid the new source
+  packages. Allow-list entries were added after the weight rules; weights stay ignored.
+
+### LFW (D-039): blocked, documented
+- The reference notebook resolves to Kaggle `jessicali9530/lfw-dataset` v4 (full deep-funneled
+  LFW).
+- Its licence field points to a description with no licence. The official host is NXDOMAIN at
+  the authoritative nameserver.
+- Not downloaded. The parser for the official View-2 pairs is ready and tested on a synthetic
+  fixture.
+- The exact unblock options are in `docs/real_world_benchmark.md` §3. RMFRD, DFW, CPLFW,
+  CALFW, MLFW and XQLFW were assessed but not downloaded.
+
+### Extraction and evaluation code (ready; not yet run on test)
+- `veilx.embeddings` (atomic, hash-verified shards with a completion marker; resumable; cache
+  invalidation by fingerprint) and `scripts/extract_embeddings.py` (bounded render queue;
+  re-rendered occlusions must match the plan's recipe hash).
+- `veilx.eval` and `scripts/evaluate_phase2.py`: develop stage (val + cal only, frozen with
+  SHA-256), then one logged `final --final` stage. Analysis plan in
+  `docs/baseline_evaluation.md` (D-041).
+
+### Quality
+- 305 tests pass in the CPU environment; the torch tests also pass in `.venv-gpu`.
+- Quality gate PASS: ruff, format, mypy strict, pytest, config, privacy scan, torch tests.
+
+---
+
 ## 2026-10-26 — Phase 1b: real data, occlusion engine, experiment readiness (no recognition model)
 
 ### Session events

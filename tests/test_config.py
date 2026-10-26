@@ -42,14 +42,23 @@ def test_registered_constants_match_approved_values() -> None:
     assert c.bootstrap_ci_level.value == 0.95
 
 
-def test_v030_real_data_sections_and_frozen_constants() -> None:
+def test_v040_real_data_sections_and_frozen_constants() -> None:
     proto = load_protocol(PROTOCOL)
-    assert proto.protocol_version == "0.3.0"
+    assert proto.protocol_version == "0.4.0"
     dp = proto.data_preparation
-    assert dp is not None and dp.images_final == 310_665 and dp.identities_final == 35_333
+    assert dp is not None and dp.images_final == 643_995 and dp.identities_final == 101_999
+    assert len(dp.parts) == 4 and set(dp.archive_sha256) == set(dp.archive_bytes)
     assert sum(dp.identities_per_split.values()) == dp.identities_final
     assert sum(dp.images_per_split.values()) == dp.images_final
-    assert proto.pairs.genuine_pairs_per_identity_cap == dp.genuine_pairs_per_identity_cap == 10
+    # train keeps the protocol-wide cap; val/test use the bounded cap (D-038)
+    assert proto.pairs.genuine_pairs_per_identity_cap == dp.genuine_pairs_per_identity_cap["train"]
+    assert (
+        dp.genuine_pairs_per_identity_cap["val"]
+        == dp.genuine_pairs_per_identity_cap["test_balanced"]
+        == 3
+    )
+    roles = {x.split(":")[0] for x in dp.occlusion_plan_sets}
+    assert roles == {"val", "cal", "test_id", "test_ood"}  # no train plans in Phase 2
     cp = proto.calibration_plan
     assert cp is not None and cp.independent_genuine_pairs + 2 * cp.independent_impostor_pairs <= (
         cp.calibration_identities

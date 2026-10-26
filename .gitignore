@@ -131,3 +131,10 @@ Thumbs.db
 desktop.ini
 .remember/
 .claude/
+
+# ---- Allow-list (must follow the weight/embedding rules above) --------
+# Source packages named like data directories (code only; weight/array extension rules still apply).
+!src/veilx/models/
+!src/veilx/embeddings/
+# Aggregated model-verification numbers (JSON only; no embeddings, no image ids).
+!reports/models/

@@ -41,19 +41,20 @@ Status values: **approved** (by PI), **provisional** (registered, may change via
 | D-034 | 2026-10-26 | Constants frozen in v0.3.0: confidence level 0.95, cost ratio 10:1, FAR points {1%, 0.1% estimation-only}, CI level 0.95. Still provisional: clean margin 0.5 pp, accepted-error target 5%, dedup recall target | approved (PI) / provisional | PI brief 2026-10-26 |
 | D-035 | 2026-10-26 | New evidence category `real_data_statistic` for dataset facts, separate from model results; its statements may not contain performance terms (schema-enforced) | design | Research integrity |
 | D-036 | 2026-10-26 | GPU training infrastructure prepared (run-config schema, checkpoint manager, mixed precision) behind a double authorisation guard (config flag **and** environment variable); no training performed | design | Phase 1b authorisation scope |
+| D-037 | 2026-10-27 | Backbones pinned: AdaFace IR-101 and **ArcFace IR-101**, both WebFace4M CVLface releases (HF, pinned commits, safetensors only, SHA-256 = Hub LFS). The same-data, same-family pair isolates the loss. Strict loader (exact keys/shapes/dtypes); output equal to the authors' module (max diff 0.0) | design (within D-003) | `docs/model_card_backbones.md` |
+| D-038 | 2026-10-27 | Protocol **v0.4.0**: DigiFace 5-image P2+P3 added (PI-approved Phase 2 expansion); identity-hash splits unchanged; genuine cap per identity **3** for `val`/`test_balanced` (10 kept for `train`); LOFO plans for val, cal, test_id and test_ood (test_balanced) only; train-role plans deferred to Phase 3; `test_far` clean-only; stress on a 20,000-pair subsample; near-duplicate review search not re-run (rule still unvalidated, not applied). Phase 1b manifests archived, not overwritten | design (bounded GPU budget; identity-uniform weighting kept) | `docs/protocol_changelog.md` |
+| D-039 | 2026-10-27 | **LFW blocked.** The reference notebook resolves to Kaggle `jessicali9530/lfw-dataset` v4 (full deep-funneled LFW). Its redistribution rights are not established and the official host is NXDOMAIN, so it is not downloaded (brief: no unauthorised mirrors). Evaluation proceeds on DigiFace only | design (brief rule) / PI action needed | `docs/real_world_benchmark.md` |
+| D-040 | 2026-10-27 | Embedding extraction in **fp16** autocast (vs fp32 on 20,000 val pairs: min cosine ≥ 0.9998, max pair-score diff ≤ 0.003; bf16 is about 4–5× worse). The same precision is used for every split | design | `reports/models/model_verification.json` |
+| D-041 | 2026-10-27 | Two-stage evaluation: **develop** (val + cal only; thresholds, LTT grids and orders, oracle-visibility strata edges and LTT fits frozen with SHA-256), then **one** logged `final --final` test run. Analysis plan committed before test access. Oracle (mask) visibility is an upper-bound arm, not an estimator | design (pre-registration) | `docs/baseline_evaluation.md` |
 
-## Pending PI decisions (updated after Phase 1b)
-1. **Optional extra data (recommendation, not downloaded):** DigiFace 5-image parts P2+P3
-   (+6.3 GiB). They triple independent calibration capacity (1,177 → 3,399 impostor pairs) and
-   would make 0.1% selective FMR certifiable, but only with zero false matches. They also
-   triple per-stratum capacity for visibility-stratified calibration (CALC-002). The 72-image
-   parts P2–P5 (+11 GiB) matter only for later training diversity.
+## Pending PI decisions (updated in Phase 2)
+1. **LFW (D-039):** either accept the Kaggle mirror under a documented risk acceptance and
+   provide Kaggle API credentials, or supply an original LFW archive
+   (`docs/real_world_benchmark.md` §3).
 2. ROF: ethics/legal confirmation (still not authorised).
-3. Kaggle dataset: still blocked (HTTP 404).
-4. Accepted-decision error target (5%) and clean margin (0.5 pp): confirm or revise after
-   Phase 2 real-score power checks.
-5. Phase 2 authorisation (frozen-backbone embedding extraction; detector/backbone weight
-   downloads).
+3. Accepted-decision error target (5%) and clean margin (0.5 pp): confirm or revise in light of
+   the Phase 2 measurements (`docs/statistical_audit.md`).
+4. Phase 3 authorisation (visibility estimator / fusion training): not requested by Phase 2.
 
 Resolved since Phase 1a: the download go-ahead (D-027), FAR 0.1% estimation-only (D-034),
 frozen confidence level and cost ratio (D-034), and the class-conditional estimand (D-019,

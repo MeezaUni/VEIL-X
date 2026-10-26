@@ -9,7 +9,7 @@
 # =============================================================================
 schema_version: 1
 protocol_id: veilx-c3c1
-protocol_version: 0.3.0   # changes: docs/protocol_changelog.md
+protocol_version: 0.4.0   # changes: docs/protocol_changelog.md
 status: provisional
 
 project:
@@ -176,7 +176,7 @@ constants:
     value: 0.5
     status: provisional
     rationale: "Max tolerated drop in clean-pair TAR@FAR=1% (percentage points) for H4."
-    feasibility: "SIM-006 (synthetic): power 28%/68%/100% at 200/1,000/3,333 clean test identities; the real test split has 7,154 identities. Kept provisional until power is re-checked with real score distributions (Phase 2)."
+    feasibility: "SIM-006 (synthetic): power 28%/68%/100% at 200/1,000/3,333 clean test identities; the 0.4.0 test split has 20,374 identities. Real-score check: docs/statistical_audit.md (Phase 2)."
   cost_ratio_false_match_to_false_non_match:
     value: 10
     status: frozen
@@ -186,7 +186,7 @@ constants:
     value: 0.95
     status: frozen
     rationale: "1 - delta for Learn-then-Test risk control. Approved by the PI 2026-10-26."
-    feasibility: "Real calibration set: 1,190 independent impostor + 1,190 genuine pairs (identity-disjoint)."
+    feasibility: "Real calibration set (0.4.0): 3,409 independent impostor + 3,409 genuine pairs (identity-disjoint, 10,227 identities)."
   accepted_decision_error_target:
     value: 0.05
     status: provisional
@@ -196,7 +196,7 @@ constants:
     value: [0.01, 0.001]
     status: frozen
     rationale: "Operating points for TAR@FAR and selective FMR reporting. FAR 0.1% is ESTIMATION-ONLY (PI decision 2026-10-26)."
-    feasibility: "Real calibration set: 1,190 independent impostor pairs -> best certifiable sFMR 0.25% (0 FM), so 1% is certifiable and 0.1% is not; test FAR-estimation set: 100,000 impostor pairs over 7,154 identities."
+    feasibility: "Real calibration set (0.4.0): 3,409 independent impostor pairs -> best certifiable sFMR 0.088% (0 FM at full coverage), so 1% is certifiable and 0.1% only with zero false matches (kept estimation-only); test FAR-estimation set: 100,000 impostor pairs over 20,373 identities."
   bootstrap_ci_level:
     value: 0.95
     status: frozen
@@ -232,24 +232,33 @@ test_access:
 # =============================================================================
 data_preparation:
   dataset_id: digiface1m
-  parts: [subjects_0-1999_72_imgs, subjects_100000-133332_5_imgs]
+  parts: [subjects_0-1999_72_imgs, subjects_100000-133332_5_imgs, subjects_133333-166665_5_imgs, subjects_166666-199998_5_imgs]
   archive_sha256:
     subjects_0-1999_72_imgs.zip: 29c5347f2287637c646eee7a760cbc392763ecd804e7bb5a9ba6d557fa94f9b3
     subjects_100000-133332_5_imgs.zip: 998253e11e8c3cca20e92fd51a6b6a40dd6661344ee6c0a2e46a8586cd84f641
+    subjects_133333-166665_5_imgs.zip: 1d99a9512366cbe0b2f51ee19ef847d76adde3fd42097b7aa4c274316b980701
+    subjects_166666-199998_5_imgs.zip: a70f53ae6306ad1266491f2314dffcbd69a1c6cba10b63cc63eb15e248a28606
   archive_bytes:
     subjects_0-1999_72_imgs.zip: 2938553163
     subjects_100000-133332_5_imgs.zip: 3399664847
+    subjects_133333-166665_5_imgs.zip: 3398240548
+    subjects_166666-199998_5_imgs.zip: 3400932852
   checksum_source: "No published checksum. Size equals the official host's Content-Length; every member passed zip CRC-32; SHA-256 recorded at first download (trust-on-first-download fingerprint, not an authenticity proof)."
   image_size: [112, 112]
   alignment: "All images 112x112 RGBA with alpha=255 everywhere (alpha dropped losslessly). Mean of 1,000 random images aligns with the ArcFace 5-point template (visual check); landmark-free template placement is therefore used for occlusions."
-  images_scanned: 310665
-  images_final: 310665
-  identities_final: 35333
-  identities_per_split: {train: 21057, val: 3552, cal: 3570, test: 7154}
-  images_per_split: {train: 182871, val: 31495, cal: 31317, test: 64982}
-  genuine_pairs_per_identity_cap: 10
+  # 0.4.0: all 310,665 Phase 1b images keep their split and pixel hash (verified)
+  images_scanned: 643995
+  images_final: 643995
+  identities_final: 101999
+  identities_per_split: {train: 61067, val: 10329, cal: 10229, test: 20374}
+  images_per_split: {train: 382921, val: 65380, cal: 64612, test: 131082}
+  # 0.4.0 (D-038): caps per pair set; equal per-identity weight inside each set
+  genuine_pairs_per_identity_cap: {train: 10, val: 3, test_balanced: 3}
   far_estimation_impostor_pairs: 100000
-  summary_report: reports/data/digiface_phase1b_summary.json
+  # 0.4.0 (D-038): train-role plans deferred to Phase 3; test_far is a clean-only FAR set
+  occlusion_plan_sets: ["val:val", "cal:cal_independent", "test_id:test_balanced", "test_ood:test_balanced"]
+  stress_max_pairs: 20000   # combined occlusions: exploratory subsample of test_balanced
+  summary_report: reports/data/digiface_v0.4.0_summary.json
 
 occlusion:
   generator_version: occl-1.0.0
@@ -268,8 +277,8 @@ occlusion:
 
 calibration_plan:
   pairing: identity_disjoint_matching
-  calibration_identities: 3570
-  independent_genuine_pairs: 1190
-  independent_impostor_pairs: 1190
-  best_certifiable_fmr_zero_errors: 0.002514
-  note: "1% selective FMR certifiable; 0.1% estimation-only. Stratified calibration divides capacity across strata (see docs/protocol_design.md)."
+  calibration_identities: 10229
+  independent_genuine_pairs: 3409
+  independent_impostor_pairs: 3409
+  best_certifiable_fmr_zero_errors: 0.000878
+  note: "0.4.0: 1% selective FMR certifiable (<= 24 false matches at full coverage); 0.1% would need >= 2,995 accepted impostors with ZERO false matches, so it stays estimation-only (D-034). Per visibility stratum (delta/3) 0.1% is never certifiable. reports/data/capacity_v0.4.0.json"

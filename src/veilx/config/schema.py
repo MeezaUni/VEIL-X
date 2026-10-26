@@ -310,9 +310,20 @@ class DataPreparationSection(_Strict):
     identities_final: int
     identities_per_split: dict[SplitName, int]
     images_per_split: dict[SplitName, int]
-    genuine_pairs_per_identity_cap: int = Field(ge=1)
+    # pair-set tag -> genuine cap per identity (equal per-identity weight inside each set)
+    genuine_pairs_per_identity_cap: dict[str, int]
     far_estimation_impostor_pairs: int = Field(ge=1)
+    # "role:pair_set" combinations that receive leave-one-family-out occlusion plans
+    occlusion_plan_sets: tuple[str, ...] = ()
+    stress_max_pairs: int | None = Field(default=None, ge=1)
     summary_report: str
+
+    @field_validator("genuine_pairs_per_identity_cap")
+    @classmethod
+    def _caps_positive(cls, v: dict[str, int]) -> dict[str, int]:
+        if not v or any(c < 1 for c in v.values()):
+            raise ValueError("genuine caps must be a non-empty mapping of positive integers")
+        return v
 
 
 class OcclusionSection(_Strict):

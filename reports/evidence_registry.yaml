@@ -139,6 +139,20 @@ records:
     source: "scripts/prepare_digiface.py"
     artefact: "reports/data/digiface_phase1b_summary.json"
     created: "2026-10-26"
+  - id: DATA-004
+    type: real_data_statistic
+    title: "DigiFace expansion to four parts (protocol v0.4.0)"
+    statement: "Four approved parts, 643,995 images of 101,999 identities (99,999 five-image + 2,000 seventy-two-image), all 112x112 RGBA fully opaque, 0 decode failures, 0 exact pixel duplicates; splits train/val/cal/test = 61,067/10,329/10,229/20,374 identities; every Phase 1b image keeps its split and pixel hash; calibration set 3,409 genuine + 3,409 impostor identity-disjoint pairs."
+    source: "scripts/prepare_digiface.py"
+    artefact: "reports/data/digiface_v0.4.0_summary.json"
+    created: "2026-10-27"
+  - id: CALC-003
+    type: mathematical_calculation
+    title: "Calibration capacity at protocol v0.4.0"
+    statement: "With 3,409 identity-disjoint impostor pairs the best certifiable selective FMR at 95% confidence is 0.088% (zero false matches at full coverage); 1% stays certifiable with up to 24 false matches; 0.1% needs >= 2,995 accepted impostors with zero false matches and is never certifiable per visibility stratum (delta/3), so FAR 0.1% remains estimation-only."
+    source: "scripts/capacity_report.py"
+    artefact: "reports/data/capacity_v0.4.0.json"
+    created: "2026-10-27"
   # ------------------------------------------------------------------ hypotheses
   - id: HYP-001
     type: unverified_hypothesis
