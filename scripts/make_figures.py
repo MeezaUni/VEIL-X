@@ -60,12 +60,17 @@ mpl.rcParams.update(
 )
 
 
+FMT = "svg"
+
+
 def _save(fig: Any, name: str, note: str = SCOPE) -> None:
     fig.text(0.01, 0.005, note, fontsize=7, color=INK2, ha="left", va="bottom")
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
     OUT.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT / f"{name}.svg", metadata={"Date": None})
+    meta = {"Date": None} if FMT == "svg" else None
+    fig.savefig(OUT / f"{name}.{FMT}", metadata=meta, dpi=110)
     plt.close(fig)
-    print(f"wrote {name}.svg")
+    print(f"wrote {name}.{FMT}")
 
 
 def _val(r: dict[str, Any] | None) -> float:
@@ -171,7 +176,8 @@ def fig_error_vs_visibility(res: dict[str, Any]) -> None:
                 names = sorted(p, key=lambda s: float(s.strip("[)").split(",")[0]))
                 y = [p[n][0] / p[n][1] if p[n][1] else np.nan for n in names]
                 ax.plot(range(len(names)), y, "-o", ms=5, color=SLOT[k], mec=SURFACE, label=role)
-            ax.set_xticks(range(len(names)), names, rotation=30, ha="right", fontsize=7)
+            labels = ["clean" if n.startswith("[1.00") else n for n in names]
+            ax.set_xticks(range(len(names)), labels, rotation=30, ha="right", fontsize=7)
             ax.set_ylabel(f"{metric.upper()} at cal FAR 1%")
             if i == 0:
                 ax.set_title(NAMES[bid])
@@ -207,13 +213,14 @@ def fig_severity_heatmap(res: dict[str, Any]) -> None:
         ax.set_xticks(range(3), levels)
         ax.set_yticks(range(len(FAMS)), [SHORT[f] for f in FAMS])
         ax.grid(False)
-        ax.set_title(f"{NAMES[bid]}: FNMR, held-out family")
+        ax.set_title(f"{NAMES[bid]}: Test-OOD FNMR by max severity in pair", fontsize=9)
         fig.colorbar(im, ax=ax, fraction=0.04)
     _save(fig, "severity_fnmr_heatmap")
 
 
-def fig_ltt(res: dict[str, Any], target: str) -> None:
-    arms = ("global", "stratified_vis", "clean_cal")
+def fig_ltt(res: dict[str, Any], target: str, version: str = "v1") -> None:
+    suffix = "" if version == "v1" else "_v2"
+    arms = tuple(a + suffix for a in ("global", "stratified_vis", "clean_cal"))
     for bid, r in res.items():
         fig, axes = plt.subplots(3, 2, figsize=(9, 7.6), sharex=True)
         x = np.arange(len(FAMS))
@@ -264,12 +271,13 @@ def fig_ltt(res: dict[str, Any], target: str) -> None:
                 if i == 2:
                     ax.set_xticks(x, [SHORT[f] for f in FAMS], rotation=20, ha="right")
         axes[0, 0].legend(loc="upper left", fontsize=7)
+        label = "pre-registered order" if version == "v1" else "post-hoc p-value order (D-042)"
         fig.suptitle(
-            f"{NAMES[bid]}: realised selective risk of frozen LTT rules ({target})",
+            f"{NAMES[bid]}: realised selective risk of frozen LTT rules ({target}; {label})",
             fontsize=10,
             color=INK,
         )
-        _save(fig, f"ltt_realised_{bid.split('_')[0]}_{target}")
+        _save(fig, f"ltt_realised_{bid.split('_')[0]}_{target}_{version}")
 
 
 def fig_throughput() -> None:
@@ -306,7 +314,18 @@ def fig_throughput() -> None:
 
 
 def main() -> int:
-    final = json.loads((EXP / "phase2_final.json").read_text("utf-8"))
+    global OUT, FMT
+    import argparse
+
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--input", type=Path, default=EXP / "phase2_final.json")
+    ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--format", default="svg", choices=["svg", "png"])
+    args = ap.parse_args()
+    OUT, FMT = args.out, args.format
+    if FMT != "svg":
+        mpl.use("agg", force=True)
+    final = json.loads(args.input.read_text("utf-8"))
     res = final["results"]
     fig_roc_clean(res)
     fig_scores_clean(res)
@@ -314,7 +333,8 @@ def main() -> int:
     fig_error_vs_visibility(res)
     fig_severity_heatmap(res)
     for t in final["targets"]:
-        fig_ltt(res, t)
+        for version in ("v1", "v2"):
+            fig_ltt(res, t, version)
     fig_throughput()
     return 0
 

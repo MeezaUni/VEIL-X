@@ -1,0 +1,3329 @@
+{
+  "protocol_version": "0.4.0",
+  "created_utc": "2026-10-26T20:55:51.131733+00:00",
+  "delta": 0.05,
+  "targets": {
+    "primary_alpha": [
+      0.05,
+      0.05
+    ],
+    "far1_fm": [
+      0.01,
+      0.05
+    ]
+  },
+  "n_grid": 61,
+  "cal_summary": {
+    "mode": "independent",
+    "n_pairs": 6818,
+    "n_genuine": 3409,
+    "n_impostor": 3409,
+    "n_identities": 10227,
+    "n_images": 13636,
+    "max_pairs_per_identity": 1,
+    "max_pairs_per_image": 1,
+    "max_pairs_per_source_image": 1,
+    "identity_disjoint": true,
+    "effective_independent_pairs": 6818,
+    "max_identity_disjoint_subset": 6818,
+    "strata": {
+      "clean_clean": 6818
+    },
+    "note": "identity-disjoint: pair outcomes independent under i.i.d. identity sampling"
+  },
+  "backbones": {
+    "adaface_ir101_webface4m": {
+      "backbone_fingerprint": "13c7662136a8555a-fp16",
+      "embedding_run": "13c7662136a8555a-fp16",
+      "thresholds": {
+        "val_eer": 0.3056385517120362,
+        "val_best_accuracy": 0.3152431547641754,
+        "val_far_1pct": 0.31326100230216986,
+        "val_far_0.1pct": 0.38370290398597723,
+        "cal_far_1pct": 0.31159102916717535
+      },
+      "val_clean": {
+        "n_pairs": 61974,
+        "roc_auc": 0.9988057144721111,
+        "eer": 0.012134120760318834
+      },
+      "cal_clean_auc": 0.9987794805064949,
+      "folds": {
+        "F1_mask": {
+          "vis_edge": 0.683164,
+          "val_occluded_auc": 0.9843023557248867,
+          "cal_occluded_auc": 0.9846695902112684,
+          "cal_strata_counts": {
+            "clean": 1727,
+            "vis_high": 2536,
+            "vis_low": 2555
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.17855147594213486,
+                  0.2809693077802659
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1914,
+                "n_rejected": 502,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6128,
+                  "accepted_genuine": 3203,
+                  "accepted_impostor": 2925,
+                  "false_matches": 62,
+                  "false_non_matches": 82,
+                  "p_value": 2.573204100117037e-12
+                },
+                "n_ordered": 1914
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.20246463383734228,
+                    0.35876115113496776
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1795,
+                  "n_rejected": 528,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1590,
+                    "accepted_genuine": 864,
+                    "accepted_impostor": 726,
+                    "false_matches": 1,
+                    "false_non_matches": 4,
+                    "p_value": 1.0969025494685974e-14
+                  },
+                  "n_ordered": 1795
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.20246463383734228,
+                    0.3340801792144775
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1801,
+                  "n_rejected": 501,
+                  "cal_stats": {
+                    "n": 2536,
+                    "accepted": 2329,
+                    "accepted_genuine": 1191,
+                    "accepted_impostor": 1138,
+                    "false_matches": 10,
+                    "false_non_matches": 6,
+                    "p_value": 8.407878221001677e-15
+                  },
+                  "n_ordered": 1801
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.035381893455982215,
+                    0.3340801792144775
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1806,
+                  "n_rejected": 26,
+                  "cal_stats": {
+                    "n": 2555,
+                    "accepted": 1227,
+                    "accepted_genuine": 902,
+                    "accepted_impostor": 325,
+                    "false_matches": 5,
+                    "false_non_matches": 12,
+                    "p_value": 0.0009396928969987644
+                  },
+                  "n_ordered": 1806
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.20246463383734228,
+                  0.2560354174077512
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 574,
+                "n_rejected": 556,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6464,
+                  "accepted_genuine": 3293,
+                  "accepted_impostor": 3171,
+                  "false_matches": 108,
+                  "false_non_matches": 117,
+                  "p_value": 3.8693810531110074e-05
+                },
+                "n_ordered": 574
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.3056385517120362,
+                    0.3056385517120362
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 821,
+                  "n_rejected": 512,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1727,
+                    "accepted_genuine": 902,
+                    "accepted_impostor": 825,
+                    "false_matches": 5,
+                    "false_non_matches": 19,
+                    "p_value": 6.447692158291834e-06
+                  },
+                  "n_ordered": 821
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.2809693077802659,
+                    0.2809693077802659
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 717,
+                  "n_rejected": 614,
+                  "cal_stats": {
+                    "n": 2536,
+                    "accepted": 2536,
+                    "accepted_genuine": 1259,
+                    "accepted_impostor": 1277,
+                    "false_matches": 28,
+                    "false_non_matches": 29,
+                    "p_value": 8.549213186914409e-07
+                  },
+                  "n_ordered": 717
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.09712323434650899,
+                    0.2809693077802659
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 154,
+                  "n_rejected": 70,
+                  "cal_stats": {
+                    "n": 2555,
+                    "accepted": 1793,
+                    "accepted_genuine": 1032,
+                    "accepted_impostor": 761,
+                    "false_matches": 20,
+                    "false_non_matches": 27,
+                    "p_value": 0.0007876848789154738
+                  },
+                  "n_ordered": 154
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.035381893455982215,
+                  0.40017462861537934
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1788,
+                "n_rejected": 20,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 3378,
+                  "accepted_genuine": 2640,
+                  "accepted_impostor": 738,
+                  "false_matches": 2,
+                  "false_non_matches": 13,
+                  "p_value": 0.021752361863382707
+                },
+                "n_ordered": 1788
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.10958833208307624,
+                    0.4185563144683838
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1113,
+                  "n_rejected": 5,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1254,
+                    "accepted_genuine": 839,
+                    "accepted_impostor": 415,
+                    "false_matches": 0,
+                    "false_non_matches": 1,
+                    "p_value": 0.015438523314636169
+                  },
+                  "n_ordered": 1113
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.1287156218290329,
+                    0.380667345672846
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1292,
+                  "n_rejected": 100,
+                  "cal_stats": {
+                    "n": 2536,
+                    "accepted": 1956,
+                    "accepted_genuine": 1120,
+                    "accepted_impostor": 836,
+                    "false_matches": 2,
+                    "false_non_matches": 1,
+                    "p_value": 0.010110588657429139
+                  },
+                  "n_ordered": 1292
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1267,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1267
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.18967806536704304,
+                  0.3340801792144775
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 425,
+                "n_rejected": 336,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6036,
+                  "accepted_genuine": 3042,
+                  "accepted_impostor": 2994,
+                  "false_matches": 18,
+                  "false_non_matches": 97,
+                  "p_value": 0.01293198683010509
+                },
+                "n_ordered": 425
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 410,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 410
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.2809693077802659,
+                    0.35876115113496776
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 397,
+                  "n_rejected": 257,
+                  "cal_stats": {
+                    "n": 2536,
+                    "accepted": 2438,
+                    "accepted_genuine": 1184,
+                    "accepted_impostor": 1254,
+                    "false_matches": 5,
+                    "false_non_matches": 29,
+                    "p_value": 0.014101032794649882
+                  },
+                  "n_ordered": 397
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 16,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 16
+                }
+              }
+            }
+          }
+        },
+        "F2_sunglasses": {
+          "vis_edge": 0.501591,
+          "val_occluded_auc": 0.9816782218972213,
+          "cal_occluded_auc": 0.9829027023785072,
+          "cal_strata_counts": {
+            "clean": 1725,
+            "vis_high": 2581,
+            "vis_low": 2512
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.1608546445667744,
+                  0.2751544739603997
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1915,
+                "n_rejected": 421,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5870,
+                  "accepted_genuine": 3176,
+                  "accepted_impostor": 2694,
+                  "false_matches": 75,
+                  "false_non_matches": 74,
+                  "p_value": 7.040823732809912e-09
+                },
+                "n_ordered": 1915
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.19011143290996552,
+                    0.3660708697140217
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1795,
+                  "n_rejected": 461,
+                  "cal_stats": {
+                    "n": 1725,
+                    "accepted": 1550,
+                    "accepted_genuine": 830,
+                    "accepted_impostor": 720,
+                    "false_matches": 0,
+                    "false_non_matches": 1,
+                    "p_value": 9.141044180303058e-17
+                  },
+                  "n_ordered": 1795
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.16986546985805034,
+                    0.3056385517120362
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1808,
+                  "n_rejected": 436,
+                  "cal_stats": {
+                    "n": 2581,
+                    "accepted": 2277,
+                    "accepted_genuine": 1176,
+                    "accepted_impostor": 1101,
+                    "false_matches": 12,
+                    "false_non_matches": 8,
+                    "p_value": 1.0547100924930083e-12
+                  },
+                  "n_ordered": 1808
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1827,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1827
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.19011143290996552,
+                  0.2751544739603997
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 529,
+                "n_rejected": 491,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6236,
+                  "accepted_genuine": 3204,
+                  "accepted_impostor": 3032,
+                  "false_matches": 75,
+                  "false_non_matches": 102,
+                  "p_value": 3.1618846726098776e-07
+                },
+                "n_ordered": 529
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.3056385517120362,
+                    0.3056385517120362
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 835,
+                  "n_rejected": 595,
+                  "cal_stats": {
+                    "n": 1725,
+                    "accepted": 1725,
+                    "accepted_genuine": 867,
+                    "accepted_impostor": 858,
+                    "false_matches": 7,
+                    "false_non_matches": 16,
+                    "p_value": 1.0902852337252284e-06
+                  },
+                  "n_ordered": 835
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.2318430244922638,
+                    0.2751544739603997
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 605,
+                  "n_rejected": 551,
+                  "cal_stats": {
+                    "n": 2581,
+                    "accepted": 2509,
+                    "accepted_genuine": 1226,
+                    "accepted_impostor": 1283,
+                    "false_matches": 30,
+                    "false_non_matches": 28,
+                    "p_value": 9.734525654209807e-07
+                  },
+                  "n_ordered": 605
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.09175930207967758,
+                    0.2991621886789799
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 128,
+                  "n_rejected": 61,
+                  "cal_stats": {
+                    "n": 2512,
+                    "accepted": 1667,
+                    "accepted_genuine": 1023,
+                    "accepted_impostor": 644,
+                    "false_matches": 17,
+                    "false_non_matches": 26,
+                    "p_value": 0.0020556248301695315
+                  },
+                  "n_ordered": 128
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.006477588105015453,
+                  0.43796625882387163
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1792,
+                "n_rejected": 4,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 2680,
+                  "accepted_genuine": 2319,
+                  "accepted_impostor": 361,
+                  "false_matches": 0,
+                  "false_non_matches": 5,
+                  "p_value": 0.026564720430486907
+                },
+                "n_ordered": 1792
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.21637602459639313,
+                    0.3660708697140217
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1105,
+                  "n_rejected": 211,
+                  "cal_stats": {
+                    "n": 1725,
+                    "accepted": 1605,
+                    "accepted_genuine": 833,
+                    "accepted_impostor": 772,
+                    "false_matches": 0,
+                    "false_non_matches": 4,
+                    "p_value": 0.0004269433262718463
+                  },
+                  "n_ordered": 1105
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.09773013282567262,
+                    0.3859370436668396
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1306,
+                  "n_rejected": 59,
+                  "cal_stats": {
+                    "n": 2581,
+                    "accepted": 1693,
+                    "accepted_genuine": 1015,
+                    "accepted_impostor": 678,
+                    "false_matches": 0,
+                    "false_non_matches": 1,
+                    "p_value": 0.0010981506858273235
+                  },
+                  "n_ordered": 1306
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1287,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1287
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.17954972591996193,
+                  0.34463886499404894
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 369,
+                "n_rejected": 296,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5766,
+                  "accepted_genuine": 2926,
+                  "accepted_impostor": 2840,
+                  "false_matches": 13,
+                  "false_non_matches": 95,
+                  "p_value": 0.0009823291307948408
+                },
+                "n_ordered": 369
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 412,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 412
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.2318430244922638,
+                    0.34463886499404894
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 322,
+                  "n_rejected": 271,
+                  "cal_stats": {
+                    "n": 2581,
+                    "accepted": 2389,
+                    "accepted_genuine": 1132,
+                    "accepted_impostor": 1257,
+                    "false_matches": 4,
+                    "false_non_matches": 28,
+                    "p_value": 0.004932680284471193
+                  },
+                  "n_ordered": 322
+                }
+              }
+            }
+          }
+        },
+        "F3_hand_object": {
+          "vis_edge": 0.512412,
+          "val_occluded_auc": 0.9832517182261705,
+          "cal_occluded_auc": 0.9806662449690356,
+          "cal_strata_counts": {
+            "clean": 1727,
+            "vis_high": 2591,
+            "vis_low": 2500
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.1367590929418803,
+                  0.30010469894111164
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1912,
+                "n_rejected": 329,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5465,
+                  "accepted_genuine": 3098,
+                  "accepted_impostor": 2367,
+                  "false_matches": 39,
+                  "false_non_matches": 70,
+                  "p_value": 4.7702942247994294e-15
+                },
+                "n_ordered": 1912
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.15246827657520773,
+                    0.39138212190568455
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1795,
+                  "n_rejected": 405,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1430,
+                    "accepted_genuine": 807,
+                    "accepted_impostor": 623,
+                    "false_matches": 1,
+                    "false_non_matches": 0,
+                    "p_value": 4.4728828337665073e-13
+                  },
+                  "n_ordered": 1795
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.08516442020609978,
+                    0.42518619312346007
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1804,
+                  "n_rejected": 156,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 1528,
+                    "accepted_genuine": 967,
+                    "accepted_impostor": 561,
+                    "false_matches": 0,
+                    "false_non_matches": 1,
+                    "p_value": 3.1837764576939426e-13
+                  },
+                  "n_ordered": 1804
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.0059101840239018195,
+                    0.40855627417564394
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1822,
+                  "n_rejected": 4,
+                  "cal_stats": {
+                    "n": 2500,
+                    "accepted": 861,
+                    "accepted_genuine": 688,
+                    "accepted_impostor": 173,
+                    "false_matches": 2,
+                    "false_non_matches": 6,
+                    "p_value": 0.007185519507831626
+                  },
+                  "n_ordered": 1822
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.190247264303267,
+                  0.2756525167822839
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 559,
+                "n_rejected": 483,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6249,
+                  "accepted_genuine": 3233,
+                  "accepted_impostor": 3016,
+                  "false_matches": 69,
+                  "false_non_matches": 131,
+                  "p_value": 0.0062384381067798365
+                },
+                "n_ordered": 559
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.3056385517120362,
+                    0.3056385517120362
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 831,
+                  "n_rejected": 722,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1727,
+                    "accepted_genuine": 857,
+                    "accepted_impostor": 870,
+                    "false_matches": 8,
+                    "false_non_matches": 12,
+                    "p_value": 1.50561498341103e-08
+                  },
+                  "n_ordered": 831
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.2527360279709101,
+                    0.2527360279709101
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 660,
+                  "n_rejected": 603,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2591,
+                    "accepted_genuine": 1300,
+                    "accepted_impostor": 1291,
+                    "false_matches": 45,
+                    "false_non_matches": 43,
+                    "p_value": 0.005501364228591669
+                  },
+                  "n_ordered": 660
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.09132458263635636,
+                    0.3056385517120362
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 150,
+                  "n_rejected": 40,
+                  "cal_stats": {
+                    "n": 2500,
+                    "accepted": 1619,
+                    "accepted_genuine": 983,
+                    "accepted_impostor": 636,
+                    "false_matches": 14,
+                    "false_non_matches": 33,
+                    "p_value": 0.008179152193162943
+                  },
+                  "n_ordered": 150
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.0059101840239018195,
+                  0.4555486430376767
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1790,
+                "n_rejected": 3,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 2582,
+                  "accepted_genuine": 2182,
+                  "accepted_impostor": 400,
+                  "false_matches": 0,
+                  "false_non_matches": 7,
+                  "p_value": 0.017950553275045196
+                },
+                "n_ordered": 1790
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.11019339315593246,
+                    0.40855627417564394
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1120,
+                  "n_rejected": 15,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1241,
+                    "accepted_genuine": 795,
+                    "accepted_impostor": 446,
+                    "false_matches": 0,
+                    "false_non_matches": 0,
+                    "p_value": 0.011305682645796048
+                  },
+                  "n_ordered": 1120
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.1443117265701294,
+                    0.3487144241482019
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1298,
+                  "n_rejected": 155,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2061,
+                    "accepted_genuine": 1142,
+                    "accepted_impostor": 919,
+                    "false_matches": 1,
+                    "false_non_matches": 4,
+                    "p_value": 0.0010019739222158009
+                  },
+                  "n_ordered": 1298
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1281,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1281
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.1790172054767609,
+                  0.3487144241482019
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 399,
+                "n_rejected": 263,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5793,
+                  "accepted_genuine": 2937,
+                  "accepted_impostor": 2856,
+                  "false_matches": 10,
+                  "false_non_matches": 110,
+                  "p_value": 0.0006892846316771918
+                },
+                "n_ordered": 399
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.3487144241482019,
+                    0.39138212190568455
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 420,
+                  "n_rejected": 184,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1698,
+                    "accepted_genuine": 830,
+                    "accepted_impostor": 868,
+                    "false_matches": 1,
+                    "false_non_matches": 23,
+                    "p_value": 0.0015890596138935784
+                  },
+                  "n_ordered": 420
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.2527360279709101,
+                    0.3487144241482019
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 367,
+                  "n_rejected": 279,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2428,
+                    "accepted_genuine": 1181,
+                    "accepted_impostor": 1247,
+                    "false_matches": 1,
+                    "false_non_matches": 43,
+                    "p_value": 0.015676192298459173
+                  },
+                  "n_ordered": 367
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 3,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 3
+                }
+              }
+            }
+          }
+        },
+        "F4_random_patch": {
+          "vis_edge": 0.611394,
+          "val_occluded_auc": 0.9911356106141903,
+          "cal_occluded_auc": 0.9913212665626104,
+          "cal_strata_counts": {
+            "clean": 1726,
+            "vis_high": 2591,
+            "vis_low": 2501
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.21368679140508176,
+                  0.275896422803402
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1904,
+                "n_rejected": 614,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6476,
+                  "accepted_genuine": 3306,
+                  "accepted_impostor": 3170,
+                  "false_matches": 75,
+                  "false_non_matches": 74,
+                  "p_value": 3.4886324775054106e-14
+                },
+                "n_ordered": 1904
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.3039619828760625,
+                    0.3039619828760625
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1795,
+                  "n_rejected": 837,
+                  "cal_stats": {
+                    "n": 1726,
+                    "accepted": 1726,
+                    "accepted_genuine": 835,
+                    "accepted_impostor": 891,
+                    "false_matches": 8,
+                    "false_non_matches": 8,
+                    "p_value": 1.018692801194227e-10
+                  },
+                  "n_ordered": 1795
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.16716532215476038,
+                    0.3571030942797661
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1801,
+                  "n_rejected": 415,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2215,
+                    "accepted_genuine": 1199,
+                    "accepted_impostor": 1016,
+                    "false_matches": 6,
+                    "false_non_matches": 8,
+                    "p_value": 8.377329239742856e-16
+                  },
+                  "n_ordered": 1801
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1805,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1805
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.2503071576356888,
+                  0.2503071576356888
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 713,
+                "n_rejected": 681,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6818,
+                  "accepted_genuine": 3409,
+                  "accepted_impostor": 3409,
+                  "false_matches": 138,
+                  "false_non_matches": 127,
+                  "p_value": 0.004948084160172441
+                },
+                "n_ordered": 713
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.3039619828760625,
+                    0.3039619828760625
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 834,
+                  "n_rejected": 833,
+                  "cal_stats": {
+                    "n": 1726,
+                    "accepted": 1726,
+                    "accepted_genuine": 835,
+                    "accepted_impostor": 891,
+                    "false_matches": 8,
+                    "false_non_matches": 8,
+                    "p_value": 1.018692801194227e-10
+                  },
+                  "n_ordered": 834
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.275896422803402,
+                    0.275896422803402
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 700,
+                  "n_rejected": 587,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2591,
+                    "accepted_genuine": 1330,
+                    "accepted_impostor": 1261,
+                    "false_matches": 29,
+                    "false_non_matches": 39,
+                    "p_value": 0.0001348054400844093
+                  },
+                  "n_ordered": 700
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.16716532215476038,
+                    0.275896422803402
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 357,
+                  "n_rejected": 259,
+                  "cal_stats": {
+                    "n": 2501,
+                    "accepted": 2181,
+                    "accepted_genuine": 1146,
+                    "accepted_impostor": 1035,
+                    "false_matches": 26,
+                    "false_non_matches": 34,
+                    "p_value": 0.0004756391074838042
+                  },
+                  "n_ordered": 357
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": false,
+                "rule": null,
+                "guarantee_valid": true,
+                "n_candidates": 1777,
+                "n_rejected": 0,
+                "cal_stats": null,
+                "n_ordered": 1777
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.23010544878989458,
+                    0.3571030942797661
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1121,
+                  "n_rejected": 245,
+                  "cal_stats": {
+                    "n": 1726,
+                    "accepted": 1639,
+                    "accepted_genuine": 813,
+                    "accepted_impostor": 826,
+                    "false_matches": 1,
+                    "false_non_matches": 2,
+                    "p_value": 0.0023183407860002023
+                  },
+                  "n_ordered": 1121
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.09538334208726884,
+                    0.39791764268279084
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1314,
+                  "n_rejected": 28,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 1718,
+                    "accepted_genuine": 1113,
+                    "accepted_impostor": 605,
+                    "false_matches": 0,
+                    "false_non_matches": 0,
+                    "p_value": 0.002287139905953887
+                  },
+                  "n_ordered": 1314
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1268,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1268
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.23010544878989458,
+                  0.33238645724952226
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 559,
+                "n_rejected": 481,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6334,
+                  "accepted_genuine": 3132,
+                  "accepted_impostor": 3202,
+                  "false_matches": 16,
+                  "false_non_matches": 98,
+                  "p_value": 0.0013198298013210469
+                },
+                "n_ordered": 559
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.3571030942797661,
+                    0.3789105115830898
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 420,
+                  "n_rejected": 418,
+                  "cal_stats": {
+                    "n": 1726,
+                    "accepted": 1720,
+                    "accepted_genuine": 830,
+                    "accepted_impostor": 890,
+                    "false_matches": 0,
+                    "false_non_matches": 24,
+                    "p_value": 0.001889483804047663
+                  },
+                  "n_ordered": 420
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.2503071576356888,
+                    0.3789105115830898
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 419,
+                  "n_rejected": 172,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2393,
+                    "accepted_genuine": 1181,
+                    "accepted_impostor": 1212,
+                    "false_matches": 2,
+                    "false_non_matches": 22,
+                    "p_value": 0.00045177870342008695
+                  },
+                  "n_ordered": 419
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.15046318984031676,
+                    0.39791764268279084
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 127,
+                  "n_rejected": 29,
+                  "cal_stats": {
+                    "n": 2501,
+                    "accepted": 1790,
+                    "accepted_genuine": 836,
+                    "accepted_impostor": 954,
+                    "false_matches": 2,
+                    "false_non_matches": 27,
+                    "p_value": 0.008466028512957737
+                  },
+                  "n_ordered": 127
+                }
+              }
+            }
+          }
+        },
+        "F5_extreme_lighting": {
+          "vis_edge": 0.611712,
+          "val_occluded_auc": 0.98243032081983,
+          "cal_occluded_auc": 0.9811975117028837,
+          "cal_strata_counts": {
+            "clean": 1705,
+            "vis_high": 2548,
+            "vis_low": 2565
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.123341746147722,
+                  0.3056385517120362
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1913,
+                "n_rejected": 289,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5174,
+                  "accepted_genuine": 3028,
+                  "accepted_impostor": 2146,
+                  "false_matches": 37,
+                  "false_non_matches": 55,
+                  "p_value": 1.1223226670423049e-15
+                },
+                "n_ordered": 1913
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.15234185655415058,
+                    0.4143447746485474
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1796,
+                  "n_rejected": 333,
+                  "cal_stats": {
+                    "n": 1705,
+                    "accepted": 1414,
+                    "accepted_genuine": 814,
+                    "accepted_impostor": 600,
+                    "false_matches": 0,
+                    "false_non_matches": 1,
+                    "p_value": 4.306883985257408e-14
+                  },
+                  "n_ordered": 1796
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.18978677360713483,
+                    0.3056385517120362
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1802,
+                  "n_rejected": 499,
+                  "cal_stats": {
+                    "n": 2548,
+                    "accepted": 2329,
+                    "accepted_genuine": 1231,
+                    "accepted_impostor": 1098,
+                    "false_matches": 13,
+                    "false_non_matches": 7,
+                    "p_value": 5.353169559364658e-12
+                  },
+                  "n_ordered": 1802
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.017508321262896063,
+                    0.4143447746485474
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1803,
+                  "n_rejected": 10,
+                  "cal_stats": {
+                    "n": 2565,
+                    "accepted": 788,
+                    "accepted_genuine": 572,
+                    "accepted_impostor": 216,
+                    "false_matches": 1,
+                    "false_non_matches": 9,
+                    "p_value": 0.0001908152161848911
+                  },
+                  "n_ordered": 1803
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.18978677360713483,
+                  0.27063222348690036
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 541,
+                "n_rejected": 475,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6257,
+                  "accepted_genuine": 3217,
+                  "accepted_impostor": 3040,
+                  "false_matches": 83,
+                  "false_non_matches": 120,
+                  "p_value": 0.00034109155619519647
+                },
+                "n_ordered": 541
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.3056385517120362,
+                    0.3056385517120362
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 845,
+                  "n_rejected": 785,
+                  "cal_stats": {
+                    "n": 1705,
+                    "accepted": 1705,
+                    "accepted_genuine": 858,
+                    "accepted_impostor": 847,
+                    "false_matches": 11,
+                    "false_non_matches": 7,
+                    "p_value": 5.801336004747045e-09
+                  },
+                  "n_ordered": 845
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.2496623789817096,
+                    0.27063222348690036
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 676,
+                  "n_rejected": 572,
+                  "cal_stats": {
+                    "n": 2548,
+                    "accepted": 2523,
+                    "accepted_genuine": 1274,
+                    "accepted_impostor": 1249,
+                    "false_matches": 31,
+                    "false_non_matches": 27,
+                    "p_value": 5.325016817900724e-06
+                  },
+                  "n_ordered": 676
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.07875709359347821,
+                    0.3176852743625641
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 134,
+                  "n_rejected": 26,
+                  "cal_stats": {
+                    "n": 2565,
+                    "accepted": 1476,
+                    "accepted_genuine": 889,
+                    "accepted_impostor": 587,
+                    "false_matches": 11,
+                    "false_non_matches": 28,
+                    "p_value": 0.00472823292588786
+                  },
+                  "n_ordered": 134
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.04443767555430531,
+                  0.39659796047210694
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1792,
+                "n_rejected": 38,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 3376,
+                  "accepted_genuine": 2543,
+                  "accepted_impostor": 833,
+                  "false_matches": 1,
+                  "false_non_matches": 13,
+                  "p_value": 0.0021771974526521138
+                },
+                "n_ordered": 1792
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.18978677360713483,
+                    0.37933332432806494
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1120,
+                  "n_rejected": 157,
+                  "cal_stats": {
+                    "n": 1705,
+                    "accepted": 1552,
+                    "accepted_genuine": 829,
+                    "accepted_impostor": 723,
+                    "false_matches": 1,
+                    "false_non_matches": 1,
+                    "p_value": 0.0058007255341436005
+                  },
+                  "n_ordered": 1120
+                },
+                "vis_high": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1304,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1304
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1262,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1262
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.17902183794975282,
+                  0.34085953935980795
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 381,
+                "n_rejected": 254,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5778,
+                  "accepted_genuine": 2919,
+                  "accepted_impostor": 2859,
+                  "false_matches": 10,
+                  "false_non_matches": 99,
+                  "p_value": 5.431402467562157e-05
+                },
+                "n_ordered": 381
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.3601650361716747,
+                    0.37933332432806494
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 423,
+                  "n_rejected": 312,
+                  "cal_stats": {
+                    "n": 1705,
+                    "accepted": 1696,
+                    "accepted_genuine": 850,
+                    "accepted_impostor": 846,
+                    "false_matches": 1,
+                    "false_non_matches": 22,
+                    "p_value": 0.0019371856506918154
+                  },
+                  "n_ordered": 423
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.27063222348690036,
+                    0.34085953935980795
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 380,
+                  "n_rejected": 362,
+                  "cal_stats": {
+                    "n": 2548,
+                    "accepted": 2456,
+                    "accepted_genuine": 1224,
+                    "accepted_impostor": 1232,
+                    "false_matches": 1,
+                    "false_non_matches": 39,
+                    "p_value": 0.0012893987690484423
+                  },
+                  "n_ordered": 380
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "clean_cal_arm": {
+        "primary_alpha": {
+          "feasible": true,
+          "rule": [
+            0.3056124746799469,
+            0.3056385517120362
+          ],
+          "guarantee_valid": true,
+          "n_candidates": 1894,
+          "n_rejected": 897,
+          "cal_stats": {
+            "n": 6818,
+            "accepted": 6818,
+            "accepted_genuine": 3409,
+            "accepted_impostor": 3409,
+            "false_matches": 42,
+            "false_non_matches": 46,
+            "p_value": 9.872671167262415e-31
+          },
+          "n_ordered": 1894
+        },
+        "primary_alpha__v2": {
+          "feasible": true,
+          "rule": [
+            0.3056124746799469,
+            0.3056124746799469
+          ],
+          "guarantee_valid": true,
+          "n_candidates": 922,
+          "n_rejected": 906,
+          "cal_stats": {
+            "n": 6818,
+            "accepted": 6818,
+            "accepted_genuine": 3409,
+            "accepted_impostor": 3409,
+            "false_matches": 42,
+            "false_non_matches": 46,
+            "p_value": 9.872671167262415e-31
+          },
+          "n_ordered": 922
+        },
+        "far1_fm": {
+          "feasible": true,
+          "rule": [
+            0.23365816885232937,
+            0.3698390325009824
+          ],
+          "guarantee_valid": true,
+          "n_candidates": 1768,
+          "n_rejected": 641,
+          "cal_stats": {
+            "n": 6818,
+            "accepted": 6472,
+            "accepted_genuine": 3288,
+            "accepted_impostor": 3184,
+            "false_matches": 7,
+            "false_non_matches": 13,
+            "p_value": 1.1245204768414729e-07
+          },
+          "n_ordered": 1768
+        },
+        "far1_fm__v2": {
+          "feasible": true,
+          "rule": [
+            0.3698390325009824,
+            0.3698390325009824
+          ],
+          "guarantee_valid": true,
+          "n_candidates": 805,
+          "n_rejected": 733,
+          "cal_stats": {
+            "n": 6818,
+            "accepted": 6818,
+            "accepted_genuine": 3409,
+            "accepted_impostor": 3409,
+            "false_matches": 7,
+            "false_non_matches": 134,
+            "p_value": 0.0017703478045609257
+          },
+          "n_ordered": 805
+        }
+      }
+    },
+    "arcface_ir101_webface4m": {
+      "backbone_fingerprint": "af47f6fe5e21db0a-fp16",
+      "embedding_run": "af47f6fe5e21db0a-fp16",
+      "thresholds": {
+        "val_eer": 0.260014683008194,
+        "val_best_accuracy": 0.27312588691711426,
+        "val_far_1pct": 0.276229202747345,
+        "val_far_0.1pct": 0.3421435356140137,
+        "cal_far_1pct": 0.2763662934303284
+      },
+      "val_clean": {
+        "n_pairs": 61974,
+        "roc_auc": 0.9980600840328577,
+        "eer": 0.01590989769903508
+      },
+      "cal_clean_auc": 0.9980984024050361,
+      "folds": {
+        "F1_mask": {
+          "vis_edge": 0.683164,
+          "val_occluded_auc": 0.9808001416846763,
+          "cal_occluded_auc": 0.9818783316572416,
+          "cal_strata_counts": {
+            "clean": 1727,
+            "vis_high": 2536,
+            "vis_low": 2555
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.06264724043756727,
+                  0.29901900634169576
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1915,
+                "n_rejected": 183,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 4389,
+                  "accepted_genuine": 2864,
+                  "accepted_impostor": 1525,
+                  "false_matches": 14,
+                  "false_non_matches": 30,
+                  "p_value": 6.426662479383425e-19
+                },
+                "n_ordered": 1915
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.0680047254562378,
+                    0.3723768814951184
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1796,
+                  "n_rejected": 131,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1133,
+                    "accepted_genuine": 817,
+                    "accepted_impostor": 316,
+                    "false_matches": 0,
+                    "false_non_matches": 1,
+                    "p_value": 9.133963488950218e-08
+                  },
+                  "n_ordered": 1796
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.19400931894779205,
+                    0.25489221613109114
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1806,
+                  "n_rejected": 621,
+                  "cal_stats": {
+                    "n": 2536,
+                    "accepted": 2439,
+                    "accepted_genuine": 1219,
+                    "accepted_impostor": 1220,
+                    "false_matches": 18,
+                    "false_non_matches": 15,
+                    "p_value": 4.36796905051784e-11
+                  },
+                  "n_ordered": 1806
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1813,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1813
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.15431078620254995,
+                  0.23300726726651197
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 514,
+                "n_rejected": 478,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6267,
+                  "accepted_genuine": 3212,
+                  "accepted_impostor": 3055,
+                  "false_matches": 77,
+                  "false_non_matches": 126,
+                  "p_value": 0.002185901773669515
+                },
+                "n_ordered": 514
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.25489221613109114,
+                    0.25489221613109114
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 771,
+                  "n_rejected": 439,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1727,
+                    "accepted_genuine": 902,
+                    "accepted_impostor": 825,
+                    "false_matches": 16,
+                    "false_non_matches": 29,
+                    "p_value": 0.005995540238371665
+                  },
+                  "n_ordered": 771
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.23300726726651197,
+                    0.23300726726651197
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 674,
+                  "n_rejected": 674,
+                  "cal_stats": {
+                    "n": 2536,
+                    "accepted": 2536,
+                    "accepted_genuine": 1259,
+                    "accepted_impostor": 1277,
+                    "false_matches": 32,
+                    "false_non_matches": 36,
+                    "p_value": 0.00011701400660103099
+                  },
+                  "n_ordered": 674
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.05686200993135571,
+                    0.25489221613109114
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 125,
+                  "n_rejected": 70,
+                  "cal_stats": {
+                    "n": 2555,
+                    "accepted": 1590,
+                    "accepted_genuine": 969,
+                    "accepted_impostor": 621,
+                    "false_matches": 9,
+                    "false_non_matches": 27,
+                    "p_value": 0.00044082160344610573
+                  },
+                  "n_ordered": 125
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.012166726565919835,
+                  0.3558172755241394
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1794,
+                "n_rejected": 22,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 3136,
+                  "accepted_genuine": 2528,
+                  "accepted_impostor": 608,
+                  "false_matches": 1,
+                  "false_non_matches": 11,
+                  "p_value": 0.01584829456030005
+                },
+                "n_ordered": 1794
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1091,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1091
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.11373293149471281,
+                    0.339049035564065
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1301,
+                  "n_rejected": 122,
+                  "cal_stats": {
+                    "n": 2536,
+                    "accepted": 1998,
+                    "accepted_genuine": 1076,
+                    "accepted_impostor": 922,
+                    "false_matches": 1,
+                    "false_non_matches": 1,
+                    "p_value": 0.0009750793663464074
+                  },
+                  "n_ordered": 1301
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1270,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1270
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.1449047828912735,
+                  0.29901900634169576
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 368,
+                "n_rejected": 277,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5851,
+                  "accepted_genuine": 2943,
+                  "accepted_impostor": 2908,
+                  "false_matches": 14,
+                  "false_non_matches": 109,
+                  "p_value": 0.0014668672173787248
+                },
+                "n_ordered": 368
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.260014683008194,
+                    0.3558172755241394
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 350,
+                  "n_rejected": 1,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1674,
+                    "accepted_genuine": 862,
+                    "accepted_impostor": 812,
+                    "false_matches": 1,
+                    "false_non_matches": 29,
+                    "p_value": 0.013095874948390332
+                  },
+                  "n_ordered": 350
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.23300726726651197,
+                    0.32078789532184604
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 365,
+                  "n_rejected": 333,
+                  "cal_stats": {
+                    "n": 2536,
+                    "accepted": 2396,
+                    "accepted_genuine": 1147,
+                    "accepted_impostor": 1249,
+                    "false_matches": 4,
+                    "false_non_matches": 36,
+                    "p_value": 0.005222747314107358
+                  },
+                  "n_ordered": 365
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 12,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 12
+                }
+              }
+            }
+          }
+        },
+        "F2_sunglasses": {
+          "vis_edge": 0.501591,
+          "val_occluded_auc": 0.9775087683332933,
+          "cal_occluded_auc": 0.9791691638813311,
+          "cal_strata_counts": {
+            "clean": 1725,
+            "vis_high": 2581,
+            "vis_low": 2512
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.08969352643191815,
+                  0.260014683008194
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1918,
+                "n_rejected": 238,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5074,
+                  "accepted_genuine": 2996,
+                  "accepted_impostor": 2078,
+                  "false_matches": 40,
+                  "false_non_matches": 49,
+                  "p_value": 2.4459940184409926e-13
+                },
+                "n_ordered": 1918
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1797,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1797
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.11411289381980896,
+                    0.28626707300543786
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1811,
+                  "n_rejected": 334,
+                  "cal_stats": {
+                    "n": 2581,
+                    "accepted": 2049,
+                    "accepted_genuine": 1108,
+                    "accepted_impostor": 941,
+                    "false_matches": 4,
+                    "false_non_matches": 13,
+                    "p_value": 3.5992476581068324e-12
+                  },
+                  "n_ordered": 1811
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.00416271624900402,
+                    0.34131782579422
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1832,
+                  "n_rejected": 13,
+                  "cal_stats": {
+                    "n": 2512,
+                    "accepted": 933,
+                    "accepted_genuine": 711,
+                    "accepted_impostor": 222,
+                    "false_matches": 1,
+                    "false_non_matches": 8,
+                    "p_value": 0.00014384799593237442
+                  },
+                  "n_ordered": 1832
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.14403743869066246,
+                  0.2257350859642029
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 462,
+                "n_rejected": 440,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6108,
+                  "accepted_genuine": 3205,
+                  "accepted_impostor": 2903,
+                  "false_matches": 99,
+                  "false_non_matches": 115,
+                  "p_value": 7.342609982847577e-05
+                },
+                "n_ordered": 462
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.260014683008194,
+                    0.260014683008194
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 789,
+                  "n_rejected": 662,
+                  "cal_stats": {
+                    "n": 1725,
+                    "accepted": 1725,
+                    "accepted_genuine": 867,
+                    "accepted_impostor": 858,
+                    "false_matches": 11,
+                    "false_non_matches": 18,
+                    "p_value": 7.6441868367012e-06
+                  },
+                  "n_ordered": 789
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.17713676039129497,
+                    0.2257350859642029
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 546,
+                  "n_rejected": 473,
+                  "cal_stats": {
+                    "n": 2581,
+                    "accepted": 2465,
+                    "accepted_genuine": 1226,
+                    "accepted_impostor": 1239,
+                    "false_matches": 30,
+                    "false_non_matches": 37,
+                    "p_value": 0.00043588589428870744
+                  },
+                  "n_ordered": 546
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.05179316548630595,
+                    0.260014683008194
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 90,
+                  "n_rejected": 32,
+                  "cal_stats": {
+                    "n": 2512,
+                    "accepted": 1532,
+                    "accepted_genuine": 984,
+                    "accepted_impostor": 548,
+                    "false_matches": 15,
+                    "false_non_matches": 21,
+                    "p_value": 0.006227295386158707
+                  },
+                  "n_ordered": 90
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  -0.00557687834603712,
+                  0.3889472107291221
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1798,
+                "n_rejected": 4,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 2515,
+                  "accepted_genuine": 2147,
+                  "accepted_impostor": 368,
+                  "false_matches": 0,
+                  "false_non_matches": 7,
+                  "p_value": 0.024760055390093703
+                },
+                "n_ordered": 1798
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1107,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1107
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.05179316548630595,
+                    0.34131782579422
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1316,
+                  "n_rejected": 12,
+                  "cal_stats": {
+                    "n": 2581,
+                    "accepted": 1464,
+                    "accepted_genuine": 957,
+                    "accepted_impostor": 507,
+                    "false_matches": 0,
+                    "false_non_matches": 2,
+                    "p_value": 0.006124119562845171
+                  },
+                  "n_ordered": 1316
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1298,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1298
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.12816434051096445,
+                  0.30592683395743386
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 314,
+                "n_rejected": 202,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5444,
+                  "accepted_genuine": 2812,
+                  "accepted_impostor": 2632,
+                  "false_matches": 14,
+                  "false_non_matches": 94,
+                  "p_value": 0.006293043339616498
+                },
+                "n_ordered": 314
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.28626707300543786,
+                    0.3574319615662098
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 355,
+                  "n_rejected": 141,
+                  "cal_stats": {
+                    "n": 1725,
+                    "accepted": 1681,
+                    "accepted_genuine": 828,
+                    "accepted_impostor": 853,
+                    "false_matches": 1,
+                    "false_non_matches": 24,
+                    "p_value": 0.001979473798333051
+                  },
+                  "n_ordered": 355
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.1648386892974377,
+                    0.3246548591852189
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 272,
+                  "n_rejected": 142,
+                  "cal_stats": {
+                    "n": 2581,
+                    "accepted": 2208,
+                    "accepted_genuine": 1038,
+                    "accepted_impostor": 1170,
+                    "false_matches": 1,
+                    "false_non_matches": 29,
+                    "p_value": 0.0002943414867745446
+                  },
+                  "n_ordered": 272
+                }
+              }
+            }
+          }
+        },
+        "F3_hand_object": {
+          "vis_edge": 0.512412,
+          "val_occluded_auc": 0.9794256337542913,
+          "cal_occluded_auc": 0.9775942084181598,
+          "cal_strata_counts": {
+            "clean": 1727,
+            "vis_high": 2591,
+            "vis_low": 2500
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.0951770607829094,
+                  0.260014683008194
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1916,
+                "n_rejected": 291,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5118,
+                  "accepted_genuine": 3006,
+                  "accepted_impostor": 2112,
+                  "false_matches": 42,
+                  "false_non_matches": 65,
+                  "p_value": 5.797826486520643e-13
+                },
+                "n_ordered": 1916
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.12087909857556224,
+                    0.3442884283065796
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1797,
+                  "n_rejected": 341,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1412,
+                    "accepted_genuine": 801,
+                    "accepted_impostor": 611,
+                    "false_matches": 1,
+                    "false_non_matches": 0,
+                    "p_value": 8.122875185207112e-13
+                  },
+                  "n_ordered": 1797
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.08368332535773519,
+                    0.3275670794844628
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1806,
+                  "n_rejected": 225,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 1766,
+                    "accepted_genuine": 1050,
+                    "accepted_impostor": 716,
+                    "false_matches": 2,
+                    "false_non_matches": 4,
+                    "p_value": 8.39176636376269e-14
+                  },
+                  "n_ordered": 1806
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    -0.018721499435603615,
+                    0.3608426367491486
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1829,
+                  "n_rejected": 1,
+                  "cal_stats": {
+                    "n": 2500,
+                    "accepted": 808,
+                    "accepted_genuine": 659,
+                    "accepted_impostor": 149,
+                    "false_matches": 1,
+                    "false_non_matches": 3,
+                    "p_value": 0.004240068460567988
+                  },
+                  "n_ordered": 1829
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.14452362537384042,
+                  0.22559292474389087
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 493,
+                "n_rejected": 431,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6143,
+                  "accepted_genuine": 3210,
+                  "accepted_impostor": 2933,
+                  "false_matches": 109,
+                  "false_non_matches": 119,
+                  "p_value": 0.000527072283217798
+                },
+                "n_ordered": 493
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.260014683008194,
+                    0.260014683008194
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 782,
+                  "n_rejected": 597,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1727,
+                    "accepted_genuine": 857,
+                    "accepted_impostor": 870,
+                    "false_matches": 8,
+                    "false_non_matches": 20,
+                    "p_value": 5.7504240129542136e-05
+                  },
+                  "n_ordered": 782
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.1906920000910759,
+                    0.22559292474389087
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 597,
+                  "n_rejected": 480,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2508,
+                    "accepted_genuine": 1265,
+                    "accepted_impostor": 1243,
+                    "false_matches": 41,
+                    "false_non_matches": 36,
+                    "p_value": 0.0023138664994350727
+                  },
+                  "n_ordered": 597
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.06205543828383091,
+                    0.260014683008194
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 110,
+                  "n_rejected": 56,
+                  "cal_stats": {
+                    "n": 2500,
+                    "accepted": 1581,
+                    "accepted_genuine": 958,
+                    "accepted_impostor": 623,
+                    "false_matches": 17,
+                    "false_non_matches": 33,
+                    "p_value": 0.012947488701561092
+                  },
+                  "n_ordered": 110
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": false,
+                "rule": null,
+                "guarantee_valid": true,
+                "n_candidates": 1796,
+                "n_rejected": 0,
+                "cal_stats": null,
+                "n_ordered": 1796
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1106,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1106
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.06205543828383091,
+                    0.3608426367491486
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1311,
+                  "n_rejected": 25,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 1513,
+                    "accepted_genuine": 961,
+                    "accepted_impostor": 552,
+                    "false_matches": 0,
+                    "false_non_matches": 3,
+                    "p_value": 0.0038960759808019186
+                  },
+                  "n_ordered": 1311
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1289,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1289
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.13576174087822437,
+                  0.30845152848958973
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 341,
+                "n_rejected": 228,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5558,
+                  "accepted_genuine": 2821,
+                  "accepted_impostor": 2737,
+                  "false_matches": 13,
+                  "false_non_matches": 108,
+                  "p_value": 0.0017940279231735865
+                },
+                "n_ordered": 341
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.267800651550293,
+                    0.3769268965721132
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 347,
+                  "n_rejected": 34,
+                  "cal_stats": {
+                    "n": 1727,
+                    "accepted": 1645,
+                    "accepted_genuine": 781,
+                    "accepted_impostor": 864,
+                    "false_matches": 1,
+                    "false_non_matches": 21,
+                    "p_value": 0.0016474006189199084
+                  },
+                  "n_ordered": 347
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.17703145502507686,
+                    0.3275670794844628
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 310,
+                  "n_rejected": 177,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2248,
+                    "accepted_genuine": 1075,
+                    "accepted_impostor": 1173,
+                    "false_matches": 2,
+                    "false_non_matches": 29,
+                    "p_value": 0.0006296030887707876
+                  },
+                  "n_ordered": 310
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 3,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 3
+                }
+              }
+            }
+          }
+        },
+        "F4_random_patch": {
+          "vis_edge": 0.611394,
+          "val_occluded_auc": 0.9879220985979555,
+          "cal_occluded_auc": 0.9874171788807103,
+          "cal_strata_counts": {
+            "clean": 1726,
+            "vis_high": 2591,
+            "vis_low": 2501
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.15205562859773641,
+                  0.25011839467287067
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1909,
+                "n_rejected": 520,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6128,
+                  "accepted_genuine": 3181,
+                  "accepted_impostor": 2947,
+                  "false_matches": 55,
+                  "false_non_matches": 75,
+                  "p_value": 2.5734991136919708e-14
+                },
+                "n_ordered": 1909
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.17484068740904332,
+                    0.3167254305630922
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1795,
+                  "n_rejected": 527,
+                  "cal_stats": {
+                    "n": 1726,
+                    "accepted": 1585,
+                    "accepted_genuine": 803,
+                    "accepted_impostor": 782,
+                    "false_matches": 5,
+                    "false_non_matches": 2,
+                    "p_value": 4.191316695974827e-12
+                  },
+                  "n_ordered": 1795
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.1891054823622108,
+                    0.25011839467287067
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1805,
+                  "n_rejected": 631,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2478,
+                    "accepted_genuine": 1280,
+                    "accepted_impostor": 1198,
+                    "false_matches": 17,
+                    "false_non_matches": 29,
+                    "p_value": 4.6713063161096824e-07
+                  },
+                  "n_ordered": 1805
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.060435586735606193,
+                    0.2955950555205345
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1808,
+                  "n_rejected": 102,
+                  "cal_stats": {
+                    "n": 2501,
+                    "accepted": 1510,
+                    "accepted_genuine": 941,
+                    "accepted_impostor": 569,
+                    "false_matches": 7,
+                    "false_non_matches": 14,
+                    "p_value": 1.1282091331322731e-06
+                  },
+                  "n_ordered": 1808
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.1891054823622108,
+                  0.22770018494129182
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 646,
+                "n_rejected": 609,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6581,
+                  "accepted_genuine": 3317,
+                  "accepted_impostor": 3264,
+                  "false_matches": 101,
+                  "false_non_matches": 131,
+                  "p_value": 0.002382782100101644
+                },
+                "n_ordered": 646
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.260014683008194,
+                    0.260014683008194
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 789,
+                  "n_rejected": 698,
+                  "cal_stats": {
+                    "n": 1726,
+                    "accepted": 1726,
+                    "accepted_genuine": 835,
+                    "accepted_impostor": 891,
+                    "false_matches": 17,
+                    "false_non_matches": 15,
+                    "p_value": 1.3650359693181701e-06
+                  },
+                  "n_ordered": 789
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.20638307929039001,
+                    0.22770018494129182
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 649,
+                  "n_rejected": 570,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2563,
+                    "accepted_genuine": 1320,
+                    "accepted_impostor": 1243,
+                    "false_matches": 30,
+                    "false_non_matches": 39,
+                    "p_value": 0.00016856204770957487
+                  },
+                  "n_ordered": 649
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.11253782067075371,
+                    0.25011839467287067
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 278,
+                  "n_rejected": 183,
+                  "cal_stats": {
+                    "n": 2501,
+                    "accepted": 1990,
+                    "accepted_genuine": 1071,
+                    "accepted_impostor": 919,
+                    "false_matches": 16,
+                    "false_non_matches": 36,
+                    "p_value": 0.006073438881910896
+                  },
+                  "n_ordered": 278
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": false,
+                "rule": null,
+                "guarantee_valid": true,
+                "n_candidates": 1786,
+                "n_rejected": 0,
+                "cal_stats": null,
+                "n_ordered": 1786
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.09980687590315938,
+                    0.38190795071423056
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1122,
+                  "n_rejected": 41,
+                  "cal_stats": {
+                    "n": 1726,
+                    "accepted": 1261,
+                    "accepted_genuine": 749,
+                    "accepted_impostor": 512,
+                    "false_matches": 0,
+                    "false_non_matches": 0,
+                    "p_value": 0.005823976768663695
+                  },
+                  "n_ordered": 1122
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.07719300683587789,
+                    0.33465151846408847
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1322,
+                  "n_rejected": 43,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 1759,
+                    "accepted_genuine": 1103,
+                    "accepted_impostor": 656,
+                    "false_matches": 1,
+                    "false_non_matches": 0,
+                    "p_value": 0.010447188072180993
+                  },
+                  "n_ordered": 1322
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1267,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1267
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.17484068740904332,
+                  0.2955950555205345
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 484,
+                "n_rejected": 403,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6131,
+                  "accepted_genuine": 3035,
+                  "accepted_impostor": 3096,
+                  "false_matches": 18,
+                  "false_non_matches": 102,
+                  "p_value": 0.008184991823104453
+                },
+                "n_ordered": 484
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.2955950555205345,
+                    0.33465151846408847
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 384,
+                  "n_rejected": 259,
+                  "cal_stats": {
+                    "n": 1726,
+                    "accepted": 1695,
+                    "accepted_genuine": 809,
+                    "accepted_impostor": 886,
+                    "false_matches": 2,
+                    "false_non_matches": 22,
+                    "p_value": 0.006781516478265078
+                  },
+                  "n_ordered": 384
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.20638307929039001,
+                    0.33465151846408847
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 360,
+                  "n_rejected": 211,
+                  "cal_stats": {
+                    "n": 2591,
+                    "accepted": 2356,
+                    "accepted_genuine": 1142,
+                    "accepted_impostor": 1214,
+                    "false_matches": 1,
+                    "false_non_matches": 39,
+                    "p_value": 0.006165385381268194
+                  },
+                  "n_ordered": 360
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.08270763281732799,
+                    0.38190795071423056
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 68,
+                  "n_rejected": 9,
+                  "cal_stats": {
+                    "n": 2501,
+                    "accepted": 1412,
+                    "accepted_genuine": 677,
+                    "accepted_impostor": 735,
+                    "false_matches": 1,
+                    "false_non_matches": 19,
+                    "p_value": 0.005216736312580224
+                  },
+                  "n_ordered": 68
+                }
+              }
+            }
+          }
+        },
+        "F5_extreme_lighting": {
+          "vis_edge": 0.611712,
+          "val_occluded_auc": 0.9788203952319565,
+          "cal_occluded_auc": 0.9781304659959603,
+          "cal_strata_counts": {
+            "clean": 1705,
+            "vis_high": 2548,
+            "vis_low": 2565
+          },
+          "arms": {
+            "primary_alpha": {
+              "global": {
+                "feasible": true,
+                "rule": [
+                  0.11369378161430357,
+                  0.2424938068762422
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 1916,
+                "n_rejected": 367,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5567,
+                  "accepted_genuine": 3063,
+                  "accepted_impostor": 2504,
+                  "false_matches": 62,
+                  "false_non_matches": 76,
+                  "p_value": 1.2702962119078637e-10
+                },
+                "n_ordered": 1916
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.10722690599411726,
+                    0.36822708487510697
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1797,
+                  "n_rejected": 270,
+                  "cal_stats": {
+                    "n": 1705,
+                    "accepted": 1303,
+                    "accepted_genuine": 789,
+                    "accepted_impostor": 514,
+                    "false_matches": 1,
+                    "false_non_matches": 1,
+                    "p_value": 9.951916570104587e-11
+                  },
+                  "n_ordered": 1797
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.17603032891452317,
+                    0.2424938068762422
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1805,
+                  "n_rejected": 572,
+                  "cal_stats": {
+                    "n": 2548,
+                    "accepted": 2415,
+                    "accepted_genuine": 1239,
+                    "accepted_impostor": 1176,
+                    "false_matches": 19,
+                    "false_non_matches": 17,
+                    "p_value": 7.1386191518571e-10
+                  },
+                  "n_ordered": 1805
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.019338331073522574,
+                    0.3016885586380959
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1811,
+                  "n_rejected": 28,
+                  "cal_stats": {
+                    "n": 2565,
+                    "accepted": 1098,
+                    "accepted_genuine": 746,
+                    "accepted_impostor": 352,
+                    "false_matches": 4,
+                    "false_non_matches": 13,
+                    "p_value": 8.742938314450475e-05
+                  },
+                  "n_ordered": 1811
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.14396719735860825,
+                  0.22289231561124345
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 480,
+                "n_rejected": 445,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 6157,
+                  "accepted_genuine": 3194,
+                  "accepted_impostor": 2963,
+                  "false_matches": 106,
+                  "false_non_matches": 129,
+                  "p_value": 0.0058853951157633744
+                },
+                "n_ordered": 480
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.260014683008194,
+                    0.2625102798938751
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 794,
+                  "n_rejected": 619,
+                  "cal_stats": {
+                    "n": 1705,
+                    "accepted": 1705,
+                    "accepted_genuine": 858,
+                    "accepted_impostor": 847,
+                    "false_matches": 11,
+                    "false_non_matches": 18,
+                    "p_value": 1.0098089544092136e-05
+                  },
+                  "n_ordered": 794
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.20567889446020132,
+                    0.22289231561124345
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 625,
+                  "n_rejected": 580,
+                  "cal_stats": {
+                    "n": 2548,
+                    "accepted": 2509,
+                    "accepted_genuine": 1271,
+                    "accepted_impostor": 1238,
+                    "false_matches": 37,
+                    "false_non_matches": 35,
+                    "p_value": 0.00033541165078713743
+                  },
+                  "n_ordered": 625
+                },
+                "vis_low": {
+                  "feasible": true,
+                  "rule": [
+                    0.0500102356262505,
+                    0.260014683008194
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 99,
+                  "n_rejected": 25,
+                  "cal_stats": {
+                    "n": 2565,
+                    "accepted": 1495,
+                    "accepted_genuine": 902,
+                    "accepted_impostor": 593,
+                    "false_matches": 18,
+                    "false_non_matches": 26,
+                    "p_value": 0.013207164368940275
+                  },
+                  "n_ordered": 99
+                }
+              }
+            },
+            "far1_fm": {
+              "global": {
+                "feasible": false,
+                "rule": null,
+                "guarantee_valid": true,
+                "n_candidates": 1796,
+                "n_rejected": 0,
+                "cal_stats": null,
+                "n_ordered": 1796
+              },
+              "stratified_vis": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.09516880585253237,
+                    0.3843339086472987
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1101,
+                  "n_rejected": 16,
+                  "cal_stats": {
+                    "n": 1705,
+                    "accepted": 1238,
+                    "accepted_genuine": 769,
+                    "accepted_impostor": 469,
+                    "false_matches": 0,
+                    "false_non_matches": 1,
+                    "p_value": 0.008972351234045932
+                  },
+                  "n_ordered": 1101
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.083478375338018,
+                    0.32002391320467
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 1304,
+                  "n_rejected": 51,
+                  "cal_stats": {
+                    "n": 2548,
+                    "accepted": 1807,
+                    "accepted_genuine": 1106,
+                    "accepted_impostor": 701,
+                    "false_matches": 1,
+                    "false_non_matches": 1,
+                    "p_value": 0.007042489453457024
+                  },
+                  "n_ordered": 1304
+                },
+                "vis_low": {
+                  "feasible": false,
+                  "rule": null,
+                  "guarantee_valid": true,
+                  "n_candidates": 1270,
+                  "n_rejected": 0,
+                  "cal_stats": null,
+                  "n_ordered": 1270
+                }
+              },
+              "global_v2": {
+                "feasible": true,
+                "rule": [
+                  0.13531482502818107,
+                  0.3016885586380959
+                ],
+                "guarantee_valid": true,
+                "n_candidates": 319,
+                "n_rejected": 250,
+                "cal_stats": {
+                  "n": 6818,
+                  "accepted": 5566,
+                  "accepted_genuine": 2818,
+                  "accepted_impostor": 2748,
+                  "false_matches": 12,
+                  "false_non_matches": 109,
+                  "p_value": 0.0025062588663283597
+                },
+                "n_ordered": 319
+              },
+              "stratified_vis_v2": {
+                "clean": {
+                  "feasible": true,
+                  "rule": [
+                    0.28233358360826966,
+                    0.36822708487510697
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 360,
+                  "n_rejected": 61,
+                  "cal_stats": {
+                    "n": 1705,
+                    "accepted": 1648,
+                    "accepted_genuine": 808,
+                    "accepted_impostor": 840,
+                    "false_matches": 1,
+                    "false_non_matches": 20,
+                    "p_value": 0.0020445317519284774
+                  },
+                  "n_ordered": 360
+                },
+                "vis_high": {
+                  "feasible": true,
+                  "rule": [
+                    0.20567889446020132,
+                    0.3016885586380959
+                  ],
+                  "guarantee_valid": true,
+                  "n_candidates": 317,
+                  "n_rejected": 317,
+                  "cal_stats": {
+                    "n": 2548,
+                    "accepted": 2385,
+                    "accepted_genuine": 1183,
+                    "accepted_impostor": 1202,
+                    "false_matches": 1,
+                    "false_non_matches": 35,
+                    "p_value": 0.0003677755250949503
+                  },
+                  "n_ordered": 317
+                }
+              }
+            }
+          }
+        }
+      },
+      "clean_cal_arm": {
+        "primary_alpha": {
+          "feasible": true,
+          "rule": [
+            0.2598625272512436,
+            0.2598625272512436
+          ],
+          "guarantee_valid": true,
+          "n_candidates": 1895,
+          "n_rejected": 809,
+          "cal_stats": {
+            "n": 6818,
+            "accepted": 6818,
+            "accepted_genuine": 3409,
+            "accepted_impostor": 3409,
+            "false_matches": 49,
+            "false_non_matches": 73,
+            "p_value": 6.8449403218580645e-18
+          },
+          "n_ordered": 1895
+        },
+        "primary_alpha__v2": {
+          "feasible": true,
+          "rule": [
+            0.2598625272512436,
+            0.2598625272512436
+          ],
+          "guarantee_valid": true,
+          "n_candidates": 892,
+          "n_rejected": 811,
+          "cal_stats": {
+            "n": 6818,
+            "accepted": 6818,
+            "accepted_genuine": 3409,
+            "accepted_impostor": 3409,
+            "false_matches": 49,
+            "false_non_matches": 73,
+            "p_value": 6.8449403218580645e-18
+          },
+          "n_ordered": 892
+        },
+        "far1_fm": {
+          "feasible": true,
+          "rule": [
+            0.15860437270253896,
+            0.35108418017625814
+          ],
+          "guarantee_valid": true,
+          "n_candidates": 1768,
+          "n_rejected": 449,
+          "cal_stats": {
+            "n": 6818,
+            "accepted": 6064,
+            "accepted_genuine": 3181,
+            "accepted_impostor": 2883,
+            "false_matches": 5,
+            "false_non_matches": 6,
+            "p_value": 5.434368587834939e-08
+          },
+          "n_ordered": 1768
+        },
+        "far1_fm__v2": {
+          "feasible": true,
+          "rule": [
+            0.31026216809451584,
+            0.31026216809451584
+          ],
+          "guarantee_valid": true,
+          "n_candidates": 776,
+          "n_rejected": 612,
+          "cal_stats": {
+            "n": 6818,
+            "accepted": 6818,
+            "accepted_genuine": 3409,
+            "accepted_impostor": 3409,
+            "false_matches": 18,
+            "false_non_matches": 140,
+            "p_value": 0.00793080892152025
+          },
+          "n_ordered": 776
+        }
+      }
+    }
+  },
+  "sha256": "0e8a43fb7234a52388d017308249796a000b378424aaec11a8875bf5d90fa8a1",
+  "evidence_type": "real_measured_model_result",
+  "scope": "validation/calibration only (no test access)",
+  "provenance": {
+    "veilx_version": "0.0.1",
+    "timestamp_utc": "2026-10-26T21:01:33.610554+00:00",
+    "git": {
+      "commit": "eda4d7d71c86b56ae275fec6d9edb695f011c85d",
+      "dirty": true,
+      "repo_is_project_root": true
+    },
+    "python": "3.12.14",
+    "implementation": "CPython",
+    "os": "Windows",
+    "packages": {
+      "numpy": "2.5.4",
+      "pydantic": "2.14.1",
+      "PyYAML": "6.0.3",
+      "torch": null,
+      "onnxruntime": null,
+      "insightface": null
+    },
+    "configs": {},
+    "seed": null,
+    "argv": [
+      "scripts/evaluate_phase2.py",
+      "develop"
+    ],
+    "extra": {}
+  }
+}

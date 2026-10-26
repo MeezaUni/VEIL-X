@@ -132,6 +132,48 @@ def order_candidates_on_validation(
     return [t[3] for t in keep]
 
 
+def order_candidates_by_validation_pvalue(
+    rules: Sequence[ThresholdRule],
+    val_scores: ArrayLike,
+    val_labels: ArrayLike,
+    *,
+    n_cal_expected: int,
+    target_fm: float,
+    target_fnm: float,
+    delta: float,
+    val_gate_values: ArrayLike | None = None,
+) -> list[ThresholdRule]:
+    """Fixed-sequence order from **validation data only**, by projected evidence strength.
+
+    For each rule the validation counts are scaled to the calibration size and the
+    class-conditional binomial p-value that this projection would earn is computed
+    (``max`` over the FM and FNM tests, as in :class:`LTTCalibrator`). Rules whose projected
+    p-value exceeds ``delta`` are pruned (they would not be certified even if calibration
+    mirrored validation); the rest are tested from the strongest projected evidence to the
+    weakest (ties: higher validation coverage first). Compared with
+    :func:`order_candidates_on_validation`, the first rules tested carry a margin, so a small
+    calibration fluctuation does not stop the sequence at step one (Phase 2 finding, D-042).
+    The order never depends on calibration data, so validity is unaffected.
+    """
+    s, y = _validate_inputs(val_scores, val_labels)
+    scale = n_cal_expected / s.size
+    keep: list[tuple[float, float, int, ThresholdRule]] = []
+    for j, rule in enumerate(rules):
+        acc, acc_g, acc_i, fm, fnm = _stats(rule, s, y, val_gate_values)
+        n_i, n_g = round(acc_i * scale), round(acc_g * scale)
+        if n_i == 0 or n_g == 0:
+            continue
+        p = max(
+            binomial_pvalue(round(fm * scale), n_i, target_fm),
+            binomial_pvalue(round(fnm * scale), n_g, target_fnm),
+        )
+        if p > delta:
+            continue
+        keep.append((p, -acc / s.size, j, rule))
+    keep.sort(key=lambda t: (t[0], t[1], t[2]))
+    return [t[3] for t in keep]
+
+
 def binomial_pvalue(errors: int, accepted: int, target: float) -> float:
     """Exact binomial p-value for H0: risk > target, conditional on the accepted count."""
     if not 0 < target < 1:

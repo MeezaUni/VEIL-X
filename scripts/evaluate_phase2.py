@@ -64,6 +64,7 @@ from veilx.selective.ltt import (
     RiskControlResult,
     ThresholdRule,
     fit_stratified,
+    order_candidates_by_validation_pvalue,
     order_candidates_on_validation,
 )
 
@@ -194,6 +195,25 @@ def _ltt_record(res: RiskControlResult) -> dict[str, Any]:
     }
 
 
+STRATA = ("clean", "vis_high", "vis_low")
+
+
+def _fit_ordered(
+    ordered: list[ThresholdRule],
+    sc: ScoredPairs,
+    cal_set: PairSet,
+    afm: float,
+    afnm: float,
+    families: tuple[str, ...] = (),
+) -> dict[str, Any]:
+    if not ordered:
+        return {"feasible": False, "rule": None, "n_ordered": 0, "note": "no candidate survives"}
+    res = LTTCalibrator(ordered, target_fm=afm, target_fnm=afnm, delta=DELTA).fit(
+        sc.score, sc.label, pair_set=cal_set, calibration_families=families
+    )
+    return _ltt_record(res) | {"n_ordered": len(ordered)}
+
+
 # ----------------------------------------------------------------- develop
 
 
@@ -252,6 +272,17 @@ def develop() -> int:
                 sc.score, sc.label, pair_set=cal_set
             )
             b["clean_cal_arm"][tname] = _ltt_record(res) | {"n_ordered": len(ordered)}
+            # v2 (post-hoc sensitivity, D-042): order by projected validation p-value
+            o2 = order_candidates_by_validation_pvalue(
+                rules_c,
+                sv.score,
+                sv.label,
+                n_cal_expected=len(sc),
+                target_fm=afm,
+                target_fnm=afnm,
+                delta=DELTA,
+            )
+            b["clean_cal_arm"][f"{tname}__v2"] = _fit_ordered(o2, sc, cal_set, afm, afnm)
         for fold in FAMILIES:
             vrows = _plan(layout, fold, "val", "val")
             crows = _plan(layout, fold, "cal", "cal_independent")
@@ -309,11 +340,51 @@ def develop() -> int:
                     delta=DELTA,
                     candidates_by_stratum=by_stratum,
                 )
+                seen = tuple(x for x in FAMILIES if x != fold)
+                o2 = order_candidates_by_validation_pvalue(
+                    rules,
+                    sv_f.score,
+                    sv_f.label,
+                    n_cal_expected=len(sc_f),
+                    target_fm=afm,
+                    target_fnm=afnm,
+                    delta=DELTA,
+                )
+                by2 = {
+                    s_name: order_candidates_by_validation_pvalue(
+                        rules,
+                        sv_f.score[st_val == s_name],
+                        sv_f.label[st_val == s_name],
+                        n_cal_expected=max(int((st_cal == s_name).sum()), 1),
+                        target_fm=afm,
+                        target_fnm=afnm,
+                        delta=DELTA / 3,
+                    )
+                    for s_name in STRATA
+                }
+                strat2 = fit_stratified(
+                    LTTCalibrator,
+                    rules,
+                    sc_f.score,
+                    sc_f.label,
+                    st_cal.tolist(),
+                    cal_set,
+                    target_fm=afm,
+                    target_fnm=afnm,
+                    delta=DELTA,
+                    candidates_by_stratum=by2,
+                )
                 f["arms"][tname] = {
                     "global": _ltt_record(g) | {"n_ordered": len(ordered)},
                     "stratified_vis": {
                         s_name: _ltt_record(r) | {"n_ordered": len(by_stratum[s_name])}
                         for s_name, r in strat.per_stratum.items()
+                    },
+                    # v2 = post-hoc sensitivity arms (D-042); not part of the pre-registration
+                    "global_v2": _fit_ordered(o2, sc_f, cal_set, afm, afnm, seen),
+                    "stratified_vis_v2": {
+                        s_name: _ltt_record(r) | {"n_ordered": len(by2[s_name])}
+                        for s_name, r in strat2.per_stratum.items()
                     },
                 }
             b["folds"][fold] = f
@@ -324,6 +395,8 @@ def develop() -> int:
                         t: [
                             a["global"]["feasible"],
                             {s: v["feasible"] for s, v in a["stratified_vis"].items()},
+                            a["global_v2"]["feasible"],
+                            {s: v["feasible"] for s, v in a["stratified_vis_v2"].items()},
                         ]
                         for t, a in f["arms"].items()
                     }
@@ -526,10 +599,11 @@ def final(args: argparse.Namespace) -> int:
         rng = np.random.default_rng(0)
         r["audit_shuffle_auc"] = roc_auc(s_tb.score, rng.permutation(s_tb.label))
         r["clean_selective"] = {
-            tname: selective_summary(
-                _decide(fb["clean_cal_arm"][tname]["rule"], s_tb.score), s_tb, *TARGETS[tname]
+            key: selective_summary(
+                _decide(fb["clean_cal_arm"][key]["rule"], s_tb.score), s_tb, *TARGETS[tname]
             )
             for tname in TARGETS
+            for key in (tname, f"{tname}__v2")
         }
         r["folds"] = {}
         for fold, ff in fb["folds"].items():
@@ -578,11 +652,17 @@ def final(args: argparse.Namespace) -> int:
                     d_g = _decide(arms["global"]["rule"], sp.score)
                     d_s = _decide_stratified(arms["stratified_vis"], sp, ff["vis_edge"])
                     d_c = _decide(fb["clean_cal_arm"][tname]["rule"], sp.score)
+                    d_g2 = _decide(arms["global_v2"]["rule"], sp.score)
+                    d_s2 = _decide_stratified(arms["stratified_vis_v2"], sp, ff["vis_edge"])
+                    d_c2 = _decide(fb["clean_cal_arm"][f"{tname}__v2"]["rule"], sp.score)
                     st = _strata(sp.covis, ff["vis_edge"])
                     block["selective"][tname] = {
                         "global": selective_summary(d_g, sp, *TARGETS[tname]),
                         "clean_cal": selective_summary(d_c, sp, *TARGETS[tname]),
                         "stratified_vis": selective_summary(d_s, sp, *TARGETS[tname]),
+                        "global_v2": selective_summary(d_g2, sp, *TARGETS[tname]),
+                        "clean_cal_v2": selective_summary(d_c2, sp, *TARGETS[tname]),
+                        "stratified_vis_v2": selective_summary(d_s2, sp, *TARGETS[tname]),
                         "stratified_vis_per_stratum": {
                             s_name: selective_summary(
                                 d_s[st == s_name], sp.subset(st == s_name), *TARGETS[tname]

@@ -18,7 +18,10 @@ from veilx.selective import (
     fit_stratified,
     symmetric_rules,
 )
-from veilx.selective.ltt import order_candidates_on_validation
+from veilx.selective.ltt import (
+    order_candidates_by_validation_pvalue,
+    order_candidates_on_validation,
+)
 from veilx.sim.model import ScoreModel, rule_truth, sample_pairs, sim_pair_set
 from veilx.stats.feasibility import binom_cdf
 
@@ -206,3 +209,79 @@ def test_simulated_violation_rate_within_delta() -> None:
             violations += truth[res.rule] > target
     rate = violations / reps
     assert rate <= delta + 3 * np.sqrt(delta * (1 - delta) / reps)
+
+
+def test_pvalue_ordering_prunes_and_sorts_by_projected_evidence() -> None:
+    val, _ = easy_cal(seed=5)
+    order = order_candidates_by_validation_pvalue(
+        RULES,
+        val.scores,
+        val.labels,
+        n_cal_expected=100,
+        target_fm=0.05,
+        target_fnm=0.05,
+        delta=0.05,
+    )
+    assert order == []  # 100 calibration pairs cannot certify 5 % (needs >= 59 per class)
+    order = order_candidates_by_validation_pvalue(
+        RULES,
+        val.scores,
+        val.labels,
+        n_cal_expected=5000,
+        target_fm=0.05,
+        target_fnm=0.05,
+        delta=0.05,
+    )
+    assert order
+    from veilx.selective.ltt import _stats
+
+    s, y = val.scores, val.labels
+    scale = 5000 / s.size
+    ps = []
+    for r in order:
+        _, ag, ai, fm, fnm = _stats(r, np.asarray(s, float), np.asarray(y), None)
+        ps.append(
+            max(
+                binomial_pvalue(round(fm * scale), round(ai * scale), 0.05),
+                binomial_pvalue(round(fnm * scale), round(ag * scale), 0.05),
+            )
+        )
+    assert ps == sorted(ps) and max(ps) <= 0.05
+
+
+def test_pvalue_ordering_keeps_validity_and_improves_power() -> None:
+    """SIMULATED: the new order keeps the violation rate within delta and certifies at least
+    as often as the original order on a small calibration set."""
+    model, target, delta, reps, n = ScoreModel(), 0.05, 0.2, 150, 800
+    truth = {r: rule_truth(model, r).class_conditional_risk for r in RULES}
+    viol, feas_new, feas_old = 0, 0, 0
+    for rep in range(reps):
+        rng = make_rng(13, "ltt-pvalue-order", rep)
+        val, cal = sample_pairs(model, n, rng), sample_pairs(model, n, rng)
+        new = order_candidates_by_validation_pvalue(
+            RULES,
+            val.scores,
+            val.labels,
+            n_cal_expected=n,
+            target_fm=target,
+            target_fnm=target,
+            delta=delta,
+        )
+        old = order_candidates_on_validation(
+            RULES, val.scores, val.labels, n_cal_expected=n, target=target, delta=delta
+        )
+        for order, is_new in ((new, True), (old, False)):
+            if not order:
+                continue
+            res = LTTCalibrator(order, target_fm=target, delta=delta).fit(
+                cal.scores, cal.labels, pair_set=sim_pair_set(cal)
+            )
+            if res.rule is None:
+                continue
+            if is_new:
+                feas_new += 1
+                viol += truth[res.rule] > target
+            else:
+                feas_old += 1
+    assert viol / reps <= delta + 3 * np.sqrt(delta * (1 - delta) / reps)
+    assert feas_new >= feas_old

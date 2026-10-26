@@ -50,6 +50,31 @@ deployable estimator; a learned visibility estimator is Phase 3 and is not built
 frozen configuration's SHA-256 is recorded, and the final stage refuses to run if it has
 changed.
 
+## 2a. Amendment before test access (D-042)
+
+The develop stage (freeze `700cd8e9…`) showed that the pre-registered fixed-sequence order often
+stopped at its **first** candidate on calibration data. Examples: the ArcFace clean stratum
+of fold F2 at the 5 % targets, and 4 of 10 global `far1_fm` fits. The cause is the
+ordering: the first rule tested was the lowest-coverage rule that barely met the zero-error
+sample-size minimum, so any calibration fluctuation ended the sequence. This is a statistical
+**power** failure, not a validity problem.
+
+A second, validation-only ordering was therefore added. Rules are ranked by the binomial
+p-value that their validation counts, scaled to the calibration size, would earn, and pruned
+at δ.
+- In simulation it keeps the violation rate within δ and certifies at least as often
+  (`tests/test_ltt.py`).
+- Its arms (`global_v2`, `stratified_vis_v2`, `clean_cal_v2`) are reported **in addition to**
+  the unchanged pre-registered arms. The rerun freeze `0e8a43fb…` contains the v1 arms
+  byte-identical.
+- The amendment was triggered by calibration results, not test results. Its risk statements
+  therefore use a union bound over the two procedures: **δ ≤ 0.10** for v2, and δ = 0.05
+  remains for v1.
+
+The v2 global arm is feasible in every fold, backbone and target. Low-visibility strata at
+sFMR ≤ 1 % often stay infeasible; that is a capacity limit (§ CALC-003), not an ordering
+artefact.
+
 ## 3. Reported in the final stage
 
 1. **Clean** (`test_balanced`, plus `test_far` impostors for FMR):
