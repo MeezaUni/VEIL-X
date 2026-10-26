@@ -1,0 +1,115 @@
+{
+  "evidence_type": "real_measured_model_result",
+  "scope": "embedding extraction run (throughput/latency/memory; no accuracy numbers)",
+  "pilot": true,
+  "precision": "fp16",
+  "batch": 256,
+  "part_size": 512,
+  "device": "cuda",
+  "cpu_workers": 4,
+  "backbones": {
+    "adaface_ir101_webface4m": "13c7662136a8555a-fp16",
+    "arcface_ir101_webface4m": "af47f6fe5e21db0a-fp16"
+  },
+  "n_groups": 3,
+  "n_items": 3600,
+  "wall_seconds_last_session": 27.7,
+  "groups": [
+    {
+      "group": "clean",
+      "n": 1200,
+      "n_computed_this_session": 1200,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 10.7,
+      "images_per_s_end_to_end": 112.3,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 2.9,
+        "arcface_ir101_webface4m": 2.3
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 413.0,
+        "arcface_ir101_webface4m": 531.6
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F1_mask__test_ood__test_balanced",
+      "n": 1200,
+      "n_computed_this_session": 1200,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 11.3,
+      "images_per_s_end_to_end": 106.6,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 2.8,
+        "arcface_ir101_webface4m": 2.2
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 434.2,
+        "arcface_ir101_webface4m": 541.0
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "stress__test_balanced",
+      "n": 1200,
+      "n_computed_this_session": 1200,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 13.0,
+      "images_per_s_end_to_end": 92.5,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 2.8,
+        "arcface_ir101_webface4m": 2.3
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 435.6,
+        "arcface_ir101_webface4m": 527.9
+      },
+      "peak_gpu_mem_mib": 2507.6
+    }
+  ],
+  "accelerator": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "provenance": {
+    "veilx_version": "0.0.1",
+    "timestamp_utc": "2026-10-26T19:45:28.369435+00:00",
+    "git": {
+      "commit": "50f18f63c7369f92859b684f13f6e66197732f06",
+      "dirty": true,
+      "repo_is_project_root": true
+    },
+    "python": "3.12.14",
+    "implementation": "CPython",
+    "os": "Windows",
+    "packages": {
+      "numpy": "2.5.4",
+      "pydantic": "2.14.1",
+      "PyYAML": "6.0.3",
+      "torch": "2.11.0+cu128",
+      "onnxruntime": null,
+      "insightface": null
+    },
+    "configs": {},
+    "seed": null,
+    "argv": [
+      "scripts/extract_embeddings.py",
+      "--pilot",
+      "1200",
+      "--part-size",
+      "512",
+      "--workers",
+      "4"
+    ],
+    "extra": {}
+  }
+}

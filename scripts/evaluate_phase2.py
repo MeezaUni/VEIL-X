@@ -455,7 +455,14 @@ def _audit(layout: DataLayout, ident: dict[str, str], res: dict[str, Any]) -> di
 
 
 def final(args: argparse.Namespace) -> int:
-    require_final_for_test(SplitName.TEST, final=args.final)
+    """Test evaluation, or (``--rehearse``) the identical code path on the VALIDATION split
+    with val plans standing in for test plans: no test access, no run-log entry, private
+    output only. Used to catch failures before the single logged test run."""
+    rehearse = bool(args.rehearse)
+    if not rehearse:
+        require_final_for_test(SplitName.TEST, final=args.final)
+    pairs_tag, far_tag = ("val", "val") if rehearse else ("test_balanced", "test_far")
+    plan_role = {"test_id": "val", "test_ood": "val"} if rehearse else {}
     layout = _layout()
     frozen = json.loads(
         (layout.private_reports / "phase2_frozen_eval_config.json").read_text("utf-8")
@@ -476,13 +483,14 @@ def final(args: argparse.Namespace) -> int:
         else None,
         "splits": ["test"],
     }
-    run_log = ROOT / PROTO.test_access.run_log
-    run_log.parent.mkdir(parents=True, exist_ok=True)
-    with run_log.open("a", encoding="utf-8", newline="\n") as fh:
-        fh.write(json.dumps(log_entry) + "\n")
+    if not rehearse:
+        run_log = ROOT / PROTO.test_access.run_log
+        run_log.parent.mkdir(parents=True, exist_ok=True)
+        with run_log.open("a", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps(log_entry) + "\n")
     ident = _identity_map(layout)
-    tb = _pairs(layout, "test_balanced")
-    tf = _pairs(layout, "test_far")
+    tb = _pairs(layout, pairs_tag)
+    tf = _pairs(layout, far_tag)
     results: dict[str, Any] = {}
     for bid, fb in frozen["backbones"].items():
         emb = Embeddings(layout, bid)
@@ -527,8 +535,9 @@ def final(args: argparse.Namespace) -> int:
         for fold, ff in fb["folds"].items():
             fr: dict[str, Any] = {}
             for role in ("test_id", "test_ood"):
-                rows = _plan(layout, fold, role, "test_balanced")
-                sp = score_pairs(tb, ident, emb.lookup(f"{fold}__{role}__test_balanced"), rows)
+                prole = plan_role.get(role, role)
+                rows = _plan(layout, fold, prole, pairs_tag)
+                sp = score_pairs(tb, ident, emb.lookup(f"{fold}__{prole}__{pairs_tag}"), rows)
                 if not np.array_equal(sp.pair_id, s_tb.pair_id):
                     raise RuntimeError("plan/clean pair order mismatch")
                 block: dict[str, Any] = {
@@ -582,26 +591,14 @@ def final(args: argparse.Namespace) -> int:
                             if (st == s_name).any()
                         },
                     }
-                if role == "test_id":
-                    block["c1_exploratory"] = _c1_exploratory(
-                        sp.subset(sp.covis < 0.999999), thr["cal_far_1pct"]
-                    )
+                block["c1_exploratory"] = _c1_exploratory(
+                    sp.subset(sp.covis < 0.999999), thr["cal_far_1pct"]
+                )
                 fr[role] = block
-            fr["test_ood"]["c1_exploratory"] = _c1_exploratory(
-                (lambda s: s.subset(s.covis < 0.999999))(
-                    score_pairs(
-                        tb,
-                        ident,
-                        emb.lookup(f"{fold}__test_ood__test_balanced"),
-                        _plan(layout, fold, "test_ood", "test_balanced"),
-                    )
-                ),
-                thr["cal_far_1pct"],
-            )
             r["folds"][fold] = fr
             print(f"{bid} {fold} done", flush=True)
         stress_path = layout.manifests / "occlusion" / "stress__test_balanced.jsonl.gz"
-        if (emb.dir / "stress__test_balanced.npz").exists():
+        if not rehearse and (emb.dir / "stress__test_balanced.npz").exists():
             r["stress"] = _stress(layout, emb, ident, tb, stress_path, thr)
         results[bid] = r
     report = {
@@ -616,7 +613,13 @@ def final(args: argparse.Namespace) -> int:
         "audit": _audit(layout, ident, results),
         "provenance": prov,
     }
-    pub = ROOT / "reports" / "experiments" / "phase2_final.json"
+    if rehearse:
+        report["scope"] = "REHEARSAL on the validation split (val plans as stand-ins); not a result"
+    pub = (
+        layout.private_reports / "phase2_rehearsal.json"
+        if rehearse
+        else ROOT / "reports" / "experiments" / "phase2_final.json"
+    )
     with pub.open("w", encoding="utf-8", newline="\n") as fh:
         json.dump(report, fh, indent=1, default=str)
     print(f"run {run_id}: wrote {pub}")
@@ -656,6 +659,7 @@ def main() -> int:
     )
     ap.add_argument("stage", choices=["develop", "final"])
     ap.add_argument("--final", action="store_true", help="required for test-split access")
+    ap.add_argument("--rehearse", action="store_true", help="run the final code path on val")
     args = ap.parse_args()
     return develop() if args.stage == "develop" else final(args)
 

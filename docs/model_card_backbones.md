@@ -41,7 +41,7 @@ empirically (§2).
 |---|---|---|
 | Strict load: exact key set, shapes and dtypes; `strict=True`; loaded-tensor fingerprint = checkpoint fingerprint | pass (917 tensors) | pass (925 tensors) |
 | Equality with the **authors' own module** (built from the pinned reference code, same weights), fp32, max abs diff on random and real inputs, CPU and CUDA | 0.0 | 0.0 |
-| CPU vs CUDA fp32, max abs diff of raw (unnormalised, norm ≈ 7–10) outputs | ≈ 2e-3 | ≈ 3e-3 |
+| CPU vs CUDA fp32, max abs diff of raw (unnormalised; real-image norms ≈ 20–25) outputs | ≈ 2e-3 | ≈ 3e-3 |
 | Determinism: two CUDA fp32 passes | bit-identical | bit-identical |
 | Val AUC, RGB vs BGR input (20,000 pairs) | **0.99881** vs 0.99817 | **0.99810** vs 0.99732 |
 | fp16 autocast vs fp32: min cosine, max pair-score diff, val AUC | 0.99989, 0.0027, 0.99881 | 0.99985, 0.0019, 0.99809 |

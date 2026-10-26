@@ -1,0 +1,73 @@
+{
+  "evidence_type": "real_measured_model_result",
+  "scope": "embedding extraction run (throughput/latency/memory; no accuracy numbers)",
+  "pilot": true,
+  "precision": "fp32",
+  "batch": 256,
+  "device": "cpu",
+  "cpu_workers": 12,
+  "backbones": {
+    "adaface_ir101_webface4m": "13c7662136a8555a-fp32",
+    "arcface_ir101_webface4m": "af47f6fe5e21db0a-fp32"
+  },
+  "n_groups": 1,
+  "n_items": 128,
+  "wall_seconds": 19.1,
+  "groups": [
+    {
+      "group": "clean",
+      "n": 128,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 18.5,
+      "images_per_s_end_to_end": 6.9,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 8.1,
+        "arcface_ir101_webface4m": 7.3
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 15.8,
+        "arcface_ir101_webface4m": 17.6
+      },
+      "peak_gpu_mem_mib": null
+    }
+  ],
+  "accelerator": "cpu",
+  "provenance": {
+    "veilx_version": "0.0.1",
+    "timestamp_utc": "2026-10-26T19:33:17.960708+00:00",
+    "git": {
+      "commit": "50f18f63c7369f92859b684f13f6e66197732f06",
+      "dirty": true,
+      "repo_is_project_root": true
+    },
+    "python": "3.12.14",
+    "implementation": "CPython",
+    "os": "Windows",
+    "packages": {
+      "numpy": "2.5.4",
+      "pydantic": "2.14.1",
+      "PyYAML": "6.0.3",
+      "torch": "2.11.0+cu128",
+      "onnxruntime": null,
+      "insightface": null
+    },
+    "configs": {},
+    "seed": null,
+    "argv": [
+      "scripts/extract_embeddings.py",
+      "--pilot",
+      "128",
+      "--device",
+      "cpu",
+      "--precision",
+      "fp32",
+      "--kinds",
+      "clean"
+    ],
+    "extra": {}
+  }
+}
