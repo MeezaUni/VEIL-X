@@ -1,0 +1,70 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "calibration_sample_size",
+  "params": {
+    "delta": 0.05,
+    "model": {
+      "covis_a": 4.0,
+      "covis_b": 1.5,
+      "genuine_slope": 3.0,
+      "impostor_slope": 0.0,
+      "mu_genuine": 5.0,
+      "mu_impostor": 0.0,
+      "noise_slope": 0.5,
+      "sigma_identity_genuine": 0.5,
+      "sigma_identity_impostor": 0.3,
+      "sigma_noise": 1.0
+    },
+    "reps": 200,
+    "sizes": [
+      100,
+      300,
+      1000,
+      3000
+    ],
+    "target": 0.05
+  },
+  "results": {
+    "n_cal=100": {
+      "infeasible_rate": 1.0,
+      "max_true_risk_selected": null,
+      "mean_true_coverage": 0.0,
+      "mean_true_risk_selected": null,
+      "mean_violation_ratio": null,
+      "violation_rate": 0.0,
+      "violation_rate_mc_se": 7.071067811865476e-08
+    },
+    "n_cal=1000": {
+      "infeasible_rate": 0.0,
+      "max_true_risk_selected": 0.0574667836860275,
+      "mean_true_coverage": 0.9044064288779212,
+      "mean_true_risk_selected": 0.02962864170579733,
+      "mean_violation_ratio": 0.5925728341159466,
+      "violation_rate": 0.005,
+      "violation_rate_mc_se": 0.004987484335815001
+    },
+    "n_cal=300": {
+      "infeasible_rate": 0.535,
+      "max_true_risk_selected": 0.04505983749913827,
+      "mean_true_coverage": 0.3225435314757117,
+      "mean_true_risk_selected": 0.011488761588594005,
+      "mean_violation_ratio": 0.2297752317718801,
+      "violation_rate": 0.0,
+      "violation_rate_mc_se": 7.071067811865476e-08
+    },
+    "n_cal=3000": {
+      "infeasible_rate": 0.0,
+      "max_true_risk_selected": 0.050956530286419846,
+      "mean_true_coverage": 0.9434809975007994,
+      "mean_true_risk_selected": 0.03786610959349503,
+      "mean_violation_ratio": 0.7573221918699008,
+      "violation_rate": 0.01,
+      "violation_rate_mc_se": 0.007035623639735145
+    },
+    "oracle_max_coverage_at_target": 0.9676100326698795
+  },
+  "scale": "full",
+  "seed": 303,
+  "sim_version": "1.0.0"
+}

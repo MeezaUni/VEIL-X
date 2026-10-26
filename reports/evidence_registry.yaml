@@ -1,0 +1,123 @@
+# VEIL-X evidence registry — validated by src/veilx/evidence.py and tests/test_evidence.py.
+# Types: published_result | mathematical_calculation | synthetic_simulation |
+#        real_measured_model_result | unverified_hypothesis
+# There are NO real_measured_model_result entries: no face-recognition model has been run.
+schema_version: 1
+records:
+  # ------------------------------------------------------------------ published
+  - id: PUB-001
+    type: published_result
+    title: "LTT selective classification uses an exact binomial on the accepted subsample"
+    statement: "Angelopoulos et al. (Learn then Test, Sec. 3.2) control P(T(X) != Y | T(X) != empty) with the exact binomial tail on n(T) accepted calibration points; the general theorem controls sup risk over the rejected set under i.i.d. calibration data."
+    source: "https://arxiv.org/abs/2110.01052"
+    created: "2026-10-26"
+    caveats: "Read via ar5iv HTML rendering; exact equation numbering to be re-checked against the PDF before citation."
+  - id: PUB-002
+    type: published_result
+    title: "AUGRC definition and closed form"
+    statement: "Traub et al. (NeurIPS 2024) define generalized risk P(failure, accepted), AUGRC as its integral over coverage, and give AUGRC = (1-AUROC_f) acc (1-acc) + (1-acc)^2/2."
+    source: "https://arxiv.org/abs/2407.01032"
+    created: "2026-10-26"
+  - id: PUB-003
+    type: published_result
+    title: "Naive bootstrap of similarity-score ROC quantities can be invalid"
+    statement: "Conti and Clemencon (ICLR 2024) show that FAR/FRR are U-statistics, so a naive bootstrap can jeopardise uncertainty assessment and a recentering technique is required."
+    source: "https://arxiv.org/abs/2211.07245"
+    created: "2026-10-26"
+  # ------------------------------------------------------------------ calculations
+  - id: CALC-001
+    type: mathematical_calculation
+    title: "Binomial sample-size requirements for registered constants"
+    statement: "Exact Clopper-Pearson calculations: certifying FMR <= 1% (0.1%) at 95% needs >= 299 (2,995) independent impostor pairs with zero false matches; a 5% accepted-error target needs >= 59/93/286 accepted pairs at 0/2/3% observed error."
+    source: "scripts/feasibility_report.py"
+    artefact: "scripts/feasibility_report.py"
+    created: "2026-10-26"
+  # ------------------------------------------------------------------ simulations
+  - id: SIM-001
+    type: synthetic_simulation
+    title: "Identity-cluster vs pair-level bootstrap coverage"
+    statement: "Simulated (synthetic scores, 300 reps): nominal-95% identity-cluster bootstrap covered FNMR in 93.3% (MC se 1.4%) and FMR in 99.3% of runs; the pair-level bootstrap covered 83.0% and 84.3%."
+    source: "veilx.sim.experiments.bootstrap_coverage"
+    artefact: "reports/simulations/bootstrap_coverage.json"
+    created: "2026-10-26"
+    caveats: "Identity-cluster intervals are slightly anti-conservative for FNMR and conservative for FMR (product weights) in this model; not a property of real data."
+  - id: SIM-002
+    type: synthetic_simulation
+    title: "LTT with independent vs identity-reusing calibration pairs"
+    statement: "Simulated (400 reps, delta=0.10): violation rate 2.5% with identity-disjoint calibration, 3.75% with 120 reused identities and 8.25% with 30 reused identities."
+    source: "veilx.sim.experiments.independence_vs_correlation"
+    artefact: "reports/simulations/independence_vs_correlation.json"
+    created: "2026-10-26"
+    caveats: "Dependence raised violations ~3x yet stayed below delta here; this is not evidence that dependent calibration is safe."
+  - id: SIM-003
+    type: synthetic_simulation
+    title: "Calibration sample-size sensitivity"
+    statement: "Simulated: with 100 calibration pairs LTT was always infeasible (abstain on all); 300 pairs infeasible in 53.5% of runs; 1,000 and 3,000 pairs achieved 90.4% and 94.3% mean coverage vs an oracle 96.8%, with violation rates 0.5% and 1.0% (delta=0.05)."
+    source: "veilx.sim.experiments.calibration_sample_size"
+    artefact: "reports/simulations/calibration_sample_size.json"
+    created: "2026-10-26"
+  - id: SIM-004
+    type: synthetic_simulation
+    title: "Guarantee violation under increasing synthetic shift"
+    statement: "Simulated: calibrated on the seen distribution (delta=0.05), the violation rate was 0.5% without shift and 16%, 95.5%, 100%, 100% at shift severities 0.1, 0.25, 0.5, 1.0 (mean risk/target 0.59 -> 10.3)."
+    source: "veilx.sim.experiments.guarantee_under_shift"
+    artefact: "reports/simulations/guarantee_under_shift.json"
+    created: "2026-10-26"
+    caveats: "Magnitudes depend entirely on the arbitrary synthetic shift; only the qualitative pattern is informative."
+  - id: SIM-005
+    type: synthetic_simulation
+    title: "Visibility-stratified vs global calibration"
+    statement: "Simulated: under a covariate-only shift in co-visibility, stratified LTT violated in 1% of runs vs 100% for global LTT, at much lower coverage (17.0% vs 87.3%); under a conditional shift both violated (83% vs 100%)."
+    source: "veilx.sim.experiments.stratified_vs_global"
+    artefact: "reports/simulations/stratified_vs_global.json"
+    created: "2026-10-26"
+    caveats: "Stratification can only help when the shift is explained by the stratifying variable; real occlusion shifts need not satisfy this."
+  - id: SIM-006
+    type: synthetic_simulation
+    title: "Power for the 0.5 pp clean non-inferiority margin"
+    statement: "Simulated (true difference 0, TAR at FAR=1%): power to demonstrate non-inferiority was 28% with 200 test identities, 68% with 1,000 and 100% with 3,333 (4 genuine pairs per identity)."
+    source: "veilx.sim.experiments.clean_tolerance_power"
+    artefact: "reports/simulations/clean_tolerance_power.json"
+    created: "2026-10-26"
+    caveats: "Depends on synthetic separability and correlation between methods."
+  - id: SIM-007
+    type: synthetic_simulation
+    title: "Prevalence sensitivity of the mixture vs class-conditional estimand"
+    statement: "Simulated: calibrated at prevalence 0.5, the mixture estimand violated in 9% of runs at test prevalence 0.95 (delta=0.05); the class-conditional estimand stayed at <= 0.5% across prevalences 0.05-0.95."
+    source: "veilx.sim.experiments.prevalence_sensitivity"
+    artefact: "reports/simulations/prevalence_sensitivity.json"
+    created: "2026-10-26"
+  - id: SIM-008
+    type: synthetic_simulation
+    title: "False-match cost sensitivity among certified rules"
+    statement: "Simulated: among LTT-certified rules with near-maximal coverage, a 1:1 cost ratio selected (0.75, 3.25) while 10:1 and 100:1 selected the stricter match threshold (1.25, 3.75), lowering true sFMR from 0.55% to 0.14% at equal coverage (75%)."
+    source: "veilx.sim.experiments.cost_sensitivity"
+    artefact: "reports/simulations/cost_sensitivity.json"
+    created: "2026-10-26"
+    caveats: "Selection among certified rules used true (oracle) costs of the synthetic model."
+  - id: SIM-009
+    type: synthetic_simulation
+    title: "Clopper-Pearson bound sanity check"
+    statement: "Simulated: the one-sided 95% Clopper-Pearson upper bound covered the true rate in >= 96.5% of 4,000 draws for each tested (n, p)."
+    source: "veilx.sim.experiments.binomial_bound_sanity"
+    artefact: "reports/simulations/binomial_bound_sanity.json"
+    created: "2026-10-26"
+  # ------------------------------------------------------------------ hypotheses
+  - id: HYP-001
+    type: unverified_hypothesis
+    title: "H2a: risk control degrades on held-out challenge families"
+    statement: "On real held-out occlusion families, LTT-calibrated decisions will exceed their target error; untested on real data."
+    source: "docs/protocol_design.md"
+    created: "2026-10-26"
+  - id: HYP-002
+    type: unverified_hypothesis
+    title: "H2b: visibility-stratified calibration reduces violations"
+    statement: "Stratifying calibration by co-visibility reduces violations on held-out families at a coverage cost; untested on real data (see SIM-005 for the synthetic mechanism)."
+    source: "docs/protocol_design.md"
+    created: "2026-10-26"
+  - id: HYP-003
+    type: unverified_hypothesis
+    title: "H1: co-visibility adds predictive power beyond quality"
+    statement: "Pair-level co-visibility improves error prediction/abstention beyond image-quality measures; untested."
+    source: "docs/protocol_design.md"
+    created: "2026-10-26"

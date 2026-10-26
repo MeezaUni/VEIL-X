@@ -136,7 +136,31 @@ de-occlusion, 1:N identification, real-time video.
    folder before any commit, so that personal documents never end up in VEIL-X history.
    *(Done, D-016.)*
 
-## 4. Next milestone (Phase 1a, proposed): data layer + evaluation harness, no models
+## 4a. Phase 1a status (2026-10-26): complete, without data downloads
+
+Done:
+- DigiFace adapter (on synthetic fixtures only).
+- Pair engine.
+- Metric library.
+- Identity bootstrap.
+- Audited LTT calibrator and empirical calibrator.
+- Simulation harness, with 9 labelled simulation reports.
+- Evidence registry.
+
+Not done, because it was deliberately deferred: running the adapter on real DigiFace data,
+which needs the download go-ahead. See `DEVELOPMENT_LOG.md`.
+
+## 4b. Proposed Phase 1b: real-data plumbing, still no recognition model
+1. After the download go-ahead: run the adapter on the DigiFace subset. Freeze the manifest and
+   the split counts.
+2. Build pair lists, including identity-disjoint calibration sets. Record their checksums.
+3. Occlusion synthesis for F1–F5 (procedural assets only), with GT masks and
+   `assert_family_isolation` in the pipeline.
+4. Pixel-level hashing and the validated near-duplicate procedure (`protocol_design.md` §8).
+5. Two-way-aware bootstrap refinement (SIM-001 caveat), then freeze the bootstrap constant.
+6. Decide on D-019, the 0.5 pp margin and FAR 0.1% (estimation-only). Then freeze the constants.
+
+## 4. Original Phase 1a proposal (kept for traceability)
 
 Scope, after the download go-ahead for the DigiFace subset:
 1. `DigiFaceAdapter` (implements `DatasetAdapter`): manifest generation with pixel SHA-256 and

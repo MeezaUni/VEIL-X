@@ -1,0 +1,92 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "guarantee_under_shift",
+  "params": {
+    "cal_model": {
+      "covis_a": 4.0,
+      "covis_b": 1.5,
+      "genuine_slope": 3.0,
+      "impostor_slope": 0.0,
+      "mu_genuine": 5.0,
+      "mu_impostor": 0.0,
+      "noise_slope": 0.5,
+      "sigma_identity_genuine": 0.5,
+      "sigma_identity_impostor": 0.3,
+      "sigma_noise": 1.0
+    },
+    "delta": 0.05,
+    "n_cal": 1000,
+    "reps": 200,
+    "severities": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "shift_endpoint_model": {
+      "covis_a": 1.5,
+      "covis_b": 2.5,
+      "genuine_slope": 5.0,
+      "impostor_slope": 0.0,
+      "mu_genuine": 5.0,
+      "mu_impostor": 0.0,
+      "noise_slope": 1.0,
+      "sigma_identity_genuine": 0.5,
+      "sigma_identity_impostor": 0.3,
+      "sigma_noise": 1.0
+    },
+    "target": 0.05
+  },
+  "results": {
+    "severity=0.0": {
+      "infeasible_rate": 0.0,
+      "max_true_risk_selected": 0.050956530286419846,
+      "mean_true_coverage": 0.9030634545814781,
+      "mean_true_risk_selected": 0.029429965740884415,
+      "mean_violation_ratio": 0.5885993148176885,
+      "violation_rate": 0.005,
+      "violation_rate_mc_se": 0.004987484335815001
+    },
+    "severity=0.1": {
+      "infeasible_rate": 0.0,
+      "max_true_risk_selected": 0.0686072567055774,
+      "mean_true_coverage": 0.8935292882594635,
+      "mean_true_risk_selected": 0.042419871617349954,
+      "mean_violation_ratio": 0.848397432346999,
+      "violation_rate": 0.16,
+      "violation_rate_mc_se": 0.02592296279363144
+    },
+    "severity=0.25": {
+      "infeasible_rate": 0.0,
+      "max_true_risk_selected": 0.10469598088705596,
+      "mean_true_coverage": 0.8779827344455089,
+      "mean_true_risk_selected": 0.0715926907172482,
+      "mean_violation_ratio": 1.4318538143449637,
+      "violation_rate": 0.955,
+      "violation_rate_mc_se": 0.014658615214269054
+    },
+    "severity=0.5": {
+      "infeasible_rate": 0.0,
+      "max_true_risk_selected": 0.1967387578592317,
+      "mean_true_coverage": 0.8518420684915371,
+      "mean_true_risk_selected": 0.15782502125148704,
+      "mean_violation_ratio": 3.156500425029741,
+      "violation_rate": 1.0,
+      "violation_rate_mc_se": 7.071067811865476e-08
+    },
+    "severity=1.0": {
+      "infeasible_rate": 0.0,
+      "max_true_risk_selected": 0.5244639648051659,
+      "mean_true_coverage": 0.8286619164594212,
+      "mean_true_risk_selected": 0.512972877201351,
+      "mean_violation_ratio": 10.259457544027018,
+      "violation_rate": 1.0,
+      "violation_rate_mc_se": 7.071067811865476e-08
+    }
+  },
+  "scale": "full",
+  "seed": 404,
+  "sim_version": "1.0.0"
+}

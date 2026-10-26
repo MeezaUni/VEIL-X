@@ -1,0 +1,25 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "binomial_bound_sanity",
+  "params": {
+    "reps": 4000
+  },
+  "results": {
+    "n=1000,p=0.045": {
+      "coverage": 0.96525,
+      "nominal_min": 0.95
+    },
+    "n=300,p=0.03": {
+      "coverage": 0.98,
+      "nominal_min": 0.95
+    },
+    "n=59,p=0.02": {
+      "coverage": 1.0,
+      "nominal_min": 0.95
+    }
+  },
+  "scale": "full",
+  "seed": 909,
+  "sim_version": "1.0.0"
+}

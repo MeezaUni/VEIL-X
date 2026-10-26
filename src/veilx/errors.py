@@ -29,3 +29,11 @@ class ProtocolViolationError(VeilxError):
 
 class DataAccessError(VeilxError):
     """A dataset is not approved for the requested use (licence, access or ethics status)."""
+
+
+class InsufficientSamplesError(VeilxError):
+    """A metric or operating point is requested that the available samples cannot support."""
+
+
+class InfeasibleRequestError(VeilxError):
+    """A requested construction (e.g. N independent pairs) cannot be satisfied by the data."""

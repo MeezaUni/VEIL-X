@@ -36,6 +36,7 @@ FORBIDDEN_SUFFIXES = {
     ".npy",
     ".npz",
     ".parquet",
+    ".jsonl",
     ".h5",
     ".hdf5",
     ".lmdb",

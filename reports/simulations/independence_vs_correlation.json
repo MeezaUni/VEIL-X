@@ -1,0 +1,57 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "independence_vs_correlation",
+  "params": {
+    "delta": 0.1,
+    "estimand": "class_conditional",
+    "model": {
+      "covis_a": 4.0,
+      "covis_b": 1.5,
+      "genuine_slope": 3.0,
+      "impostor_slope": 0.0,
+      "mu_genuine": 5.0,
+      "mu_impostor": 0.0,
+      "noise_slope": 0.5,
+      "sigma_identity_genuine": 1.0,
+      "sigma_identity_impostor": 0.6,
+      "sigma_noise": 1.0
+    },
+    "n_cal": 600,
+    "n_rules": 26,
+    "reps": 400,
+    "target": 0.05
+  },
+  "results": {
+    "clustered_120_identities": {
+      "infeasible_rate": 0.075,
+      "max_true_risk_selected": 0.06113338332875081,
+      "mean_true_coverage": 0.6536448431012031,
+      "mean_true_risk_selected": 0.025953685693428048,
+      "mean_violation_ratio": 0.5190737138685609,
+      "violation_rate": 0.0375,
+      "violation_rate_mc_se": 0.009499177595981664
+    },
+    "clustered_30_identities": {
+      "infeasible_rate": 0.11,
+      "max_true_risk_selected": 0.06728310765450217,
+      "mean_true_coverage": 0.6288040864446787,
+      "mean_true_risk_selected": 0.027130558964965492,
+      "mean_violation_ratio": 0.5426111792993099,
+      "violation_rate": 0.0825,
+      "violation_rate_mc_se": 0.01375624858019075
+    },
+    "independent": {
+      "infeasible_rate": 0.0525,
+      "max_true_risk_selected": 0.06113338332875081,
+      "mean_true_coverage": 0.6741763558417204,
+      "mean_true_risk_selected": 0.026258926878425886,
+      "mean_violation_ratio": 0.5251785375685178,
+      "violation_rate": 0.025,
+      "violation_rate_mc_se": 0.007806247497997998
+    }
+  },
+  "scale": "full",
+  "seed": 202,
+  "sim_version": "1.0.0"
+}

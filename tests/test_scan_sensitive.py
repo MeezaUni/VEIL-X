@@ -65,6 +65,7 @@ def test_scanner_allows_clean_text(tmp_path: Path) -> None:
     [
         "data/x.jpg",
         "data/manifest.jsonl",
+        "pairs/cal_pairs.jsonl",
         "src/veilx/data/sample.png",
         "cache/e.npy",
         "weights/a.onnx",
@@ -107,11 +108,11 @@ def test_no_project_source_file_is_ignored() -> None:
     """Every code/config/doc file must be trackable (guards against over-broad ignore rules)."""
     candidates = [
         p.relative_to(ROOT).as_posix()
-        for d in ("src", "tests", "scripts", "configs", "docs")
+        for d in ("src", "tests", "scripts", "configs", "docs", "reports")
         for p in (ROOT / d).rglob("*")
         if p.is_file()
         and "__pycache__" not in p.parts
-        and p.suffix in {".py", ".md", ".yaml", ".yml", ".toml"}
+        and p.suffix in {".py", ".md", ".yaml", ".yml", ".toml", ".json"}
     ]
     assert candidates
     res = subprocess.run(

@@ -1,0 +1,57 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "cost_sensitivity",
+  "params": {
+    "delta": 0.05,
+    "fwer": "bonferroni",
+    "model": {
+      "covis_a": 4.0,
+      "covis_b": 1.5,
+      "genuine_slope": 3.0,
+      "impostor_slope": 0.0,
+      "mu_genuine": 5.0,
+      "mu_impostor": 0.0,
+      "noise_slope": 0.5,
+      "sigma_identity_genuine": 0.5,
+      "sigma_identity_impostor": 0.3,
+      "sigma_noise": 1.0
+    },
+    "n_cal": 20000,
+    "prevalence": 0.5,
+    "selection": "min true cost-weighted accepted risk among LTT-certified rules whose true coverage >= 80% of the best certified coverage",
+    "target": 0.05
+  },
+  "results": {
+    "cost_ratio=1": {
+      "tau_high": 3.25,
+      "tau_low": 0.75,
+      "true_cost_weighted_accepted_risk": 0.008294091669493464,
+      "true_coverage": 0.753182775812363,
+      "true_sfmr": 0.005497004830724923,
+      "true_sfnmr": 0.010970185914602346
+    },
+    "cost_ratio=10": {
+      "tau_high": 3.75,
+      "tau_low": 1.25,
+      "true_cost_weighted_accepted_risk": 0.0206692612069983,
+      "true_coverage": 0.7528723939445823,
+      "true_sfmr": 0.0013966655405756817,
+      "true_sfnmr": 0.029363188535238845
+    },
+    "cost_ratio=100": {
+      "tau_high": 3.75,
+      "tau_low": 1.25,
+      "true_cost_weighted_accepted_risk": 0.09164795328368752,
+      "true_coverage": 0.7528723939445823,
+      "true_sfmr": 0.0013966655405756817,
+      "true_sfnmr": 0.029363188535238845
+    },
+    "coverage_floor": 0.7491947594746561,
+    "n_candidates": 169,
+    "n_certified": 108
+  },
+  "scale": "full",
+  "seed": 808,
+  "sim_version": "1.0.0"
+}

@@ -27,6 +27,7 @@ pairs/local/
 *.npz
 *.zarr/
 *.parquet
+*.jsonl
 *.h5
 *.hdf5
 *.lmdb

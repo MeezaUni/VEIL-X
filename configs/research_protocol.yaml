@@ -9,7 +9,7 @@
 # =============================================================================
 schema_version: 1
 protocol_id: veilx-c3c1
-protocol_version: 0.1.0
+protocol_version: 0.2.0
 status: provisional
 
 project:
@@ -108,13 +108,16 @@ pairs:
 calibration:
   method: learn_then_test
   prediction_target: >-
-    For a calibration pair, the loss is 1 if the system ACCEPTS the pair (outputs MATCH or
-    NON-MATCH rather than ABSTAIN) and that decision disagrees with the ground-truth
-    same-identity label, else 0; the controlled quantity is the error rate among accepted
-    pairs. The score fed to the decision rule is the calibrated p(match) of the arm under
-    test (raw cosine for raw-backbone arms). Alignment failures are abstentions.
-  controlled_risk: selective_error_among_accepted
-  secondary_controlled_risks: [selective_fmr, selective_fnmr]
+    Per calibration pair the loss is 1 if the system ACCEPTS the pair (MATCH or NON-MATCH, not
+    ABSTAIN) and the decision disagrees with the same-identity label. Controlled estimands
+    (docs/ltt_audit.md): selective FMR = P(MATCH | accepted, impostor) and selective FNMR =
+    P(NON-MATCH | accepted, genuine), each <= the accepted-decision error target; together
+    they bound P(error | accepted) for ANY genuine:impostor prevalence. The score fed to the
+    decision rule is the calibrated p(match) of the arm under test (raw cosine for raw-backbone
+    arms). Alignment failures are abstentions.
+  controlled_risk: class_conditional_selective_fmr_and_fnmr
+  secondary_controlled_risks: [selective_error_among_accepted]
+  candidate_ordering: validation_only
   pvalue: binomial_exact
   fwer_procedure: fixed_sequence
   lambda_grid: tau_low_tau_high_cmin
@@ -123,7 +126,8 @@ calibration:
     - "A1 Exchangeability: calibration and test pairs are i.i.d. draws from the same distribution. Holds by construction only for Test-ID (seen families, disjoint identities of the same source). It does NOT hold for held-out families, real-occlusion sets (ROF) or other benchmarks."
     - "A2 Independence: calibration pairs are mutually independent. Enforced by an identity-disjoint matching (each identity appears in at most one calibration pair)."
     - "A3 Calibration isolation: the score function, fusion model, visibility estimator, quality model and lambda grid are fixed using train/val only, before the calibration data are examined."
-    - "A4 Composition: the selective error among accepted pairs depends on the genuine:impostor mix. The guarantee applies to the calibration composition (genuine fraction 0.5) and is not claimed for other mixes; class-conditional sFMR/sFNMR are reported alongside."
+    - "A4 Composition: the primary class-conditional estimand (sFMR and sFNMR) is prevalence-free. The secondary pooled accepted-decision error depends on the genuine:impostor mix and is certified only at the calibration prevalence, and only with Bernoulli class assignment (simulation SIM-007)."
+    - "A7 Acceptance locality: whether a calibration pair is accepted depends only on that pair and the pre-specified rule; no rule parameter (thresholds, gates, strata edges, candidate order) may be estimated on calibration data."
     - "A5 Marginal validity: the guarantee is marginal over pairs, not conditional on identity, stratum or family, except per-stratum guarantees under stratified calibration, each with its own sample-size check."
     - "A6 Multiple testing: lambda values are tested in a pre-specified fixed sequence (or Bonferroni), controlling family-wise error over the grid."
   guarantee_scope_statement: >-

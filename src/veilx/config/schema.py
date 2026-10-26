@@ -170,8 +170,13 @@ class PairSection(_Strict):
 class CalibrationSection(_Strict):
     method: Literal["learn_then_test"]
     prediction_target: str = Field(min_length=20)
-    controlled_risk: Literal["selective_error_among_accepted"]
-    secondary_controlled_risks: tuple[Literal["selective_fmr", "selective_fnmr"], ...]
+    controlled_risk: Literal[
+        "class_conditional_selective_fmr_and_fnmr", "selective_error_among_accepted"
+    ]
+    secondary_controlled_risks: tuple[
+        Literal["selective_fmr", "selective_fnmr", "selective_error_among_accepted"], ...
+    ]
+    candidate_ordering: Literal["validation_only"]
     pvalue: Literal["binomial_exact", "hoeffding_bentkus"]
     fwer_procedure: Literal["fixed_sequence", "bonferroni"]
     lambda_grid: Literal["tau_low_tau_high_cmin"]

@@ -16,6 +16,18 @@
 | `Evaluator` | `evaluate(method_id, decisions, scores, labels, identity_pairs, condition)` | → `EvaluationResult(metrics with CIs, composition, coverage)` | Identity pairs carried for the cluster bootstrap; composition always reported |
 | `ResultReporter` | `report(results, provenance)` | → relative path / run id | Results always paired with a provenance record |
 
+## Implemented in Phase 1a (no models)
+
+| Module | Implements | Key behaviour |
+|---|---|---|
+| `veilx.data.digiface.DigiFaceAdapter` | `DatasetAdapter` | Parts or flat layout; official per-ID image counts (72 / 5); reports missing/extra indices, non-numeric/out-of-range IDs, IDs found in two parts, empty and single-image identities, unexpected files, corrupt PNGs (`veilx.data.png`) and exact duplicates (excluded). Deterministic manifest + scan report; `sha256` = file bytes (D-023) |
+| `veilx.pairs.build_pairs` | Pair construction | `independent` (identity-disjoint matching, explicit `InfeasibleRequestError`) or `clustered` (capped reuse; summary marks it NOT independent). Root-photo content keys (D-021); Bernoulli or fixed class assignment; provenance digests |
+| `veilx.metrics` | Evaluation metrics | ROC/AUC/EER, TAR@FAR (benchmark + deployment), selective metrics, AUGRC/AURC, ECE/Brier/reliability (SVG); definitions in `docs/metrics.md` |
+| `veilx.stats.bootstrap` | Uncertainty | Identity-cluster (product weights for impostors) and pair bootstrap; percentile CIs |
+| `veilx.selective` | `RiskCalibrator` (fit/decide) | `LTTCalibrator` (validity checks, class-conditional/mixture estimands, fixed-sequence/Bonferroni), `EmpiricalCalibrator` (no guarantee), `fit_stratified` (δ/S), `order_candidates_on_validation` |
+| `veilx.sim` | Simulation harness | Synthetic score model with exact population rates; experiments SIM-001…009 |
+| `veilx.evidence` | Integrity registry | Typed evidence records; simulation results can never be presented as measured results |
+
 ## Cross-cutting infrastructure (implemented in Phase 0)
 
 | Module | Purpose |

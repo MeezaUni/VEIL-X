@@ -1,0 +1,50 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "clean_tolerance_power",
+  "params": {
+    "genuine_per_identity": 4,
+    "impostor_per_identity": 10,
+    "margin": 0.005,
+    "model": {
+      "covis_a": 50.0,
+      "covis_b": 1.0,
+      "genuine_slope": 3.0,
+      "impostor_slope": 0.0,
+      "mu_genuine": 5.0,
+      "mu_impostor": 0.0,
+      "noise_slope": 0.5,
+      "sigma_identity_genuine": 0.5,
+      "sigma_identity_impostor": 0.3,
+      "sigma_noise": 1.0
+    },
+    "n_boot": 300,
+    "reps": 100,
+    "test": "one-sided 95% (lower bound of 90% two-sided CI)",
+    "true_difference": 0.0
+  },
+  "results": {
+    "n_identities=1000": {
+      "mean_90pct_ci_width_tar_diff": 0.006760875,
+      "n_genuine_pairs": 4000,
+      "power_mc_se": 0.0466476151587624,
+      "power_noninferiority": 0.68
+    },
+    "n_identities=200": {
+      "mean_90pct_ci_width_tar_diff": 0.014776875000000002,
+      "n_genuine_pairs": 800,
+      "power_mc_se": 0.0448998886412873,
+      "power_noninferiority": 0.28
+    },
+    "n_identities=3333": {
+      "mean_90pct_ci_width_tar_diff": 0.003736123612361237,
+      "n_genuine_pairs": 13332,
+      "power_mc_se": 1e-07,
+      "power_noninferiority": 1.0
+    },
+    "threshold": 2.5483709700601684
+  },
+  "scale": "full",
+  "seed": 606,
+  "sim_version": "1.0.0"
+}

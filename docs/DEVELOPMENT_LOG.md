@@ -6,6 +6,90 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-10-26 — Phase 1a: evaluation and statistical foundation (no models, no downloads)
+
+### Git
+- **First publication:**
+  - Commit `3ed5cb13c50da886990323ed4c4dbb8ea1680b54` was pushed to `origin/main` after
+    pre-flight checks: project-only git root, empty remote, explicit staging of 46 reviewed
+    files, content grep for secrets and paths, privacy scan, quality gate.
+  - The remote SHA matched local HEAD.
+  - GitHub Actions `ci` on that commit: **success** (30 s).
+- **Phase 1a commit:** the commit that contains this entry (`git log -1 -- docs/DEVELOPMENT_LOG.md`).
+  Its SHA and CI result are reported in the session summary.
+
+### Milestones
+- **Learn-then-Test audit** (`docs/ltt_audit.md`):
+  - The exact binomial on the accepted subsample is valid for the conditional risk under
+    i.i.d. calibration pairs and acceptance locality. This is the construction of LTT §3.2.
+  - The primary estimand changed to class-conditional sFMR/sFNMR (prevalence-robust;
+    D-019).
+  - Validity preconditions are enforced in code.
+- **DigiFace adapter** (`veilx.data.digiface`, `veilx.data.png`): layouts, official per-ID
+  counts, anomaly reporting, corrupt-PNG detection, duplicate exclusion, deterministic
+  manifest. **Tested only on synthetic random-noise fixtures. No DigiFace data downloaded.**
+- **Pair engine** (`veilx.pairs`): independent (identity-disjoint) and clustered modes;
+  explicit infeasibility; pair counts kept separate from effective independent counts;
+  provenance digests.
+- **Metrics** (`veilx.metrics`) and the identity-cluster bootstrap (`veilx.stats.bootstrap`).
+- **Risk control** (`veilx.selective`): `LTTCalibrator`, `EmpiricalCalibrator`,
+  `fit_stratified`, validation-only candidate ordering.
+- **Simulations** (`veilx.sim`, `reports/simulations/`): 9 experiments, registered as
+  SIM-001…009. Summary in `docs/simulation_findings.md`. All are **SIMULATED**.
+- **Evidence registry** (`veilx.evidence`, `reports/evidence_registry.yaml`,
+  `docs/evidence_registry.md`).
+- **Protocol v0.2.0 (provisional):** class-conditional estimand, `candidate_ordering:
+  validation_only`, assumption A7.
+
+### Bugs and pitfalls found during this phase, all fixed and covered by tests
+1. **Fixed-sequence power collapse.** Ordering candidates widest-first made LTT infeasible in
+   every quick simulation run, because the first hypotheses accept almost nothing. Fixed by
+   validation-only pruning and ordering (D-020).
+2. **Trivial genuine pairs.** A byte-identical copy and an occlusion variant of the same
+   photo were treated as different sources. "Source" is now the root-photo content hash
+   (D-021), and the same keys feed the independence check.
+3. **Unrealistic synthetic model.** The first synthetic model had FNMR about 68% at FAR 1%, so
+   LTT was infeasible everywhere. It was re-parameterised to a more separable regime. The
+   shift experiment became a severity sweep, because a single extreme shift exaggerated
+   magnitudes.
+4. **Typing.** Strict-mypy issues in the simulation code: default-argument lambdas,
+   `Literal`s and `Any` returns. They were replaced with typed partials and factories.
+   **Re-running all simulations afterwards produced byte-identical reports.**
+5. Fixture identity collisions in two new tests (test bugs, not engine bugs).
+
+### Commands run
+```
+.venv\Scripts\python.exe scripts\run_simulations.py --scale quick --out <scratch>   # smoke runs
+.venv\Scripts\python.exe scripts\run_simulations.py --scale full                    # ~2 min
+.venv\Scripts\python.exe scripts\quality_gate.py
+```
+
+### Test results (actual, final run before commit)
+| Step | Result |
+|---|---|
+| ruff check / format | PASS / PASS |
+| mypy (strict, 30 source files) | PASS |
+| pytest | **209 passed**, 0 failed, 0 skipped (≈15 s) |
+| validate_config | PASS (protocol v0.2.0, provisional) |
+| scan_sensitive | PASS, 0 findings |
+| Full simulations re-run after refactor | 9/9 reports byte-identical |
+
+### Known limitations
+- The adapter has not seen real DigiFace files. Their image format and resolution are
+  unverified.
+- Identity-bootstrap FNMR coverage is 93.3% in simulation (slightly below nominal), and FMR
+  coverage is conservative. A refined scheme is planned for Phase 1b.
+- `order_candidates_on_validation` needs a validation set from the same distribution as
+  calibration.
+- The cost-sensitivity experiment selects among certified rules using oracle (true synthetic)
+  costs.
+- No occlusion synthesis, embeddings, quality or visibility estimators yet.
+
+### Next steps
+`implementation_roadmap.md` §4b (Phase 1b), after the PI decisions in `decision_log.md`.
+
+---
+
 ## 2026-10-26 — Phase 0: protocol lock and scaffolding (no models, no data)
 
 ### Milestones
@@ -86,9 +170,9 @@ uv pip install --python .venv\Scripts\python.exe -e . pytest ruff mypy types-PyY
   presence, not signatures).
 - The CI workflow has not run yet (nothing pushed).
 
-### Git state
-- Repository root: the project folder. Branch `main`. **No commits, nothing staged, nothing
-  pushed** (Phase 0 instruction; D-018 pending PI confirmation).
+### Git state (at end of Phase 0)
+- Repository root: the project folder. Branch `main`. No commits at that time, per the Phase 0
+  instruction (D-018). This was resolved in Phase 1a.
 
 ### Next steps
 See `implementation_roadmap.md` §4 (Phase 1a) and `decision_log.md` → Pending PI decisions.

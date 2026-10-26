@@ -22,9 +22,16 @@ Status values: **approved** (by PI), **provisional** (registered, may change via
 | D-015 | 2026-10-26 | Oracle-family stratification is a Test-ID-only diagnostic (no stratum exists for a held-out family) | design | Logical constraint |
 | D-016 | 2026-10-26 | Isolated git repository rooted at the project folder (nested `git init -b main`); Desktop repository untouched; `.gitignore` written before any staging | design | Security pre-flight |
 | D-017 | 2026-10-26 | Phase 0 dependencies limited to numpy, pydantic, PyYAML (+ pytest, ruff, mypy); Python 3.12 via uv | design | Minimal dependencies |
-| D-018 | 2026-10-26 | No commit or push in Phase 0, despite the standing GitHub workflow rule. The phase brief says "make no commits or pushes"; the more specific instruction wins until the PI confirms | **pending** | Conflicting instructions; see the summary to the PI |
+| D-018 | 2026-10-26 | No commit or push in Phase 0, despite the standing GitHub workflow rule. The phase brief says "make no commits or pushes"; the more specific instruction wins until the PI confirms | **resolved**: the PI authorised the first push in the Phase 1a brief; commit `3ed5cb1` | Conflicting instructions resolved |
+| D-019 | 2026-10-26 | Primary controlled estimand = **class-conditional** sFMR and sFNMR (intersection–union binomial test). The pooled accepted-decision error is secondary and needs Bernoulli class assignment. Resolves D-010 | provisional | `ltt_audit.md` §2–3; SIM-007 |
+| D-020 | 2026-10-26 | LTT candidate order and pruning are fixed on **validation data only** (`order_candidates_on_validation`). Calibration data are only counted | design | Fixed-sequence power collapse found in simulation; `ltt_audit.md` §4 |
+| D-021 | 2026-10-26 | "Same source" = same root-photo content hash. Occlusion variants and byte-identical copies can never form a genuine pair or count as independent | design | Bug found by `test_variants_and_duplicates_never_form_genuine_pairs` |
+| D-022 | 2026-10-26 | Simulation results are stored in `reports/simulations/` and typed in `reports/evidence_registry.yaml`, separate from model results (`results/`, ignored) | design | Research-integrity requirement |
+| D-023 | 2026-10-26 | Manifest `sha256` = hash of file bytes (integrity). The pixel-level hash for dedup is computed later (Phase 1b) | design | Avoids an image-decoding dependency in Phase 1a |
+| D-024 | 2026-10-26 | Operating points refuse to run with fewer than 10/FAR impostors unless the caller passes an explicit, documented override | design | "No silent operating points" requirement |
+| D-025 | 2026-10-26 | Protocol v0.2.0 (provisional): adds `candidate_ordering: validation_only` and assumption A7 (acceptance locality); controlled risk changed per D-019 | provisional | Audit outcome |
 
-## Pending PI decisions
+## Pending PI decisions (updated after Phase 1a)
 1. Download go-ahead: DigiFace 72-img P1 + 5-img P1 (~5.9 GiB). Optionally all three 5-img
    parts (+6.3 GiB) to certify FMR at 0.1%.
 2. Accept FAR 0.1% as estimation-only (no certified sFMR at 0.1%) under the recommended
@@ -32,6 +39,7 @@ Status values: **approved** (by PI), **provisional** (registered, may change via
 3. ROF: ethics/legal confirmation (web-collected real faces; pickle loading in an isolated
    process).
 4. Kaggle dataset: provide its licence text/metadata if visible to you, or confirm exclusion.
-5. Authorise the first commit and push to `MeezaUni/VEIL-X` (D-018).
-6. Freeze the constants marked "ready to freeze" in `protocol_design.md` §7 (cost ratio,
+5. Freeze the constants marked "ready to freeze" in `protocol_design.md` §7 (cost ratio,
    confidence level)?
+6. Approve D-019, so the primary estimand becomes class-conditional sFMR/sFNMR, and the 0.5 pp
+   clean margin given SIM-006, which needs about 3,000 clean test identities.

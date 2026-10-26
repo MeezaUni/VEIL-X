@@ -1,0 +1,114 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "stratified_vs_global",
+  "params": {
+    "cal_model": {
+      "covis_a": 4.0,
+      "covis_b": 1.5,
+      "genuine_slope": 3.0,
+      "impostor_slope": 0.0,
+      "mu_genuine": 5.0,
+      "mu_impostor": 0.0,
+      "noise_slope": 0.5,
+      "sigma_identity_genuine": 0.5,
+      "sigma_identity_impostor": 0.3,
+      "sigma_noise": 1.0
+    },
+    "delta": 0.05,
+    "n_cal": 1500,
+    "reps": 200,
+    "scenarios": {
+      "conditional_shift": {
+        "covis_a": 1.5,
+        "covis_b": 2.5,
+        "genuine_slope": 5.0,
+        "impostor_slope": 0.0,
+        "mu_genuine": 5.0,
+        "mu_impostor": 0.0,
+        "noise_slope": 1.0,
+        "sigma_identity_genuine": 0.5,
+        "sigma_identity_impostor": 0.3,
+        "sigma_noise": 1.0
+      },
+      "covariate_shift_only": {
+        "covis_a": 1.5,
+        "covis_b": 2.5,
+        "genuine_slope": 3.0,
+        "impostor_slope": 0.0,
+        "mu_genuine": 5.0,
+        "mu_impostor": 0.0,
+        "noise_slope": 0.5,
+        "sigma_identity_genuine": 0.5,
+        "sigma_identity_impostor": 0.3,
+        "sigma_noise": 1.0
+      },
+      "no_shift": {
+        "covis_a": 4.0,
+        "covis_b": 1.5,
+        "genuine_slope": 3.0,
+        "impostor_slope": 0.0,
+        "mu_genuine": 5.0,
+        "mu_impostor": 0.0,
+        "noise_slope": 0.5,
+        "sigma_identity_genuine": 0.5,
+        "sigma_identity_impostor": 0.3,
+        "sigma_noise": 1.0
+      }
+    },
+    "strata_edges": [
+      0.0,
+      0.4,
+      0.7,
+      1.0
+    ],
+    "target": 0.05
+  },
+  "results": {
+    "conditional_shift": {
+      "global": {
+        "mean_true_coverage": 0.8667198900284899,
+        "mean_true_risk": 0.5116317781741715,
+        "violation_rate": 1.0,
+        "violation_rate_mc_se": 7.071067811865476e-08
+      },
+      "stratified": {
+        "mean_true_coverage": 0.1580393110145213,
+        "mean_true_risk": 0.10093537845518277,
+        "violation_rate": 0.83,
+        "violation_rate_mc_se": 0.026561249970586856
+      }
+    },
+    "covariate_shift_only": {
+      "global": {
+        "mean_true_coverage": 0.8733049371484384,
+        "mean_true_risk": 0.1898749961579927,
+        "violation_rate": 1.0,
+        "violation_rate_mc_se": 7.071067811865476e-08
+      },
+      "stratified": {
+        "mean_true_coverage": 0.17007601780787795,
+        "mean_true_risk": 0.025867429021869625,
+        "violation_rate": 0.01,
+        "violation_rate_mc_se": 0.007035623639735145
+      }
+    },
+    "no_shift": {
+      "global": {
+        "mean_true_coverage": 0.9271030422559037,
+        "mean_true_risk": 0.03399916509848663,
+        "violation_rate": 0.015,
+        "violation_rate_mc_se": 0.008595056718835542
+      },
+      "stratified": {
+        "mean_true_coverage": 0.677011836739319,
+        "mean_true_risk": 0.02425733543933685,
+        "violation_rate": 0.0,
+        "violation_rate_mc_se": 7.071067811865476e-08
+      }
+    }
+  },
+  "scale": "full",
+  "seed": 505,
+  "sim_version": "1.0.0"
+}

@@ -2,7 +2,7 @@
 
 > Machine-readable source of truth: `configs/research_protocol.yaml` (validated by
 > `src/veilx/config/schema.py`). This document explains it. **Status: `provisional`
-> (protocol v0.1.0).** Constants marked *provisional* may change only through
+> (protocol v0.2.0; v0.1.0 → v0.2.0 changes are listed in `decision_log.md` D-019…D-025).** Constants marked *provisional* may change only through
 > `docs/decision_log.md`. After the first `--final` run, changes go to
 > `evaluation_protocol.md` §10 (deviations).
 > Labels [V]/[H]/[D]/[U]/[M] as in `research_landscape.md` §0. **No [M] results exist.**
@@ -45,10 +45,15 @@ assumptions explicitly (config `calibration.assumptions`, A1–A6):
 *accepts* a pair (outputs MATCH or NON-MATCH, not ABSTAIN) and the decision disagrees with the
 ground-truth same-identity label, else 0. The controlled quantity is the error rate among
 accepted pairs. Alignment failures are abstentions.
-[U] The LTT paper's selective-classification construction is re-checked before Phase 2
-coding, to confirm that the binomial p-value on the accepted subset is the appropriate test
-for this ratio-type risk. If it is not, the controlled quantity becomes the joint risk
-P(error ∧ accepted) and the change is recorded in the decision log.
+**Resolved in Phase 1a (`ltt_audit.md`, D-019, protocol v0.2.0).**
+- The binomial p-value on the accepted subset is valid for the conditional risk under i.i.d.
+  calibration pairs and *acceptance locality* (A7). This is the construction LTT §3.2 uses.
+- The **primary** controlled estimand is now the class-conditional pair: selective FMR and
+  selective FNMR, tested with an intersection–union max-p. Together they bound the
+  accepted-decision error for **any** genuine:impostor prevalence.
+- The pooled error at the calibration prevalence is secondary, and valid only with Bernoulli
+  class assignment.
+- The candidate order is fixed on validation data (D-020).
 
 ## 3. Identity grouping and splits
 
@@ -146,12 +151,12 @@ not measurements.
 
 | Constant | Value | Feasibility finding | Proposed disposition |
 |---|---|---|---|
-| Clean non-inferiority margin | 0.5 pp at TAR@FAR=1% | Power depends on clean test-pair count; **must be simulated in Phase 1** | Keep provisional |
+| Clean non-inferiority margin | 0.5 pp at TAR@FAR=1% | **Simulated (SIM-006):** power 28% / 68% / 100% with 200 / 1,000 / 3,333 clean test identities (4 genuine pairs each, true difference 0) | Keep provisional; needs about 3,000 clean test identities |
 | FM:FNM cost ratio | 10:1 | Reporting/tie-break weight; no sample-size implication | Ready to freeze |
 | Confidence level (1 − δ) | 0.95 | Standard; drives the counts below | Ready to freeze |
 | Accepted-decision error target | 5% | Certifiable with **≥ 59** independent accepted cal pairs at 0 errors, **≥ 93** at 2% observed, **≥ 286** at 3%, **≥ 1,282** at 4%. Applies **per stratum** under stratified calibration | Feasible |
 | FAR operating points | 1%, 0.1% | **Estimation:** feasible (10,000 test impostor pairs for 0.1%). **Certification of sFMR:** 1% needs **≥ 299** independent impostor pairs (0 FM); 0.1% needs **≥ 2,995** (0 FM) or **≥ 4,742** (1 FM). Identity-disjoint matching gives N/3 impostor pairs from N cal identities: DigiFace 72-img P1 → 66; 5-img P1 → 1,111; all three 5-img parts → 3,333 | **1% certifiable** with a 5-img part; **0.1% estimation-only** unless all three 5-img parts are approved |
-| Bootstrap CI | 95%, identity clusters, 2,000 resamples | Coverage of the cluster bootstrap must be **validated by simulation** before use. P30 indicates naive bootstraps of ROC quantities can be invalid | Keep provisional until simulated |
+| Bootstrap CI | 95%, identity clusters, 2,000 resamples | **Simulated (SIM-001):** identity bootstrap covered FNMR 93.3% and FMR 99.3%, against 83–84% for the pair bootstrap | Identity unit confirmed. A refined two-way scheme is a Phase 1b item |
 | Near-dup threshold | **unset** | Fixed only after the §8 validation | — |
 | Dedup target recall | 0.99 | Measured on synthetic known duplicates (§8) | Provisional |
 
