@@ -118,6 +118,138 @@ not validated and are not reported.
   draw can legitimately exceed the target with probability ≤ δ. Five folds × two backbones ×
   two targets × three arms are correlated draws, not independent replications.
 
-## 5. Results
+## 5. Results (MEASURED; single final run `38d853d8884c`)
 
-*To be filled from `reports/experiments/phase2_final.json` after the single final run.*
+The run used freeze `0e8a43fb…` and was logged in `results/test_runs.jsonl` at commit
+`f3376ea`; the source is `reports/experiments/phase2_final.json`. All numbers are on
+**DigiFace-1M synthetic faces** with **synthetic occlusions** and are not real-world
+performance. Intervals are 95 % identity-jackknife intervals (§3).
+
+### 5.1 Clean baselines (`test_balanced`: 61,122 genuine + 61,122 impostor pairs, 20,374 identities)
+
+| | AdaFace IR-101 | ArcFace IR-101 |
+|---|---|---|
+| ROC-AUC | 0.99856 | 0.99789 |
+| EER | 1.28 % | 1.61 % |
+| **Deployment** threshold from cal (FAR 1 %): realised FMR, test_balanced | 1.04 % [0.93, 1.16] | 0.98 % [0.86, 1.09] |
+| … realised FMR, `test_far` (100,000 impostors) | 1.10 % [1.00, 1.19] | 1.00 % [0.91, 1.09] |
+| … FNMR (= 1 − TAR) | 1.42 % [1.31, 1.53] | 2.21 % [2.08, 2.35] |
+| Threshold from val at FAR 0.1 % (estimation-only): realised FMR on `test_far` | 0.128 % [0.096, 0.160] | 0.148 % [0.114, 0.182] |
+| … FNMR | 4.35 % [4.16, 4.54] | 6.08 % [5.87, 6.30] |
+| Benchmark-mode TAR@FAR 1 % / 0.1 % (threshold chosen on test; literature convention) | 98.54 % / 95.41 % | 97.83 % / 93.50 % |
+| Accuracy at the val best-accuracy threshold | 98.77 % | 98.42 % |
+| AUC, 5-image vs 72-image identities | 0.99869 vs 0.99274 | 0.99801 vs 0.99295 |
+
+The FAR 1 % threshold fixed on calibration data transfers to test within interval.
+
+The FAR 0.1 % threshold fixed on validation realises 0.13–0.15 %. For ArcFace the interval
+excludes 0.1 %. This is consistent with D-034: a 0.1 % operating point estimated from about
+31k validation impostors is not reliable, so it stays estimation-only.
+
+The 72-image identities (rendered with more accessory and pose variation) are measurably
+harder for both backbones.
+
+### 5.2 Occlusion: LOFO degradation at the clean deployment threshold
+
+| Held-out family (fold) | AdaFace AUC Test-ID / Test-OOD | AdaFace FNMR ID / OOD | ArcFace AUC ID / OOD | ArcFace FNMR ID / OOD |
+|---|---|---|---|---|
+| F1 mask | 0.9849 / 0.9864 | 10.9 % / 10.8 % | 0.9815 / 0.9825 | 13.7 % / 14.5 % |
+| F2 sunglasses | 0.9817 / 0.9923 | 12.5 % / 7.6 % | 0.9777 / 0.9902 | 15.8 % / 9.8 % |
+| F3 hand/object | 0.9832 / 0.9880 | 12.3 % / 10.1 % | 0.9794 / 0.9852 | 15.5 % / 12.9 % |
+| F4 random patch | 0.9911 / **0.9676** | 8.1 % / **21.6 %** | 0.9877 / **0.9630** | 11.1 % / **25.1 %** |
+| F5 extreme lighting (non-physical) | 0.9825 / 0.9908 | 13.5 % / 6.8 % | 0.9792 / 0.9870 | 16.5 % / 9.8 % |
+| *Clean (same pairs)* | *0.9986* | *1.4 %* | *0.9979* | *2.2 %* |
+
+Each plan has 25 % clean–clean pairs, 25 % clean–occluded, 25 % occluded–occluded same
+family and 25 % cross family, with severity uniform over low/medium/high.
+
+- **Degradation is large and mostly non-match driven.** FNMR rises 4–15× at the clean
+  threshold. FMR falls in 9 of 10 fold/role cells per backbone (0.5–0.9 %), because occlusion
+  lowers impostor scores too; held-out masks are the exception (1.18 % AdaFace, 1.00 % ArcFace).
+- **Masks are the exception.** Mask–mask impostor pairs give FMR 2.7 % (AdaFace) and 2.2 %
+  (ArcFace) against about 0.9 % clean. Masked faces of different synthetic people look more alike.
+- **"Held-out" is not uniformly harder.**
+  - Only random patch (up to 65 % face coverage at high severity) is harder as the held-out
+    family than the seen-family mix.
+  - Held-out sunglasses or lighting is milder than the Test-ID mix, which contains the harder
+    families.
+- **Severity is monotone.** Held-out random patch, AdaFace FNMR by the pair's maximum level:
+  1.3 % (none) → 5.3 % (low) → 17.6 % (medium) → 44.9 % (high). Figure:
+  `reports/figures/severity_fnmr_heatmap.svg`.
+- **ArcFace degrades slightly more than AdaFace** in every fold. Both share data and
+  architecture, so this is a loss-function difference on this synthetic domain.
+- **Stress (exploratory; two physical families per side, 20,000 pairs).** FNMR 37.4 %
+  (AdaFace) and 43.3 % (ArcFace), against 1.6 % / 2.4 % on the same pairs clean.
+
+### 5.3 Risk control: realised selective error of frozen LTT rules
+
+Verdicts compare the realised test risk with the target. "Violated" means the 95 % interval
+lies entirely above the target.
+
+Counts below are cells of 5 folds × 2 backbones; NA marks an infeasible fit, which abstains on all pairs.
+
+| Arm (target sFMR / sFNMR) | Test-ID: violated / within / NA | Test-OOD: violated / within / NA | Coverage range |
+|---|---|---|---|
+| `global` v1 (5 % / 5 %) | 0 / 10 / 0 | **2** / 8 / 0 (both F4) | 0.62–0.95 |
+| `stratified_vis` v1 (5 % / 5 %) | 0 / 10 / 0 | **0** / 10 / 0 | 0.16–0.82 |
+| `clean_cal` (5 % / 5 %) | **10** / 0 / 0 | **10** / 0 / 0 | 1.00 |
+| `global_v2` (5 % / 5 %) | 0 / 10 / 0 | **2** / 8 / 0 (both F4) | 0.90–1.00 |
+| `stratified_vis_v2` (5 % / 5 %) | 0 / 10 / 0 | **2** / 8 / 0 (both F4) | 0.73–0.95 |
+| `global` v1 (1 % / 5 %) | 0 / 6 / 4 | 0 / 6 / 4 | 0.37–0.54 |
+| `stratified_vis` v1 (1 % / 5 %) | 0 / 10 / 0 | 0 / 9 / 1 | 0.18–0.68 |
+| `global_v2` (1 % / 5 %) | 0 / 10 / 0 | **2** / 8 / 0 (both F4) | 0.80–0.94 |
+| `stratified_vis_v2` (1 % / 5 %) | 0 / 10 / 0 | **2** / 7 / 1 | 0.24–0.87 |
+| `clean_cal` (1 % / 5 %) | **7** / 3 / 0 | **2** violated + 1 point-above / 7 / 0 | 0.79–0.92 |
+
+1. **Test-ID: no violation in any certifiable occlusion-calibrated arm** (0 violations in the 76
+   certifiable Test-ID cells across both targets and orderings; 4 cells were infeasible). This is consistent with LTT validity under A1–A7;
+   a single realisation cannot *prove* validity.
+2. **Test-OOD: risk control fails exactly where the held-out family is hardest.** With F4
+   (random patch) held out:
+   - global: sFNMR 10.0 % [CI above 5 %] (AdaFace) and 8.8 % (ArcFace);
+   - global v2: 13.2 % and 12.2 %;
+   - stratified v2: 7.5 % and 6.8 %.
+
+   All other held-out families stay within target. sFMR stays within target everywhere.
+   Hypothesis **H2a** (degradation on held-out families) is supported for one of five
+   families on synthetic data.
+3. **Oracle-visibility stratification** (pre-registered v1) **removed the F4 violation**:
+   sFNMR 0.98 % (AdaFace) and 3.50 % (ArcFace). The price was coverage: 0.46 vs 0.94
+   (AdaFace) and 0.74 vs 0.88 (ArcFace).
+   - AdaFace abstained on the whole low-visibility stratum, where no rule was certifiable.
+   - ArcFace accepted 54 % of low-visibility pairs at 7.0 % in-stratum sFNMR.
+   - The v2 stratified arm keeps more coverage and reduces, but does not remove, the
+     violation.
+
+   This is **H2b-consistent** evidence with *oracle* visibility only; a learned estimator
+   remains untested.
+4. **Calibrating on clean pairs does not transfer to occlusion, even for seen families.**
+   sFNMR is 6–22 % against a 5 % target in 20 of 20 cells at the primary target.
+   Occlusion-aware calibration data is necessary.
+5. **Clean pairs.** Every clean-calibrated rule stays within target on clean test pairs
+   (sFMR ≤ 1.6 %, sFNMR ≤ 3.8 %).
+
+### 5.4 C1 exploratory (fit-free; occluded pairs; errors at the clean deployment threshold)
+
+| | AUROC of low co-visibility (oracle) | AUROC of low feature norm (quality) | Co-visibility AUROC *within* quality deciles |
+|---|---|---|---|
+| AdaFace, 10 fold/role cells | 0.58–0.75 | 0.70–0.84 | 0.50–0.65 (> 0.5 in 9/10) |
+| ArcFace, 10 fold/role cells | 0.57–0.74 | 0.65–0.78 | 0.52–0.64 (> 0.5 in 10/10) |
+
+The backbone's own feature norm ranks errors better than oracle co-visibility. Co-visibility
+keeps a weak-to-moderate residual signal *beyond* quality (19 of 20 cells above 0.5). This
+is ESTIMATED, exploratory evidence for C1 (H1), not a test of a trained model.
+
+### 5.5 Throughput and latency (MEASURED, RTX 4060 Laptop, fp16, batch 256)
+
+| | AdaFace | ArcFace |
+|---|---|---|
+| Model forward, full run (2.17 M items) | 477 img/s (2.1 ms/img) | 520 img/s (1.9 ms/img) |
+| CPU fp32 (pilot, 128 images) | 16 img/s | 18 img/s |
+
+- End-to-end with both backbones, including PNG decode and occlusion re-rendering on 8 CPU
+  workers: 241 img/s, 2.5 h in total.
+- Peak GPU memory: 2.5 GiB.
+- Detection and alignment latency: not applicable (pre-aligned data).
+
+Figures: `reports/figures/*.svg`.

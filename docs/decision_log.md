@@ -56,6 +56,10 @@ Status values: **approved** (by PI), **provisional** (registered, may change via
 3. Accepted-decision error target (5%) and clean margin (0.5 pp): confirm or revise in light of
    the Phase 2 measurements (`docs/statistical_audit.md`).
 4. Phase 3 authorisation (visibility estimator / fusion training): not requested by Phase 2.
+   The recommendation tied to measured failures is in `docs/implementation_roadmap.md` §4f.
+5. Adopt the p-value candidate ordering (D-042) as the pre-registered default for Phase 3.
+6. FAR 0.1 %: the val-fixed threshold realised 0.13–0.15 % on test (RES-002). Confirm that it
+   stays estimation-only.
 
 Resolved since Phase 1a: the download go-ahead (D-027), FAR 0.1% estimation-only (D-034),
 frozen confidence level and cost ratio (D-034), and the class-conditional estimand (D-019,

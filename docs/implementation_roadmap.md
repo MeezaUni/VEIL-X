@@ -165,6 +165,33 @@ Done:
 
 See `data_integrity_report.md` and `DEVELOPMENT_LOG.md`.
 
+## 4e. Phase 2 status (2026-10-27): complete on DigiFace; LFW blocked
+
+Done:
+- DigiFace expanded to protocol v0.4.0 (643,995 images, 101,999 identities).
+- Frozen AdaFace and ArcFace IR-101 verified against the authors' code.
+- 2.17 M clean and occluded embeddings per backbone.
+- Develop/final evaluation with one logged test run.
+- Results: `docs/baseline_evaluation.md` §5 and `docs/statistical_audit.md` §3.
+
+Not done:
+- LFW and real-world sets (D-039, a PI decision).
+- The detector-inclusive path.
+- Train-role occlusion plans (deferred to Phase 3).
+
+## 4f. Recommended Phase 3, tied to the measured Phase 2 failures (needs authorisation)
+
+| # | Measured failure (Phase 2) | Recommended Phase 3 work | Success test (pre-register) |
+|---|---|---|---|
+| 1 | Held-out **random patch** breaks risk control (sFNMR 8.8–13.2 % vs 5 %); **oracle** visibility strata removed it at a coverage cost | Train the **visibility estimator** (7×7 grid, train split, LOFO with the isolation guard; first generate the train-role plans deferred in v0.4.0) and replace oracle strata with estimated co-visibility strata | Test-OOD F4 sFNMR within target with coverage ≥ the oracle arm's; report the gap to the oracle |
+| 2 | Clean-only calibration violates under every occlusion (20/20) | Make occlusion-aware calibration the default; consider calibration plans whose severity range covers the hardest seen family | Test-ID violation rate ≤ δ across folds |
+| 3 | Fixed-sequence power collapse of the pre-registered ordering (22/80 fits stopped at step one) | Pre-register the p-value ordering (`order_candidates_by_validation_pvalue`) as the Phase 3 default (PI decision) | Feasibility in all global fits; validity re-checked by simulation |
+| 4 | Feature norm ranks errors well (AUROC 0.65–0.84); co-visibility adds a weak residual signal (within-decile AUROC 0.50–0.65) | C1 fusion / abstention model: quality-only vs co-visibility-only vs both, trained on train, selected on val | Pre-registered AUGRC / selective-risk comparison with identity-clustered intervals |
+| 5 | Low-visibility strata at sFMR 1 % are capacity-limited | Coarser strata (2 instead of 3) or a pooled low-visibility arm. All five-image DigiFace parts are already used, so more calibration identities would need new sources | Feasibility at 1 % without loss of Test-ID validity |
+| 6 | Mask–mask impostors raise FMR to 2.2–2.7 % (security-relevant) | Report sFMR per family as a primary safety metric; check whether stratified targets need an FM-specific stratum | sFMR per family within target |
+| 7 | Paired-difference intervals unvalidated; 0.5 pp clean margin resolvable only if they are valid | Run SIM-011 (paired jackknife coverage) before any H4 claim | Coverage ≥ 0.94 |
+| 8 | Real-world validity untested (LFW blocked; no detector path) | After the PI decision on LFW/ROF: SCRFD detection/alignment with failure accounting, detector-inclusive results reported separately | — |
+
 ## 4d. Proposed Phase 2 (requires separate authorisation)
 1. Download the detector and backbone weights (InsightFace, AdaFace IR101): licence-check,
    checksum, record.

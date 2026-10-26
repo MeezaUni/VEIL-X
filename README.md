@@ -3,17 +3,22 @@
 Research code for **risk-controlled two-image (1:1) face verification under occlusion**.
 Non-commercial academic research only.
 
-> **Status: Phase 1b complete (real data, occlusion engine, experiment readiness).** No face-
-> recognition model has been run and **no model-performance results exist**. Dataset images,
-> manifests and weights are never in this repository: they live in a private data root
-> (`VEILX_DATA_ROOT`). Numbers in `docs/` and `reports/` fall into categories tracked in
+> **Status: Phase 2 complete (frozen backbones evaluated on DigiFace with synthetic occlusions).**
+> AdaFace IR-101 and ArcFace IR-101 (WebFace4M) were evaluated without any training. Results:
+> `docs/baseline_evaluation.md` and `docs/statistical_audit.md` (registry RES-001…006).
+>
+> **All model results are on synthetic faces (DigiFace-1M) with synthetic occlusions. They are
+> not real-world performance.** The real-world benchmark (LFW) is blocked pending a PI decision
+> (`docs/real_world_benchmark.md`).
+>
+> Dataset images, manifests, embeddings and weights are never in this repository: they live in
+> a private data root (`VEILX_DATA_ROOT`). Every number in `docs/` and `reports/` is typed in
 > `reports/evidence_registry.yaml`:
-> - cited prior work;
-> - registered constants (frozen or *provisional*);
+> - cited work;
 > - exact calculations;
-> - **SIMULATED** results on synthetic scores (never face-recognition evidence);
-> - **real-data statistics** about the prepared DigiFace subset (counts and integrity, never
->   model performance).
+> - **SIMULATED** results;
+> - real-data statistics;
+> - **MEASURED** model results, each with run provenance.
 
 ## Research questions (approved)
 

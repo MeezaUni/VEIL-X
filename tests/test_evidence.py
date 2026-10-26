@@ -6,7 +6,12 @@ import json
 
 import pytest
 
-from veilx.evidence import EvidenceRecord, EvidenceType, load_evidence_registry
+from veilx.evidence import (
+    REQUIRED_MEASURED_PROVENANCE,
+    EvidenceRecord,
+    EvidenceType,
+    load_evidence_registry,
+)
 
 from .conftest import ROOT
 
@@ -29,7 +34,12 @@ def test_every_simulation_report_is_registered_and_labelled() -> None:
 
 
 def test_no_measured_results_without_provenance() -> None:
-    assert REGISTRY.of_type(EvidenceType.MEASURED) == ()  # none exist in Phase 1a
+    # Phase 2: measured results exist; each carries full provenance and a committed artefact
+    measured = REGISTRY.of_type(EvidenceType.MEASURED)
+    assert measured
+    for rec in measured:
+        assert set(rec.provenance) >= REQUIRED_MEASURED_PROVENANCE
+        assert rec.artefact and (ROOT / rec.artefact).exists()
     with pytest.raises(ValueError, match="provenance"):
         EvidenceRecord(
             id="MEAS-001",

@@ -8,7 +8,7 @@ Machine-readable registry: `reports/evidence_registry.yaml`, validated by `src/v
 | `published_result` | Reported in a cited paper | Must cite a URL or DOI |
 | `mathematical_calculation` | Exact calculation (e.g. binomial bounds) | Reproducible from a script |
 | `synthetic_simulation` | Monte Carlo on synthetic scores | Artefact in `reports/simulations/`; statement says "simulated"; JSON carries `evidence_type` and the SIMULATED disclaimer. **Never evidence of face-recognition performance** |
-| `real_measured_model_result` | Measured with a real model on real data | Requires provenance: git commit, dataset ids, model ids, split, protocol version, final-run log entry. **None exist** |
+| `real_measured_model_result` | Measured with a real model on real data | Requires provenance: git commit, dataset ids, model ids, split, protocol version, final-run log entry. **Phase 2: RES-001…006** (DigiFace, synthetic occlusions; single logged test run 38d853d8884c) |
 | `real_data_statistic` | Measured facts about the prepared dataset (counts, integrity, splits, pair sets) | Artefact in `reports/data/`; statement may not contain performance terms (TAR, FAR, EER, AUC, accuracy…). **Never model performance** |
 | `unverified_hypothesis` | Not yet tested | — |
 

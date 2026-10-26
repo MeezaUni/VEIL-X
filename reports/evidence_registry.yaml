@@ -153,6 +153,78 @@ records:
     source: "scripts/capacity_report.py"
     artefact: "reports/data/capacity_v0.4.0.json"
     created: "2026-10-27"
+  # ------------------------------------------------------------------ measured (Phase 2)
+  - id: RES-001
+    type: real_measured_model_result
+    title: "Backbone verification (validation split)"
+    statement: "Re-implemented AdaFace and ArcFace IR-101 reproduce the authors' modules exactly (max abs diff 0.0); CUDA fp32 bit-deterministic; RGB input ahead of BGR on 20,000 val pairs for both (AUC 0.99881 vs 0.99817; 0.99810 vs 0.99732); fp16 vs fp32 max pair-score difference <= 0.003."
+    source: "scripts/verify_models.py"
+    artefact: "reports/models/model_verification.json"
+    created: "2026-10-27"
+    provenance:
+      git_commit: "50f18f63c7369f92859b684f13f6e66197732f06"
+      dataset_ids: ["digiface1m"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m"]
+      split: "val"
+      protocol_version: "0.4.0"
+      final_run_log_entry: "not applicable (validation only; no test access)"
+    caveats: "Synthetic faces; channel-order evidence is supporting, not a formal test."
+  - id: RES-002
+    type: real_measured_model_result
+    title: "Clean verification baselines on DigiFace test"
+    statement: "Clean test_balanced (61,122 genuine + 61,122 impostor pairs, 20,374 identities): AUC 0.99856 / 0.99789, EER 1.28% / 1.61% (AdaFace / ArcFace); deployment threshold fixed on calibration at FAR 1% realises FMR 1.10% / 1.00% on 100,000 test impostors with FNMR 1.42% / 2.21%; the val-fixed FAR 0.1% threshold realises 0.128% / 0.148%."
+    source: "scripts/evaluate_phase2.py final --final"
+    artefact: "reports/experiments/phase2_final.json"
+    created: "2026-10-27"
+    provenance: &final_run
+      git_commit: "f3376ea47680e49e7cbde0aacf16ea9e9dec7959"
+      dataset_ids: ["digiface1m"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m"]
+      split: "test"
+      protocol_version: "0.4.0"
+      final_run_log_entry: "38d853d8884c (frozen config 0e8a43fb7234a52388d017308249796a000b378424aaec11a8875bf5d90fa8a1)"
+    caveats: "Synthetic faces (DigiFace-1M); not real-world accuracy. FAR 0.1% is estimation-only."
+  - id: RES-003
+    type: real_measured_model_result
+    title: "Synthetic-occlusion degradation (leave-one-family-out)"
+    statement: "At the clean deployment threshold FNMR rises from 1.4% / 2.2% to 6.8-21.6% (AdaFace) and 9.8-25.1% (ArcFace) across folds and roles; held-out random patch is the hardest (Test-OOD AUC 0.9676 / 0.9630); mask-mask impostor pairs raise FMR to 2.7% / 2.2%; combined occlusions (exploratory) reach FNMR 37.4% / 43.3%."
+    source: "scripts/evaluate_phase2.py final --final"
+    artefact: "reports/experiments/phase2_final.json"
+    created: "2026-10-27"
+    provenance: *final_run
+    caveats: "Synthetic occlusions on synthetic faces; F5 lighting is non-physical; no detector in the loop."
+  - id: RES-004
+    type: real_measured_model_result
+    title: "Realised selective risk of frozen LTT rules (C3)"
+    statement: "Test-ID: 0 violations in 76 certifiable occlusion-calibrated cells. Test-OOD: violations only with random patch held out (global sFNMR 8.8-13.2% vs 5% target, interval above target). Oracle-visibility stratification (pre-registered) removed that violation at a coverage cost (0.46 vs 0.94 AdaFace; 0.74 vs 0.88 ArcFace). Calibration on clean pairs only violated sFNMR in 20/20 occluded cells."
+    source: "scripts/evaluate_phase2.py final --final"
+    artefact: "reports/experiments/phase2_final.json"
+    created: "2026-10-27"
+    provenance: *final_run
+    caveats: "Single calibration draw per fold; cells are correlated; v2 arms are post-hoc (D-042, union bound delta <= 0.10); visibility is oracle (mask) visibility."
+  - id: RES-005
+    type: real_measured_model_result
+    title: "C1 exploratory: co-visibility vs feature-norm quality"
+    statement: "Among occluded test pairs, low feature norm ranks decision errors with AUROC 0.65-0.84, oracle co-visibility with 0.57-0.75; within quality deciles co-visibility retains AUROC 0.50-0.65 (above 0.5 in 19/20 fold-role cells)."
+    source: "scripts/evaluate_phase2.py final --final"
+    artefact: "reports/experiments/phase2_final.json"
+    created: "2026-10-27"
+    provenance: *final_run
+    caveats: "Exploratory and fit-free; oracle visibility; not a test of H1 with a learned estimator."
+  - id: RES-006
+    type: real_measured_model_result
+    title: "Embedding extraction throughput"
+    statement: "RTX 4060 Laptop, fp16, batch 256: model forward 477 img/s (AdaFace) and 520 img/s (ArcFace); end-to-end 241 img/s for both backbones with decoding and occlusion rendering on 8 CPU workers (2.17 M items, 2.5 h); peak GPU memory 2.5 GiB; CPU fp32 fallback 16-18 img/s."
+    source: "scripts/extract_embeddings.py"
+    artefact: "reports/experiments/extraction_run.json"
+    created: "2026-10-27"
+    provenance:
+      git_commit: "f3376ea47680e49e7cbde0aacf16ea9e9dec7959"  # recorded at run end
+      dataset_ids: ["digiface1m"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m"]
+      split: "val, cal, test (images only)"
+      protocol_version: "0.4.0"
+      final_run_log_entry: "not applicable (no scores computed)"
   # ------------------------------------------------------------------ hypotheses
   - id: HYP-001
     type: unverified_hypothesis

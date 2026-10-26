@@ -21,6 +21,7 @@ mpl.use("svg")
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.ticker import NullFormatter
 
 ROOT = Path(__file__).resolve().parents[1]
 EXP = ROOT / "reports" / "experiments"
@@ -306,6 +307,7 @@ def fig_throughput() -> None:
         ax.text(r[1], k, f" {r[1]:.0f} img/s", va="center", fontsize=8, color=INK)
     ax.set_yticks(y, [r[0] for r in rows], fontsize=8)
     ax.set_xscale("log")
+    ax.xaxis.set_minor_formatter(NullFormatter())
     ax.set_xlabel("Model throughput (images/s, log; batch 256 GPU / 128 CPU)")
     ax.set_title("Embedding throughput, RTX 4060 Laptop vs CPU")
     _save(

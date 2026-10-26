@@ -6,6 +6,47 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-10-27 — Phase 2 (milestone 2): extraction, develop freeze, single test run, results
+
+### Extraction
+- The first full run was **stopped by Claude Code under host memory pressure** (idle session):
+  it was 101k items into the first group, with no shard saved.
+- Fixes, then a restart on the user's instruction:
+  - lazy per-group work lists and per-group worker pools;
+  - render workers no longer import torch (550 → 107 MB each);
+  - 32,768-item atomic part checkpoints, merged and verified;
+  - val/cal groups first.
+- Result: 22 groups × 2 backbones, 2,170,034 items.
+  - 241 img/s end-to-end, 2.5 h; model 477 / 520 img/s; peak GPU 2.5 GiB.
+  - 9.2 GB of private shards; no part files left.
+
+### Develop stage and amendment (no test access)
+- v1 freeze `700cd8e9…`. 22 of 80 fold-level LTT fits were infeasible, all at step one
+  (fixed-sequence power failure).
+- Added the p-value ordering (D-042, simulated validity and power tests) as post-hoc v2 arms.
+- Re-freeze `0e8a43fb…` contains the v1 arms byte-identical.
+- Rehearsal of the final code path on **val**; figures checked visually.
+- Committed and pushed (f3376ea) **before** the test run.
+
+### Final run (single, logged): `38d853d8884c`
+- Clean, AdaFace / ArcFace: AUC 0.99856 / 0.99789. The calibration-fixed FAR 1 % threshold
+  transfers (FMR 1.10 % / 1.00 % on 100k impostors).
+- The val-fixed FAR 0.1 % realises 0.128 % / 0.148 % (estimation-only).
+- Occlusion: FNMR up 4–15× at the clean threshold; held-out random patch is the hardest;
+  mask–mask impostors raise FMR.
+- LTT: 0 violations in 76 certifiable Test-ID cells. Test-OOD violations only with random patch
+  held out. Oracle-visibility stratification removed that violation at a coverage cost.
+  Clean-only calibration fails under any occlusion.
+- C1 exploratory: co-visibility adds a weak residual signal beyond the feature norm.
+- Audit: no identity overlap; label-shuffle AUC 0.50; val–test AUC gap ≤ 0.00025.
+
+### Documentation and QA
+- `baseline_evaluation.md` §5, `statistical_audit.md`, figures (`reports/figures/*.svg`),
+  experiment registry (`reports/experiments/registry.json`), evidence RES-001…006,
+  roadmap §4e/§4f (Phase 3 recommendation), README status.
+
+---
+
 ## 2026-10-27 — Phase 2 (milestone 1): data expansion, frozen backbones, LFW status, evaluation plan
 
 No test-split access has happened at this milestone. Nothing was trained or fine-tuned.

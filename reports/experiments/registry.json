@@ -1,0 +1,184 @@
+{
+  "schema": "veilx-experiment-registry/1",
+  "phase": 2,
+  "scope": "DigiFace-1M (synthetic) with synthetic occlusions; LFW blocked (D-039)",
+  "test_run_log": "results/test_runs.jsonl (private, git-ignored)",
+  "experiments": [
+    {
+      "id": "P2-EXP-001",
+      "purpose": "Backbone verification: strict load, equality with authors' modules, channel order, precision agreement, determinism, throughput",
+      "script": "scripts/verify_models.py --pairs 20000",
+      "artefact": "reports/models/model_verification.json",
+      "splits": [
+        "val"
+      ],
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "b0f389a12c8b0ff18f5ce268adcc64ba9e57eb1d",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "cb0b0aa5651217028330c37636559ff356dd1e899884d889fb710263b553fdc8",
+      "created_utc": "2026-10-26T19:21:36.208526+00:00"
+    },
+    {
+      "id": "P2-EXP-002",
+      "purpose": "Extraction pilot on GPU (fp16): throughput, latency, memory",
+      "script": "scripts/extract_embeddings.py --pilot 2048",
+      "artefact": "reports/experiments/extraction_pilot_cuda.json",
+      "splits": [
+        "val",
+        "test (images only; no scores computed)"
+      ],
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "50f18f63c7369f92859b684f13f6e66197732f06",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "f5d0d0a5350ec97c95ff9c9580413ff17c5475b19213ed131f201770e26dadd7",
+      "created_utc": "2026-10-26T19:45:28.369435+00:00"
+    },
+    {
+      "id": "P2-EXP-003",
+      "purpose": "Extraction pilot on CPU (fp32): CPU fallback throughput",
+      "script": "scripts/extract_embeddings.py --pilot 128 --device cpu --precision fp32 --kinds clean",
+      "artefact": "reports/experiments/extraction_pilot_cpu.json",
+      "splits": [
+        "(clean images of evaluation pair sets; no scores computed)"
+      ],
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "50f18f63c7369f92859b684f13f6e66197732f06",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "4214395e451c4f6716bb31e736a2e95c370d2eda75d2c14580ed1dc803138b9d",
+      "created_utc": "2026-10-26T19:33:17.960708+00:00"
+    },
+    {
+      "id": "P2-EXP-004",
+      "purpose": "Full embedding extraction (clean, 20 LOFO groups, stress), both backbones",
+      "script": "scripts/extract_embeddings.py",
+      "artefact": "reports/experiments/extraction_run.json",
+      "splits": [
+        "val",
+        "cal",
+        "test (images only; no scores computed)"
+      ],
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "f3376ea47680e49e7cbde0aacf16ea9e9dec7959",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "67dacaff07b359e4ac7c0507699da08fe9c93c334fb96817469bc9fdb0b96c82",
+      "created_utc": "2026-10-26T22:38:45.133105+00:00"
+    },
+    {
+      "id": "P2-EXP-005",
+      "purpose": "Develop stage: thresholds, LTT candidate orders, strata edges, LTT fits (validation + calibration only)",
+      "script": "scripts/evaluate_phase2.py develop",
+      "artefact": "reports/experiments/phase2_develop.json",
+      "splits": [
+        "val",
+        "cal"
+      ],
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": "0.4.0",
+      "git_commit": "eda4d7d71c86b56ae275fec6d9edb695f011c85d",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": "0e8a43fb7234a52388d017308249796a000b378424aaec11a8875bf5d90fa8a1",
+      "artefact_sha256": "414d68da3f4c66eaf4fddbd3c1d15c926f837c6392fa4efc92f05e947c74c689",
+      "created_utc": "2026-10-26T21:01:33.610554+00:00"
+    },
+    {
+      "id": "P2-EXP-006",
+      "purpose": "Final evaluation (single logged test run): clean baselines, LOFO degradation, realised selective risk, C1 exploratory, stress, audit",
+      "script": "scripts/evaluate_phase2.py final --final",
+      "artefact": "reports/experiments/phase2_final.json",
+      "splits": [
+        "test"
+      ],
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": "0.4.0",
+      "git_commit": "f3376ea47680e49e7cbde0aacf16ea9e9dec7959",
+      "git_dirty": true,
+      "run_id": "38d853d8884c",
+      "frozen_config_sha256": "0e8a43fb7234a52388d017308249796a000b378424aaec11a8875bf5d90fa8a1",
+      "artefact_sha256": "31df2d4244364c6616cde39c964e3f418f51d767568ce9c597ffac81871897e0",
+      "created_utc": "2026-10-26T22:39:11.301731+00:00"
+    },
+    {
+      "id": "P2-CALC-001",
+      "purpose": "Calibration capacity (exact binomial) at protocol v0.4.0",
+      "script": "scripts/capacity_report.py",
+      "artefact": "reports/data/capacity_v0.4.0.json",
+      "splits": [
+        "cal (pair counts only)"
+      ],
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [],
+      "status": "complete",
+      "evidence_type": "mathematical_calculation",
+      "protocol_version": "0.4.0",
+      "git_commit": null,
+      "git_dirty": null,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "62e79e0a7116ebb2b7cd4bfb15c7381b99648e4876fb82243d1ce93535c224c4",
+      "created_utc": null
+    }
+  ]
+}

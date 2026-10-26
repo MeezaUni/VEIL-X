@@ -1,0 +1,508 @@
+{
+  "evidence_type": "real_measured_model_result",
+  "scope": "embedding extraction run (throughput/latency/memory; no accuracy numbers)",
+  "pilot": false,
+  "precision": "fp16",
+  "batch": 256,
+  "part_size": 32768,
+  "device": "cuda",
+  "cpu_workers": 8,
+  "backbones": {
+    "adaface_ir101_webface4m": "13c7662136a8555a-fp16",
+    "arcface_ir101_webface4m": "af47f6fe5e21db0a-fp16"
+  },
+  "n_groups": 22,
+  "n_items": 2170034,
+  "wall_seconds_last_session": 8504.1,
+  "groups": [
+    {
+      "group": "clean",
+      "n": 172049,
+      "n_computed_this_session": 172049,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 699.8,
+      "images_per_s_end_to_end": 245.9,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 359.4,
+        "arcface_ir101_webface4m": 325.6
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 478.7,
+        "arcface_ir101_webface4m": 528.4
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F1_mask__val__val",
+      "n": 77466,
+      "n_computed_this_session": 77466,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 327.6,
+      "images_per_s_end_to_end": 236.5,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 164.6,
+        "arcface_ir101_webface4m": 150.4
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 470.5,
+        "arcface_ir101_webface4m": 515.2
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F2_sunglasses__val__val",
+      "n": 77466,
+      "n_computed_this_session": 77466,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 329.7,
+      "images_per_s_end_to_end": 234.9,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 165.9,
+        "arcface_ir101_webface4m": 152.2
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 466.8,
+        "arcface_ir101_webface4m": 508.9
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F3_hand_object__val__val",
+      "n": 77466,
+      "n_computed_this_session": 77466,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 317.7,
+      "images_per_s_end_to_end": 243.8,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 159.6,
+        "arcface_ir101_webface4m": 147.3
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 485.2,
+        "arcface_ir101_webface4m": 525.7
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F4_random_patch__val__val",
+      "n": 77466,
+      "n_computed_this_session": 77466,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 322.1,
+      "images_per_s_end_to_end": 240.5,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 162.0,
+        "arcface_ir101_webface4m": 149.2
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 478.2,
+        "arcface_ir101_webface4m": 519.3
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F5_extreme_lighting__val__val",
+      "n": 77466,
+      "n_computed_this_session": 77466,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 319.3,
+      "images_per_s_end_to_end": 242.6,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 160.7,
+        "arcface_ir101_webface4m": 147.6
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 482.2,
+        "arcface_ir101_webface4m": 524.8
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F1_mask__cal__cal_independent",
+      "n": 8521,
+      "n_computed_this_session": 8521,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 39.5,
+      "images_per_s_end_to_end": 215.9,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 17.8,
+        "arcface_ir101_webface4m": 16.0
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 478.7,
+        "arcface_ir101_webface4m": 531.1
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F2_sunglasses__cal__cal_independent",
+      "n": 8521,
+      "n_computed_this_session": 8521,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 39.6,
+      "images_per_s_end_to_end": 215.1,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 17.8,
+        "arcface_ir101_webface4m": 16.0
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 478.8,
+        "arcface_ir101_webface4m": 533.4
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F3_hand_object__cal__cal_independent",
+      "n": 8521,
+      "n_computed_this_session": 8521,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 39.5,
+      "images_per_s_end_to_end": 215.8,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 17.9,
+        "arcface_ir101_webface4m": 16.2
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 476.2,
+        "arcface_ir101_webface4m": 527.0
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F4_random_patch__cal__cal_independent",
+      "n": 8521,
+      "n_computed_this_session": 8521,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 39.7,
+      "images_per_s_end_to_end": 214.9,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 17.9,
+        "arcface_ir101_webface4m": 16.3
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 476.8,
+        "arcface_ir101_webface4m": 521.4
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F5_extreme_lighting__cal__cal_independent",
+      "n": 8521,
+      "n_computed_this_session": 8521,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 40.4,
+      "images_per_s_end_to_end": 210.8,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 18.1,
+        "arcface_ir101_webface4m": 16.5
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 471.2,
+        "arcface_ir101_webface4m": 515.5
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F1_mask__test_id__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 648.7,
+      "images_per_s_end_to_end": 235.5,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 327.4,
+        "arcface_ir101_webface4m": 300.2
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 466.7,
+        "arcface_ir101_webface4m": 509.1
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F2_sunglasses__test_id__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 654.8,
+      "images_per_s_end_to_end": 233.4,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 330.9,
+        "arcface_ir101_webface4m": 303.3
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 461.8,
+        "arcface_ir101_webface4m": 503.8
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F3_hand_object__test_id__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 644.1,
+      "images_per_s_end_to_end": 237.2,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 325.4,
+        "arcface_ir101_webface4m": 301.4
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 469.6,
+        "arcface_ir101_webface4m": 507.0
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F4_random_patch__test_id__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 637.8,
+      "images_per_s_end_to_end": 239.6,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 322.6,
+        "arcface_ir101_webface4m": 298.6
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 473.7,
+        "arcface_ir101_webface4m": 511.7
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F5_extreme_lighting__test_id__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 626.4,
+      "images_per_s_end_to_end": 244.0,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 317.2,
+        "arcface_ir101_webface4m": 292.7
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 481.8,
+        "arcface_ir101_webface4m": 522.0
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F1_mask__test_ood__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 620.8,
+      "images_per_s_end_to_end": 246.1,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 314.6,
+        "arcface_ir101_webface4m": 290.8
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 485.7,
+        "arcface_ir101_webface4m": 525.4
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F2_sunglasses__test_ood__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 615.3,
+      "images_per_s_end_to_end": 248.3,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 312.6,
+        "arcface_ir101_webface4m": 287.6
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 488.8,
+        "arcface_ir101_webface4m": 531.4
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F3_hand_object__test_ood__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 628.3,
+      "images_per_s_end_to_end": 243.2,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 318.8,
+        "arcface_ir101_webface4m": 291.0
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 479.4,
+        "arcface_ir101_webface4m": 525.0
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F4_random_patch__test_ood__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 624.2,
+      "images_per_s_end_to_end": 244.8,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 316.2,
+        "arcface_ir101_webface4m": 290.1
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 483.3,
+        "arcface_ir101_webface4m": 526.8
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "F5_extreme_lighting__test_ood__test_balanced",
+      "n": 152805,
+      "n_computed_this_session": 152805,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 621.9,
+      "images_per_s_end_to_end": 245.7,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 315.0,
+        "arcface_ir101_webface4m": 290.2
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 485.1,
+        "arcface_ir101_webface4m": 526.6
+      },
+      "peak_gpu_mem_mib": 2507.6
+    },
+    {
+      "group": "stress__test_balanced",
+      "n": 40000,
+      "n_computed_this_session": 40000,
+      "status": "extracted",
+      "backbones": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "seconds": 169.1,
+      "images_per_s_end_to_end": 236.5,
+      "model_seconds": {
+        "adaface_ir101_webface4m": 82.8,
+        "arcface_ir101_webface4m": 75.7
+      },
+      "model_images_per_s": {
+        "adaface_ir101_webface4m": 482.8,
+        "arcface_ir101_webface4m": 528.4
+      },
+      "peak_gpu_mem_mib": 2507.6
+    }
+  ],
+  "accelerator": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "provenance": {
+    "veilx_version": "0.0.1",
+    "timestamp_utc": "2026-10-26T22:38:45.133105+00:00",
+    "git": {
+      "commit": "f3376ea47680e49e7cbde0aacf16ea9e9dec7959",
+      "dirty": true,
+      "repo_is_project_root": true
+    },
+    "python": "3.12.14",
+    "implementation": "CPython",
+    "os": "Windows",
+    "packages": {
+      "numpy": "2.5.4",
+      "pydantic": "2.14.1",
+      "PyYAML": "6.0.3",
+      "torch": "2.11.0+cu128",
+      "onnxruntime": null,
+      "insightface": null
+    },
+    "configs": {},
+    "seed": null,
+    "argv": [
+      "scripts\\extract_embeddings.py"
+    ],
+    "extra": {}
+  }
+}
