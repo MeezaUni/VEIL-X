@@ -51,3 +51,15 @@ class AnomalyHeuristic:
             raise RuntimeError("fit_link on validation data first")
         a = self.anomaly(images)
         return self.link.predict_proba(a.reshape(-1, 1)).reshape(a.shape)
+
+
+def fit_link_cells(
+    z_maps: F64, gt_maps_uint8: NDArray[np.uint8], seed: int, n: int = 3000
+) -> LogisticModel:
+    """Fit the heuristic's 2-parameter link on validation renders: anomaly z per cell vs the
+    binary visible target (ground-truth visible fraction >= 0.5). ``n`` renders, seeded."""
+    rng = np.random.default_rng(seed)
+    pick = rng.choice(len(z_maps), min(n, len(z_maps)), replace=False)
+    z = np.asarray(z_maps[pick], np.float64).reshape(-1, 1)
+    y = (np.asarray(gt_maps_uint8[pick]).reshape(-1) >= 128).astype(np.int64)
+    return LogisticModel(("anomaly",), 1e6).fit(z, y)

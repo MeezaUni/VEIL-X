@@ -1,0 +1,154 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "visibility-estimator training on DigiFace p3_train (synthetic occlusions)",
+ "fold_heldout_family": "F1_mask",
+ "seen_families": [
+  "F2_sunglasses",
+  "F3_hand_object",
+  "F4_random_patch",
+  "F5_extreme_lighting"
+ ],
+ "pilot": false,
+ "n_parameters": 3604385,
+ "samples_per_epoch": 50000,
+ "val_samples": 10000,
+ "epochs_run": 9,
+ "best_val_loss": 0.03692308925390243,
+ "best_epoch": 4,
+ "amp_check": {
+  "val_loss_fp32": 0.036931764113903046,
+  "val_loss_fp16": 0.03692308925390243,
+  "max_abs_prob_diff": 0.01269465684890747
+ },
+ "history": [
+  {
+   "epoch": 0,
+   "train_loss": 0.11459236886143684,
+   "val_loss": 0.09127629978656769,
+   "val_iou": 0.795098326680096,
+   "val_global_mae": 0.06040427451352032,
+   "val_brier": 0.040830769508290884,
+   "lr": 0.0009972609476841376,
+   "seconds": 65.0,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 1,
+   "train_loss": 0.05882677191972732,
+   "val_loss": 0.07720414382219315,
+   "val_iou": 0.8068420370070262,
+   "val_global_mae": 0.04421011027630069,
+   "val_brier": 0.03385846523744424,
+   "lr": 0.0009890738003669036,
+   "seconds": 61.8,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.0493569677388668,
+   "val_loss": 0.04601685209274292,
+   "val_iou": 0.8850463428159091,
+   "val_global_mae": 0.021546737700627695,
+   "val_brier": 0.017695890909495464,
+   "lr": 0.0009755282581475762,
+   "seconds": 66.0,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.04371473646044731,
+   "val_loss": 0.04036272655725479,
+   "val_iou": 0.906603802944087,
+   "val_global_mae": 0.015768168779169433,
+   "val_brier": 0.014950091551052513,
+   "lr": 0.0009567727288213,
+   "seconds": 64.2,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 4,
+   "train_loss": 0.042012658693790436,
+   "val_loss": 0.03692308925390243,
+   "val_iou": 0.9004466159117279,
+   "val_global_mae": 0.013011370919526638,
+   "val_brier": 0.01328687059685554,
+   "lr": 0.0009330127018922204,
+   "seconds": 67.8,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.0405459221971035,
+   "val_loss": 0.038425842368602754,
+   "val_iou": 0.9051754266935447,
+   "val_global_mae": 0.015346137120582637,
+   "val_brier": 0.014206516932925134,
+   "lr": 0.0009045084971874736,
+   "seconds": 68.0,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 6,
+   "train_loss": 0.037471520414948466,
+   "val_loss": 0.04126939321756363,
+   "val_iou": 0.907836475034156,
+   "val_global_mae": 0.01464185789401445,
+   "val_brier": 0.015208651621229332,
+   "lr": 0.0008715724127386968,
+   "seconds": 62.1,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 7,
+   "train_loss": 0.036566036726236345,
+   "val_loss": 0.08522178320884705,
+   "val_iou": 0.8997779836019273,
+   "val_global_mae": 0.032338032842117184,
+   "val_brier": 0.028829842770421613,
+   "lr": 0.0008345653031794288,
+   "seconds": 64.1,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 8,
+   "train_loss": 0.03400078462660313,
+   "val_loss": 0.08001369700431823,
+   "val_iou": 0.9100738975394127,
+   "val_global_mae": 0.028560496946951185,
+   "val_brier": 0.02632075638445382,
+   "lr": 0.0007938926261462363,
+   "seconds": 63.8,
+   "peak_gpu_mib": 1285.9
+  }
+ ],
+ "wall_seconds": 605.5,
+ "config": {
+  "schema_version": 1,
+  "run_id": "p3-ve-f1-mask",
+  "phase": "phase3",
+  "authorized": true,
+  "purpose": "Train the lightweight visibility estimator without the held-out family F1_mask.",
+  "seed": 20261027,
+  "device": "cuda",
+  "backbone_id": "none-visibility-estimator",
+  "backbone_frozen": true,
+  "heldout_family": "F1_mask",
+  "train_pairs": "manifests/phase3/subsplits.json#p3_train",
+  "val_pairs": "manifests/phase3/subsplits.json#p3_val",
+  "batch_size": 128,
+  "grad_accumulation": 1,
+  "max_epochs": 30,
+  "learning_rate": 0.001,
+  "precision": {
+   "mode": "fp16",
+   "allow_tf32": false,
+   "deterministic": true
+  },
+  "checkpoint": {
+   "directory": "models/phase3/ve/F1_mask",
+   "keep_last": 2,
+   "save_every_steps": 1
+  }
+ },
+ "best_weights_sha256": "a2793d023e8fd1225e0b30cec79685710dd15b1bb714007d56fc945c8ef68171"
+}

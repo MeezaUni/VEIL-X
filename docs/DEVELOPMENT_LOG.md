@@ -6,6 +6,60 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-10-27 — Phase 3 (in progress): visibility-estimator training, extraction and analysis code
+
+### Visibility estimator (gate 3B)
+- Five fold models, each excluding its held-out family. They train sequentially under
+  `run_with_memory_monitor` (min free 2.5 GB).
+- Folds 1–2 finished: early stop at epoch 8, best epoch 4, best val loss 0.0369 / 0.0356, about
+  10 min per fold.
+- fp16-vs-fp32 check: val loss equal to 1e-5; max probability difference 0.013 / 0.015.
+- Public summaries: `reports/experiments/phase3_ve_training_<fold>.json` (no images, ids or
+  weights). Weights stay private under `VEILX_DATA_ROOT/models/phase3/ve/`.
+
+### Extraction pipeline (`scripts/extract_phase3.py`)
+- Stores per image: both backbones' embeddings (float16) and norms, learned map(s), heuristic
+  anomaly map and, for occluded renders, the oracle ground-truth map. Atomic part shards via the
+  new `write_array_shard` / `read_array_shard` (SHA-256 verified).
+- **The first pilot was stopped by our own memory monitor** (free RAM 2.41 GB < 2.5 GB floor,
+  while fold 2 was training). The safeguard was kept. Memory was reduced instead:
+  - pair tuples instead of pydantic objects;
+  - worker record maps limited to pair images;
+  - chunked heuristic statistics (the original single float64 pass would have needed ~6 GB);
+  - lazily built groups.
+- Second pilot (512 items, 2 workers, fold 1 only): peak 1.8 GB, min free 3.39 GB.
+  - Unit-norm embeddings.
+  - Clean images 99.2 % predicted visible.
+  - Learned vs ground-truth global visibility r = 0.99, MAE 1.25 pp.
+  - 28×28 GT grid vs engine pixel ratio: 0.07 pp.
+
+### Analysis code
+- `veilx.stats.paired`: paired identity-jackknife ratio differences (shared delete-one-identity
+  replicates), normal p-values and Holm.
+- `veilx.fusion.features`: registered fusion ladder M0–M5, M4-heur, M4-oracle.
+- `scripts/evaluate_phase3.py`: develop / final, plus `--rehearse`, which runs the final code
+  path on p3_val and logs nothing.
+- `scripts/evaluate_visibility.py`: gate 3B report.
+- The cv-selection error threshold is now read from `phase2_final.json`, not retyped.
+
+### SIM-013 (`noisy_strata_validity`, 300 reps)
+- Per-stratum validity holds with the calibration-time predictor, a noisier unbiased predictor
+  and oracle strata: 0 violations.
+- An upward-biased predictor (+0.2) violates the per-stratum guarantee in 20.3 % (± 2.3 %) of
+  replicates while pooled risk stays within target.
+- A conditional shift violates in 100 %. Registered as SIM-013 / P3-SIM-013.
+
+### Physical-occlusion readiness (gate 3H)
+- `docs/physical_occlusion_readiness.md`; documentation only, nothing downloaded.
+- ROF is distributed as pickles (blocked by our rules) and has a conflicting MIT vs
+  CC BY-NC-ND licence statement.
+- AR Face is available on request only.
+
+### QA
+- ruff, format and mypy clean; pytest 338 passed, 1 skipped (torch tests run in `.venv-gpu`).
+
+---
+
 ## 2026-10-27 — Phase 2 (milestone 3): real-photo evaluation on LFW and Phase C audit
 
 ### Acquisition (D-043)

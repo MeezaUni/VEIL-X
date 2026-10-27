@@ -1,0 +1,154 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "visibility-estimator training on DigiFace p3_train (synthetic occlusions)",
+ "fold_heldout_family": "F2_sunglasses",
+ "seen_families": [
+  "F1_mask",
+  "F3_hand_object",
+  "F4_random_patch",
+  "F5_extreme_lighting"
+ ],
+ "pilot": false,
+ "n_parameters": 3604385,
+ "samples_per_epoch": 50000,
+ "val_samples": 10000,
+ "epochs_run": 9,
+ "best_val_loss": 0.035628141552209856,
+ "best_epoch": 4,
+ "amp_check": {
+  "val_loss_fp32": 0.03562780746221542,
+  "val_loss_fp16": 0.035628141552209856,
+  "max_abs_prob_diff": 0.015494823455810547
+ },
+ "history": [
+  {
+   "epoch": 0,
+   "train_loss": 0.10901988870024681,
+   "val_loss": 0.0660869978427887,
+   "val_iou": 0.8456748010001491,
+   "val_global_mae": 0.036241272030510585,
+   "val_brier": 0.027003113003133218,
+   "lr": 0.0009972609476841376,
+   "seconds": 66.5,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 1,
+   "train_loss": 0.05765234548330307,
+   "val_loss": 0.05504315403699875,
+   "val_iou": 0.8692877120404384,
+   "val_global_mae": 0.027991407968919385,
+   "val_brier": 0.022016925820922573,
+   "lr": 0.0009890738003669036,
+   "seconds": 71.8,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.04967803036689758,
+   "val_loss": 0.04437467094063759,
+   "val_iou": 0.8917620584810193,
+   "val_global_mae": 0.01984425075941437,
+   "val_brier": 0.017038179550624657,
+   "lr": 0.0009755282581475762,
+   "seconds": 69.5,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.04343608947515488,
+   "val_loss": 0.04379877147674561,
+   "val_iou": 0.8875595040778134,
+   "val_global_mae": 0.020591547555068503,
+   "val_brier": 0.016819394455527728,
+   "lr": 0.0009567727288213,
+   "seconds": 71.3,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 4,
+   "train_loss": 0.040689300634860995,
+   "val_loss": 0.035628141552209856,
+   "val_iou": 0.9167325435985474,
+   "val_global_mae": 0.011141361845715321,
+   "val_brier": 0.012674425175642294,
+   "lr": 0.0009330127018922204,
+   "seconds": 67.2,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.03982758069396019,
+   "val_loss": 0.04141994698047638,
+   "val_iou": 0.9189011019385687,
+   "val_global_mae": 0.018447779552047256,
+   "val_brier": 0.015883714916491893,
+   "lr": 0.0009045084971874736,
+   "seconds": 62.6,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 6,
+   "train_loss": 0.03818415959537029,
+   "val_loss": 0.04553560570478439,
+   "val_iou": 0.920695062418823,
+   "val_global_mae": 0.01690398904971551,
+   "val_brier": 0.016581290928861497,
+   "lr": 0.0008715724127386968,
+   "seconds": 68.7,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 7,
+   "train_loss": 0.036699357799291614,
+   "val_loss": 0.037398979210853577,
+   "val_iou": 0.9215161150242851,
+   "val_global_mae": 0.013524458268140091,
+   "val_brier": 0.013565424152541996,
+   "lr": 0.0008345653031794288,
+   "seconds": 63.4,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 8,
+   "train_loss": 0.03471481223523617,
+   "val_loss": 0.04879223016500473,
+   "val_iou": 0.9254748094555901,
+   "val_global_mae": 0.020572540622196094,
+   "val_brier": 0.0181522562419339,
+   "lr": 0.0007938926261462363,
+   "seconds": 64.9,
+   "peak_gpu_mib": 1285.9
+  }
+ ],
+ "wall_seconds": 632.6,
+ "config": {
+  "schema_version": 1,
+  "run_id": "p3-ve-f2-sunglasses",
+  "phase": "phase3",
+  "authorized": true,
+  "purpose": "Train the lightweight visibility estimator without the held-out family F2_sunglasses.",
+  "seed": 20261027,
+  "device": "cuda",
+  "backbone_id": "none-visibility-estimator",
+  "backbone_frozen": true,
+  "heldout_family": "F2_sunglasses",
+  "train_pairs": "manifests/phase3/subsplits.json#p3_train",
+  "val_pairs": "manifests/phase3/subsplits.json#p3_val",
+  "batch_size": 128,
+  "grad_accumulation": 1,
+  "max_epochs": 30,
+  "learning_rate": 0.001,
+  "precision": {
+   "mode": "fp16",
+   "allow_tf32": false,
+   "deterministic": true
+  },
+  "checkpoint": {
+   "directory": "models/phase3/ve/F2_sunglasses",
+   "keep_last": 2,
+   "save_every_steps": 1
+  }
+ },
+ "best_weights_sha256": "8925bc4ef1f115b9e599ddb023400746ef807ab1786bc937a0fea422e2369c13"
+}

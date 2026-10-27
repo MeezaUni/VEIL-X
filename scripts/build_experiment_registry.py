@@ -123,6 +123,14 @@ ENTRIES: list[dict[str, Any]] = [
         "dataset_ids": [],
     },
     {
+        "id": "P3-SIM-013",
+        "purpose": "Stratified LTT validity with predicted (noisy/biased) visibility strata",
+        "script": "scripts/run_simulations.py --only noisy_strata_validity",
+        "artefact": "reports/simulations/noisy_strata_validity.json",
+        "splits": ["(synthetic)"],
+        "dataset_ids": [],
+    },
+    {
         "id": "P2-CALC-001",
         "purpose": "Calibration capacity (exact binomial) at protocol v0.4.0",
         "script": "scripts/capacity_report.py",

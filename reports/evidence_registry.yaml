@@ -169,6 +169,14 @@ records:
     artefact: "reports/simulations/adaptive_ordering_validity.json"
     created: "2026-10-27"
     caveats: "Synthetic score model; does not prove the bound for real score distributions."
+  - id: SIM-013
+    type: synthetic_simulation
+    title: "Stratified LTT with predicted (noisy) co-visibility strata"
+    statement: "Simulated (300 reps, delta 0.05, three predicted-visibility strata): with the calibration-time predictor (noise sd 0.1), a noisier unbiased predictor (sd 0.25) or oracle strata, per-stratum violations are 0/300. A predictor that overestimates visibility by 0.2 at test time violates the per-stratum guarantee in 20.3% of replicates (MC SE 2.3%) while pooled risk stays within target. A conditional score shift violates in 100% even with the calibration predictor."
+    source: "scripts/run_simulations.py --only noisy_strata_validity"
+    artefact: "reports/simulations/noisy_strata_validity.json"
+    created: "2026-10-27"
+    caveats: "Synthetic score and predictor-error models; magnitudes are arbitrary, only the qualitative pattern (validity conditional on predicted strata; failure under upward-biased prediction or conditional shift) is meaningful."
   # ------------------------------------------------------------------ measured (Phase 2)
   - id: RES-001
     type: real_measured_model_result

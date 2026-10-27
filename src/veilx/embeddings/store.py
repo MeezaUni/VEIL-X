@@ -92,3 +92,48 @@ def read_shard(path: Path, *, verify: bool = True) -> Shard:
     if emb.shape != (meta["n"], meta["dim"]) or len(keys) != meta["n"]:
         raise ManifestError(f"shard {path.name} shape differs from its meta")
     return Shard(keys, emb, norm, meta)
+
+
+def write_array_shard(
+    path: Path, keys: list[str], arrays: dict[str, NDArray[Any]], meta: dict[str, Any]
+) -> None:
+    """Atomic multi-array shard (same completion-marker rule as :func:`write_shard`). Every
+    array's first dimension must equal ``len(keys)``; float arrays must be finite."""
+    n = len(keys)
+    if len(set(keys)) != n:
+        raise ManifestError("duplicate keys in shard")
+    for name, a in arrays.items():
+        if a.shape[0] != n:
+            raise ValueError(f"{name}: first dimension {a.shape[0]} != {n} keys")
+        if np.issubdtype(a.dtype, np.floating) and not np.isfinite(a).all():
+            raise FloatingPointError(f"{name}: non-finite values")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _meta_path(path).unlink(missing_ok=True)
+    tmp = path.with_name(path.name + ".tmp")
+    with tmp.open("wb") as fh:
+        np.savez(fh, keys=np.asarray(keys, dtype=np.str_), **arrays)  # type: ignore[arg-type]
+    tmp.replace(path)
+    full = dict(meta) | {
+        "n": n,
+        "arrays": {k: [list(v.shape), str(v.dtype)] for k, v in arrays.items()},
+        "npz_sha256": sha256_file(path),
+    }
+    mtmp = _meta_path(path).with_name(_meta_path(path).name + ".tmp")
+    mtmp.write_text(json.dumps(full, indent=2, sort_keys=True), encoding="utf-8")
+    mtmp.replace(_meta_path(path))
+
+
+def read_array_shard(
+    path: Path, *, verify: bool = True
+) -> tuple[NDArray[np.str_], dict[str, NDArray[Any]], dict[str, Any]]:
+    meta = read_meta(path)
+    if meta is None:
+        raise ManifestError(f"incomplete shard {path.name}")
+    if verify and sha256_file(path) != meta["npz_sha256"]:
+        raise ManifestError(f"shard {path.name} does not match its recorded SHA-256")
+    with np.load(path, allow_pickle=False) as z:
+        keys = z["keys"]
+        arrays = {k: z[k] for k in z.files if k != "keys"}
+    if len(keys) != meta["n"]:
+        raise ManifestError(f"shard {path.name} key count differs from its meta")
+    return keys, arrays, meta

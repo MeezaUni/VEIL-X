@@ -61,3 +61,15 @@ def test_experiments_quick_are_labelled_and_deterministic(name: str) -> None:
     assert r1 == r2
     assert r1["evidence_type"] == "synthetic_simulation"
     assert "SIMULATED" in r1["disclaimer"] and "NOT evidence" in r1["disclaimer"]
+
+
+def test_noisy_strata_validity_pattern() -> None:
+    """SIM-013: validity holds under the calibration predictor; a conditional shift breaks it."""
+    r = EXPERIMENTS["noisy_strata_validity"](scale="quick")["results"]
+    assert r["id_predictor"]["per_stratum_violation_rate"] <= 0.2
+    assert r["oracle_strata_reference"]["per_stratum_violation_rate"] <= 0.2
+    assert r["conditional_shift_id_predictor"]["violation_rate"] >= 0.5
+    assert (
+        r["overestimating_predictor"]["mean_worst_stratum_risk"]
+        > r["id_predictor"]["mean_worst_stratum_risk"]
+    )

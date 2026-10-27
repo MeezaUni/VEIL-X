@@ -956,7 +956,148 @@ def adaptive_ordering_validity(scale: Scale = "full", seed: int = 1212) -> dict[
     )
 
 
+def _predicted(
+    c: NDArray[np.float64], rng: np.random.Generator, sigma: float, bias: float
+) -> NDArray[np.float64]:
+    return np.clip(c + bias + rng.normal(0.0, sigma, c.size), 0.0, 1.0)
+
+
+def _empirical_cc_risk(
+    scores: NDArray[np.float64],
+    labels: NDArray[np.int64],
+    strata: NDArray[np.str_],
+    rules: dict[str, ThresholdRule | None],
+) -> tuple[float, float, float]:
+    """(pooled class-conditional risk, coverage, worst per-stratum class-conditional risk) of
+    per-stratum rules on a large evaluation sample."""
+    d = np.full(scores.shape, -1, dtype=np.int64)  # -1 abstain, 1 match, 0 non-match
+    for name, rule in rules.items():
+        m = strata == name
+        if rule is not None and m.any():
+            d[m] = rule.decide(scores[m])
+    acc = d != -1
+    g, i = labels == 1, labels == 0
+    fnm = ((d == 0) & g).sum() / max((acc & g).sum(), 1)
+    fm = ((d == 1) & i).sum() / max((acc & i).sum(), 1)
+    worst = 0.0
+    for name in rules:
+        m = strata == name
+        a_g, a_i = (acc & g & m).sum(), (acc & i & m).sum()
+        if a_g:
+            worst = max(worst, ((d == 0) & g & m).sum() / a_g)
+        if a_i:
+            worst = max(worst, ((d == 1) & i & m).sum() / a_i)
+    return float(max(fm, fnm)), float(acc.mean()), float(worst)
+
+
+def noisy_strata_validity(scale: Scale = "full", seed: int = 1313) -> dict[str, Any]:
+    """SIM-013: stratified LTT when strata come from a PREDICTED (noisy) co-visibility.
+
+    Calibration and the ID evaluation use predicted c_hat = clip(c + N(0, 0.1)). The guarantee
+    is conditional on the *predicted* stratum, so it should hold at delta when the predictor's
+    error distribution is unchanged. Scenarios then change the predictor (noisier; biased up, as
+    when an unseen occluder is mistaken for visible face; biased down) or the score model
+    (conditional shift) at evaluation time. The violation rate is the fraction of replicates
+    whose reported rules have true pooled class-conditional risk above the target, measured on a
+    200k-pair evaluation sample per scenario (Monte Carlo truth).
+    """
+    reps = 300 if scale == "full" else 25
+    target, delta, n_cal, n_eval = 0.05, 0.05, 1500, 200_000 if scale == "full" else 40_000
+    sigma_id = 0.1
+    rules = symmetric_rules(CENTER, HALF_WIDTHS)
+    scenarios: dict[str, tuple[ScoreModel, float, float]] = {
+        "id_predictor": (BASE, sigma_id, 0.0),
+        "oracle_strata_reference": (BASE, 0.0, 0.0),
+        "noisier_predictor": (BASE, 0.25, 0.0),
+        "overestimating_predictor": (BASE, sigma_id, 0.2),
+        "underestimating_predictor": (BASE, sigma_id, -0.2),
+        "conditional_shift_id_predictor": (SHIFTED, sigma_id, 0.0),
+    }
+    evals = {}
+    for k, (name, (m, sg, bias)) in enumerate(scenarios.items()):
+        ev = sample_pairs(m, n_eval, make_rng(seed, "e13-eval", k))
+        evals[name] = (ev, _stratum(_predicted(ev.covis, make_rng(seed, "e13-pred", k), sg, bias)))
+    n_strata = len(STRATA_EDGES) - 1
+    res: dict[str, dict[str, list[tuple[float, float, float]]]] = {
+        s: {"stratified_predicted": []} for s in scenarios
+    }
+    for rep in range(reps):
+        rng = make_rng(seed, "e13", rep)
+        for cal_kind in ("predicted", "oracle"):
+            sg = sigma_id if cal_kind == "predicted" else 0.0
+            val = sample_pairs(BASE, n_cal, rng)
+            cal = sample_pairs(BASE, n_cal, rng)
+            v_st = _stratum(_predicted(val.covis, rng, sg, 0.0))
+            c_st = _stratum(_predicted(cal.covis, rng, sg, 0.0))
+            by = {}
+            for b in range(n_strata):
+                msk = v_st == str(b)
+                if msk.sum() < 20 or len(set(val.labels[msk].tolist())) < 2:
+                    continue
+                by[str(b)] = order_candidates_on_validation(
+                    rules,
+                    val.scores[msk],
+                    val.labels[msk],
+                    n_cal_expected=int(msk.sum()),
+                    target=target,
+                    delta=delta / n_strata,
+                )
+            fit = fit_stratified(
+                LTTCalibrator,
+                rules,
+                cal.scores,
+                cal.labels,
+                list(c_st),
+                sim_pair_set(cal),
+                target_fm=target,
+                delta=delta,
+                candidates_by_stratum=by,
+            )
+            chosen = {
+                str(b): (r.rule if (r := fit.per_stratum.get(str(b))) is not None else None)
+                for b in range(n_strata)
+            }
+            for name in scenarios:
+                if (cal_kind == "oracle") != (name == "oracle_strata_reference"):
+                    continue
+                ev, st = evals[name]
+                res[name]["stratified_predicted"].append(
+                    _empirical_cc_risk(ev.scores, ev.labels, st, chosen)
+                )
+    out: dict[str, Any] = {}
+    for name, (m, sg, bias) in scenarios.items():
+        vals = res[name]["stratified_predicted"]
+        risks = np.array([v[0] for v in vals])
+        worst = np.array([v[2] for v in vals])
+        rate = float((risks > target).mean())
+        srate = float((worst > target).mean())
+        out[name] = {
+            "predictor_sigma": sg,
+            "predictor_bias": bias,
+            "score_model": "SHIFTED" if m == SHIFTED else "BASE",
+            "violation_rate": rate,
+            "violation_rate_mc_se": _mc_se(rate, len(vals)),
+            "mean_true_risk": float(risks.mean()),
+            "mean_true_coverage": float(np.mean([v[1] for v in vals])),
+            "per_stratum_violation_rate": srate,
+            "per_stratum_violation_rate_mc_se": _mc_se(srate, len(vals)),
+            "mean_worst_stratum_risk": float(worst.mean()),
+        }
+    params = {
+        "target": target,
+        "delta": delta,
+        "n_cal": n_cal,
+        "n_eval": n_eval,
+        "reps": reps,
+        "strata_edges": STRATA_EDGES,
+        "calibration_predictor_sigma": sigma_id,
+        "note": "Monte Carlo truth on one evaluation sample per scenario (its MC error ~1e-3).",
+    }
+    return _wrap("noisy_strata_validity", scale, seed, params, out)
+
+
 EXPERIMENTS: dict[str, Callable[..., dict[str, Any]]] = {
+    "noisy_strata_validity": noisy_strata_validity,
     "paired_difference_coverage": paired_difference_coverage,
     "adaptive_ordering_validity": adaptive_ordering_validity,
     "interval_method_comparison": interval_method_comparison,

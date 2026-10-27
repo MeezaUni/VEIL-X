@@ -1,0 +1,97 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "noisy_strata_validity",
+  "params": {
+    "calibration_predictor_sigma": 0.1,
+    "delta": 0.05,
+    "n_cal": 1500,
+    "n_eval": 200000,
+    "note": "Monte Carlo truth on one evaluation sample per scenario (its MC error ~1e-3).",
+    "reps": 300,
+    "strata_edges": [
+      0.0,
+      0.4,
+      0.7,
+      1.0
+    ],
+    "target": 0.05
+  },
+  "results": {
+    "conditional_shift_id_predictor": {
+      "mean_true_coverage": 0.1847887,
+      "mean_true_risk": 0.14951203805351002,
+      "mean_worst_stratum_risk": 0.19432568017041174,
+      "per_stratum_violation_rate": 1.0,
+      "per_stratum_violation_rate_mc_se": 5.773502691896258e-08,
+      "predictor_bias": 0.0,
+      "predictor_sigma": 0.1,
+      "score_model": "SHIFTED",
+      "violation_rate": 1.0,
+      "violation_rate_mc_se": 5.773502691896258e-08
+    },
+    "id_predictor": {
+      "mean_true_coverage": 0.6742183833333333,
+      "mean_true_risk": 0.0222789100525226,
+      "mean_worst_stratum_risk": 0.025734592532771692,
+      "per_stratum_violation_rate": 0.0,
+      "per_stratum_violation_rate_mc_se": 5.773502691896258e-08,
+      "predictor_bias": 0.0,
+      "predictor_sigma": 0.1,
+      "score_model": "BASE",
+      "violation_rate": 0.0,
+      "violation_rate_mc_se": 5.773502691896258e-08
+    },
+    "noisier_predictor": {
+      "mean_true_coverage": 0.6254071833333334,
+      "mean_true_risk": 0.023806828233994236,
+      "mean_worst_stratum_risk": 0.027187177209394193,
+      "per_stratum_violation_rate": 0.0,
+      "per_stratum_violation_rate_mc_se": 5.773502691896258e-08,
+      "predictor_bias": 0.0,
+      "predictor_sigma": 0.25,
+      "score_model": "BASE",
+      "violation_rate": 0.0,
+      "violation_rate_mc_se": 5.773502691896258e-08
+    },
+    "oracle_strata_reference": {
+      "mean_true_coverage": 0.6697062666666667,
+      "mean_true_risk": 0.02361533690450314,
+      "mean_worst_stratum_risk": 0.026303682314087393,
+      "per_stratum_violation_rate": 0.0,
+      "per_stratum_violation_rate_mc_se": 5.773502691896258e-08,
+      "predictor_bias": 0.0,
+      "predictor_sigma": 0.0,
+      "score_model": "BASE",
+      "violation_rate": 0.0,
+      "violation_rate_mc_se": 5.773502691896258e-08
+    },
+    "overestimating_predictor": {
+      "mean_true_coverage": 0.8575328833333333,
+      "mean_true_risk": 0.02725806483102378,
+      "mean_worst_stratum_risk": 0.03789918322241853,
+      "per_stratum_violation_rate": 0.20333333333333334,
+      "per_stratum_violation_rate_mc_se": 0.02323710315342605,
+      "predictor_bias": 0.2,
+      "predictor_sigma": 0.1,
+      "score_model": "BASE",
+      "violation_rate": 0.0,
+      "violation_rate_mc_se": 5.773502691896258e-08
+    },
+    "underestimating_predictor": {
+      "mean_true_coverage": 0.39077055000000005,
+      "mean_true_risk": 0.01604709617036021,
+      "mean_worst_stratum_risk": 0.022455222923399316,
+      "per_stratum_violation_rate": 0.0,
+      "per_stratum_violation_rate_mc_se": 5.773502691896258e-08,
+      "predictor_bias": -0.2,
+      "predictor_sigma": 0.1,
+      "score_model": "BASE",
+      "violation_rate": 0.0,
+      "violation_rate_mc_se": 5.773502691896258e-08
+    }
+  },
+  "scale": "full",
+  "seed": 1313,
+  "sim_version": "1.0.0"
+}

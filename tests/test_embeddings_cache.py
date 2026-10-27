@@ -140,3 +140,20 @@ def test_render_reproduces_planned_occlusion_and_checks_recipe() -> None:
         "h",
     )
     assert stressed.shape == img.shape and not np.array_equal(stressed, img)
+
+
+def test_array_shard_roundtrip_and_validation(tmp_path: Path) -> None:
+    from veilx.embeddings.store import read_array_shard, write_array_shard
+
+    arrs = {"a": np.arange(6, dtype=np.float32).reshape(3, 2), "m": np.zeros((3, 4, 4), np.uint8)}
+    p = tmp_path / "x.npz"
+    write_array_shard(p, ["k0", "k1", "k2"], arrs, {"group": "x"})
+    keys, back, meta = read_array_shard(p)
+    assert keys.tolist() == ["k0", "k1", "k2"] and meta["group"] == "x" and meta["n"] == 3
+    np.testing.assert_array_equal(back["a"], arrs["a"])
+    assert back["m"].dtype == np.uint8
+    with pytest.raises(ValueError, match="first dimension"):
+        write_array_shard(p, ["k0"], arrs, {})
+    bad = {"a": np.array([[np.nan]], np.float32)}
+    with pytest.raises(FloatingPointError):
+        write_array_shard(tmp_path / "y.npz", ["k"], bad, {})
