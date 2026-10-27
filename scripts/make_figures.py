@@ -315,6 +315,141 @@ def fig_throughput() -> None:
     )
 
 
+LFW_SCOPE = (
+    "LFW (Kaggle v4) real photographs; "
+    "occlusions are SYNTHETIC overlays (derived, not official LFW)"
+)
+PATHS = (
+    ("clean_det_forced_nonmatch", "detector (all 6,000; failures = non-match)"),
+    ("clean_det_excluding_failed", "detector (failed pairs excluded)"),
+    ("clean_fixed_crop", "fixed crop (no detector)"),
+)
+
+
+def fig_lfw_clean(lfw: dict[str, Any]) -> None:
+    res = lfw["results"]
+    fig, ax = plt.subplots(figsize=(7.5, 3.2))
+    y = np.arange(len(PATHS))
+    for k, (bid, r) in enumerate(res.items()):
+        acc = [r[p]["official_10fold_accuracy"]["mean"] for p, _ in PATHS]
+        sd = [r[p]["official_10fold_accuracy"]["std"] or 0 for p, _ in PATHS]
+        ax.errorbar(
+            acc,
+            y + (k - 0.5) * 0.2,
+            xerr=sd,
+            fmt="o",
+            ms=6,
+            color=SLOT[k],
+            mec=SURFACE,
+            elinewidth=1,
+            capsize=0,
+            label=NAMES[bid],
+        )
+        for j, a in enumerate(acc):
+            ax.text(a, j + (k - 0.5) * 0.2 + 0.08, f" {100 * a:.2f}%", fontsize=7, color=INK)
+    ax.set_yticks(y, [lbl for _, lbl in PATHS], fontsize=8)
+    ax.set_xlabel("Official View-2 10-fold accuracy (mean ± s.d. over folds)")
+    ax.set_title("Clean LFW, official protocol")
+    ax.legend(loc="lower left", fontsize=7)
+    _save(fig, "lfw_clean_official_accuracy", note=LFW_SCOPE)
+
+
+def fig_lfw_vs_digiface(lfw: dict[str, Any], dig: dict[str, Any]) -> None:
+    """FNMR at the DigiFace calibration threshold (FAR 1 %): DigiFace Test-OOD vs LFW derived."""
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.4), sharey=True)
+    x = np.arange(len(FAMS))
+    for ax, bid in zip(axes, lfw["results"], strict=True):
+        d = [
+            dig["results"][bid]["folds"][f]["test_ood"]["overall"]["operating_points"][
+                "cal_far_1pct"
+            ]["fnmr"]["value"]
+            for f in FAMS
+        ]
+        lv = [
+            lfw["results"][bid]["derived_occlusion_det"][f]["pooled_at_digiface_cal_far_1pct"][
+                "fnmr"
+            ]["value"]
+            for f in FAMS
+        ]
+        ax.plot(
+            x - 0.1,
+            d,
+            "o",
+            ms=6,
+            color=SLOT[0],
+            mec=SURFACE,
+            label="DigiFace Test-OOD (synthetic faces)",
+        )
+        ax.plot(
+            x + 0.1, lv, "o", ms=6, color=SLOT[1], mec=SURFACE, label="LFW derived (real photos)"
+        )
+        ax.set_xticks(x, [SHORT[f] for f in FAMS], rotation=20, ha="right")
+        ax.set_title(NAMES[bid])
+    axes[0].set_ylabel("FNMR at DigiFace cal FAR-1% threshold")
+    axes[0].legend(loc="upper left", fontsize=7)
+    _save(fig, "lfw_vs_digiface_occlusion_fnmr", note=LFW_SCOPE + "; mixes differ (see docs)")
+
+
+def fig_lfw_severity(lfw: dict[str, Any]) -> None:
+    levels = ("low", "medium", "high")
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.4))
+    for ax, (bid, r) in zip(axes, lfw["results"].items(), strict=True):
+        m = np.array(
+            [
+                [
+                    r["derived_occlusion_det"][f]["cells"][f"{lv}:both"][
+                        "at_digiface_cal_far_1pct"
+                    ]["fnmr"]["value"]
+                    for lv in levels
+                ]
+                for f in FAMS
+            ]
+        )
+        im = ax.imshow(m, cmap=SEQ, aspect="auto", vmin=0, vmax=float(np.nanmax(m)))
+        for i in range(len(FAMS)):
+            for j in range(3):
+                ax.text(
+                    j,
+                    i,
+                    f"{100 * m[i, j]:.1f}%",
+                    ha="center",
+                    va="center",
+                    fontsize=7,
+                    color="#ffffff" if m[i, j] > 0.6 * np.nanmax(m) else INK,
+                )
+        ax.set_xticks(range(3), levels)
+        ax.set_yticks(range(len(FAMS)), [SHORT[f] for f in FAMS])
+        ax.grid(False)
+        ax.set_title(f"{NAMES[bid]}: LFW FNMR, both sides occluded", fontsize=9)
+        fig.colorbar(im, ax=ax, fraction=0.04)
+    _save(fig, "lfw_derived_occlusion_heatmap", note=LFW_SCOPE)
+
+
+def fig_lfw_detection(det: dict[str, Any]) -> None:
+    h = det["faces_per_image_histogram"]
+    keys = sorted(h, key=int)
+    fig, ax = plt.subplots(figsize=(6, 3))
+    ax.bar(
+        range(len(keys)),
+        [h[k] for k in keys],
+        color=[SLOT[1] if k == "0" else SLOT[0] for k in keys],
+        edgecolor=SURFACE,
+        linewidth=2,
+    )
+    for i, k in enumerate(keys):
+        ax.text(i, h[k], f"{h[k]:,}", ha="center", va="bottom", fontsize=7, color=INK)
+    ax.set_yscale("log")
+    ax.set_xticks(range(len(keys)), keys)
+    ax.set_xlabel("Faces detected per LFW image (0 = detection failure)")
+    ax.set_ylabel("Images (log)")
+    ax.set_title(f"SCRFD on LFW: {det['failures_no_face']} failures of {det['n_images']:,}")
+    _save(
+        fig,
+        "lfw_detection_outcomes",
+        note="Centre-nearest face is used; failures are counted, never dropped",
+    )
+
+
 def main() -> int:
     global OUT, FMT
     import argparse
@@ -338,6 +473,15 @@ def main() -> int:
         for version in ("v1", "v2"):
             fig_ltt(res, t, version)
     fig_throughput()
+    lfw_path = EXP / "lfw_final.json"
+    if lfw_path.exists():
+        lfw = json.loads(lfw_path.read_text("utf-8"))
+        fig_lfw_clean(lfw)
+        fig_lfw_vs_digiface(lfw, final)
+        fig_lfw_severity(lfw)
+    det_path = EXP / "lfw_detection.json"
+    if det_path.exists():
+        fig_lfw_detection(json.loads(det_path.read_text("utf-8")))
     return 0
 
 

@@ -43,7 +43,8 @@ from veilx.config import load_protocol
 from veilx.data.manifest import ImageRecord, PairRecord, read_jsonl
 from veilx.data.paths import resolve_data_root
 from veilx.embeddings.jobs import occluded_key
-from veilx.embeddings.store import read_shard
+from veilx.embeddings.store import Shard, read_shard
+from veilx.errors import InsufficientSamplesError
 from veilx.eval.scoring import ScoredPairs
 from veilx.eval.summaries import (
     rate,
@@ -115,6 +116,23 @@ def official_accuracy(score: np.ndarray, label: np.ndarray, fold: np.ndarray) ->
     }
 
 
+def read_parts(directory: Path, name: str) -> Shard:
+    """Concatenate verified part shards ``<name>.partNNNN.npz`` (written by lfw_embed.py)."""
+    parts = sorted(directory.glob(f"{name}.part*.npz"))
+    if not parts:
+        raise RuntimeError(f"no part shards for {name}")
+    shards = [read_shard(q) for q in parts]
+    for k, q in enumerate(parts):
+        if q.name != f"{name}.part{k:04d}.npz":
+            raise RuntimeError(f"missing part {k} of {name}")
+    return Shard(
+        np.concatenate([x.keys for x in shards]),
+        np.concatenate([x.emb for x in shards]),
+        np.concatenate([x.norm for x in shards]),
+        {"group": name, "n_parts": len(parts)},
+    )
+
+
 class LFWData:
     def __init__(self, layout: Any, pairs_name: str) -> None:
         lfw = layout.manifests / "lfw"
@@ -183,6 +201,15 @@ def _clean_scores(
     return s, na, nb
 
 
+def _tar(sp: ScoredPairs, far: float) -> dict[str, Any]:
+    """Benchmark-mode TAR@FAR, or an explicit 'insufficient' record (protocol rule: >= 10/FAR
+    impostors)."""
+    try:
+        return dict(tar_at_far(sp.score, sp.label, far).__dict__)
+    except InsufficientSamplesError as exc:
+        return {"insufficient": str(exc)}
+
+
 def _clean_block(
     data: LFWData,
     s: np.ndarray,
@@ -197,7 +224,7 @@ def _clean_block(
         "n_pairs": len(sp),
         "official_10fold_accuracy": official_accuracy(sp.score, sp.label, fold),
         "verification": verification_summary(sp, thr),
-        "benchmark_tar_at_far_1pct": tar_at_far(sp.score, sp.label, 0.01).__dict__,
+        "benchmark_tar_at_far_1pct": _tar(sp, 0.01),
         "roc_points": roc_points(sp),
         "score_histogram": score_histogram(sp),
         "ltt_transfer_clean_cal": {
@@ -396,9 +423,8 @@ def main() -> int:
             p for p in (layout.embeddings / bid).iterdir() if (p / "lfw_det_clean.npz").exists()
         )
         fb = frozen["backbones"][bid]
-        sh_det, sh_fix, sh_occ = (
-            read_shard(d / f"{n}.npz") for n in ("lfw_det_clean", "lfw_fixed_clean", "lfw_det_occl")
-        )
+        sh_det, sh_fix = (read_shard(d / f"{n}.npz") for n in ("lfw_det_clean", "lfw_fixed_clean"))
+        sh_occ = read_parts(d, "lfw_det_occl")
         dev_thr = _devtrain_thresholds(layout, sh_det)
         s_det, _na, _nb = _clean_scores(data, sh_det, "det")
         s_fix, _fa, _fbn = _clean_scores(data, sh_fix, "fixed")

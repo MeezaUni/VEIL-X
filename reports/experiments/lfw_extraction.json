@@ -1,0 +1,50 @@
+{
+  "evidence_type": "real_measured_model_result",
+  "scope": "LFW embedding extraction (throughput only)",
+  "n_plan_rows": 208530,
+  "groups": {
+    "lfw_det_clean": {
+      "n": 13195,
+      "status": "cached"
+    },
+    "lfw_fixed_clean": {
+      "n": 13233,
+      "status": "cached"
+    },
+    "lfw_det_occl": {
+      "n": 312795,
+      "n_parts": 20,
+      "computed_this_session": 312795,
+      "seconds": 3880.2,
+      "images_per_s": 80.6
+    }
+  },
+  "provenance": {
+    "veilx_version": "0.0.1",
+    "timestamp_utc": "2026-10-27T05:06:01.243072+00:00",
+    "git": {
+      "commit": "8003a8431ddc29304ecf38241bc1e92eb01fafad",
+      "dirty": true,
+      "repo_is_project_root": true
+    },
+    "python": "3.12.14",
+    "implementation": "CPython",
+    "os": "Windows",
+    "packages": {
+      "numpy": "2.5.4",
+      "pydantic": "2.14.1",
+      "PyYAML": "6.0.3",
+      "torch": "2.11.0+cu128",
+      "onnxruntime": null,
+      "insightface": null
+    },
+    "configs": {},
+    "seed": null,
+    "argv": [
+      "scripts\\lfw_embed.py",
+      "--part-size",
+      "16384"
+    ],
+    "extra": {}
+  }
+}
