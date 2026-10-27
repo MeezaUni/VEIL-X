@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import json
 import sys
+import uuid
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -37,14 +39,20 @@ FAMILIES = tuple(PROTO.family_ids)
 CAP = 20_000
 
 
-def load(feat: Path, name: str, cols: tuple[str, ...]) -> tuple[np.ndarray, dict[str, np.ndarray]]:
+def load(
+    feat: Path, name: str, cols: tuple[str, ...], select: Any = None
+) -> tuple[np.ndarray, dict[str, np.ndarray]]:
+    """Concatenate ``cols`` over a group's parts, keeping only rows chosen by ``select(keys)``
+    (applied per part, so the full group is never held in memory)."""
     parts = sorted(feat.glob(f"{name}.part*.npz"))
     keys, arr = [], {c: [] for c in cols}  # type: ignore[var-annotated]
     for p in parts:
         k, a, _ = read_array_shard(p)
-        keys.append(k)
+        idx = select(k) if select is not None else slice(None)
+        keys.append(k[idx])
         for c in cols:
-            arr[c].append(a[c])
+            arr[c].append(a[c][idx].copy())
+        del a
     return np.concatenate(keys), {c: np.concatenate(v) for c, v in arr.items()}
 
 
@@ -55,11 +63,27 @@ def scores_for(pred: np.ndarray, gt: np.ndarray, vis: np.ndarray | None) -> dict
 def main() -> int:
     layout = resolve_data_root()
     feat = layout.root / "features" / "phase3"
+    prov = collect_provenance(ROOT, argv=sys.argv)
+    with (ROOT / PROTO.test_access.run_log).open("a", encoding="utf-8", newline="\n") as fh:
+        rec = {
+            "run_id": uuid.uuid4().hex[:12],
+            "utc": datetime.now(tz=UTC).isoformat(),
+            "script": "scripts/evaluate_visibility.py",
+            "splits": ["p3_test"],
+            "git_commit": (prov.get("git") or {}).get("commit"),
+            "note": "Gate 3B: visibility-map accuracy on p3_test renders (no verification scores)",
+        }
+        fh.write(json.dumps(rec) + "\n")
     sub = json.loads((layout.manifests / "phase3" / "subsplits.json").read_text("utf-8"))
     out: dict[str, Any] = {"folds": {}}
     rng = np.random.default_rng(P3.seed)  # type: ignore[union-attr]
-    ck, carr = load(feat, "p3_clean", ("z", *(f"ve_{f[:2]}" for f in FAMILIES)))
-    test_clean = np.array([sub[str(k)] == "p3_test" for k in ck.tolist()])
+    ck, carr = load(
+        feat,
+        "p3_clean",
+        ("z", *(f"ve_{f[:2]}" for f in FAMILIES)),
+        select=lambda k: np.array([sub[str(x)] == "p3_test" for x in k.tolist()]),
+    )
+    test_clean = np.ones(len(ck), bool)
     for fold in FAMILIES:
         _, va = load(feat, f"{fold}__val__p3_val_pairs", ("z", "gt"))
         link = fit_link_cells(va["z"], va["gt"], P3.seed)  # type: ignore[union-attr]
@@ -67,7 +91,12 @@ def main() -> int:
         cells: dict[str, Any] = {}
         pools: dict[str, dict[str, list[np.ndarray]]] = {"ood": {}, "id": {}}
         for role in ("test_id", "test_ood"):
-            keys, a = load(feat, f"{fold}__{role}__p3_test_pairs", ("ve", "gt", "z", "vis"))
+            keys, a = load(  # seeded 30 % row sample per part, then capped per cell below
+                feat,
+                f"{fold}__{role}__p3_test_pairs",
+                ("ve", "gt", "z", "vis"),
+                select=lambda k: rng.random(len(k)) < 0.3,
+            )
             fam = np.array([str(k).split("|")[1] for k in keys.tolist()])
             lvl = np.array([str(k).split("|")[2] for k in keys.tolist()])
             for cell, m in (("ood", fam == fold), ("id", fam != fold)):
@@ -148,7 +177,7 @@ def main() -> int:
             "Oracle = reference only."
         ),
         "results": out,
-        "provenance": collect_provenance(ROOT, argv=sys.argv),
+        "provenance": prov,
     }
     with (ROOT / "reports" / "experiments" / "phase3_visibility_eval.json").open(
         "w", encoding="utf-8", newline="\n"

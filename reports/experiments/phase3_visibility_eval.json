@@ -1,0 +1,1390 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Gate 3B visibility-estimator evaluation on p3_test renders (DigiFace, synthetic occlusions)",
+ "note": "Map metrics on face cells of the 28x28 grid; definitions in veilx.vis.metrics. Oracle = reference only.",
+ "results": {
+  "folds": {
+   "F1_mask": {
+    "ood": {
+     "n_renders": 18229,
+     "families": [
+      "F1_mask"
+     ],
+     "learned": {
+      "n": 18229,
+      "iou": 0.8981067470485864,
+      "dice": 0.9275576829775409,
+      "n_images_with_occlusion": 18229,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.04122696175056709,
+      "ece": 0.0439433603311897,
+      "global_mae": 0.05324025534721535,
+      "region_mae": {
+       "left_eye": 0.0070886539625749576,
+       "right_eye": 0.007364682765869633,
+       "nose": 0.04125328921774793,
+       "mouth": 0.09431273507390102,
+       "lower_face": 0.11810236436447416
+      }
+     },
+     "heuristic": {
+      "n": 18229,
+      "iou": 0.3091177683331501,
+      "dice": 0.34557961031653317,
+      "n_images_with_occlusion": 18229,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.22687323191310477,
+      "ece": 0.19871963905182516,
+      "global_mae": 0.20265690731334987,
+      "region_mae": {
+       "left_eye": 0.17467312755286415,
+       "right_eye": 0.1727825053443093,
+       "nose": 0.27739057205330964,
+       "mouth": 0.4914836320877306,
+       "lower_face": 0.5038881871874581
+      }
+     },
+     "oracle_discretisation_global_mae": 0.002275613125949964,
+     "by_level_learned": {
+      "low": {
+       "n": 6042,
+       "iou": 0.8878801257958896,
+       "dice": 0.9188918871512864,
+       "n_images_with_occlusion": 6042,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.035871551619713476,
+       "ece": 0.041534593764816906,
+       "global_mae": 0.047979980535193714,
+       "region_mae": {
+        "left_eye": 0.002653086150954008,
+        "right_eye": 0.002710674712543972,
+        "nose": 0.009858252580520263,
+        "mouth": 0.10844600616199425,
+        "lower_face": 0.12695223630663785
+       }
+      },
+      "medium": {
+       "n": 6118,
+       "iou": 0.9016699785831718,
+       "dice": 0.9297418430206434,
+       "n_images_with_occlusion": 6118,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.04206386980467486,
+       "ece": 0.044768976135796876,
+       "global_mae": 0.05408086893663774,
+       "region_mae": {
+        "left_eye": 0.0022310775776921876,
+        "right_eye": 0.0025390143575632776,
+        "nose": 0.04932429111995678,
+        "mouth": 0.09167794560175767,
+        "lower_face": 0.10700499330166847
+       }
+      },
+      "high": {
+       "n": 6069,
+       "iou": 0.904695871299732,
+       "dice": 0.9339831315256588,
+       "n_images_with_occlusion": 6069,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.04571488143018255,
+       "ece": 0.04566446746263887,
+       "global_mae": 0.05762972749652306,
+       "region_mae": {
+        "left_eye": 0.016401284221353434,
+        "right_eye": 0.016862615865261943,
+        "nose": 0.0643724887109784,
+        "mouth": 0.08289840290654456,
+        "lower_face": 0.12047883328648643
+       }
+      }
+     }
+    },
+    "id": {
+     "n_renders": 20000,
+     "families": [
+      "F2_sunglasses",
+      "F3_hand_object",
+      "F4_random_patch",
+      "F5_extreme_lighting"
+     ],
+     "learned": {
+      "n": 20000,
+      "iou": 0.8962371696034722,
+      "dice": 0.9216101785772668,
+      "n_images_with_occlusion": 19540,
+      "clean_false_occlusion_rate": 0.012447583314941514,
+      "brier": 0.017555631305413575,
+      "ece": 0.01420983477655014,
+      "global_mae": 0.015501320410434545,
+      "region_mae": {
+       "left_eye": 0.01913983957219251,
+       "right_eye": 0.017444901960784312,
+       "nose": 0.016028537581699344,
+       "mouth": 0.017526161387631977,
+       "lower_face": 0.021339098039215673
+      }
+     },
+     "heuristic": {
+      "n": 20000,
+      "iou": 0.15948116292411513,
+      "dice": 0.20845053996540908,
+      "n_images_with_occlusion": 19540,
+      "clean_false_occlusion_rate": 0.08890973295078348,
+      "brier": 0.1916765011038035,
+      "ece": 0.0826954865837918,
+      "global_mae": 0.18269100517099923,
+      "region_mae": {
+       "left_eye": 0.42437793911577376,
+       "right_eye": 0.421665320280227,
+       "nose": 0.281746780838547,
+       "mouth": 0.28422505370897266,
+       "lower_face": 0.2623378627643935
+      }
+     },
+     "oracle_discretisation_global_mae": 0.0006703661590754344,
+     "by_level_learned": {
+      "low": {
+       "n": 6673,
+       "iou": 0.8565575210207466,
+       "dice": 0.8875598547758724,
+       "n_images_with_occlusion": 6322,
+       "clean_false_occlusion_rate": 0.0018945145848699148,
+       "brier": 0.013769933340930199,
+       "ece": 0.013078430969826286,
+       "global_mae": 0.012311075311367081,
+       "region_mae": {
+        "left_eye": 0.017789436933309075,
+        "right_eye": 0.015811583273964598,
+        "nose": 0.010294901216393447,
+        "mouth": 0.014433550570397035,
+        "lower_face": 0.017969411412099665
+       }
+      },
+      "medium": {
+       "n": 6657,
+       "iou": 0.8846869710594896,
+       "dice": 0.9104201005206504,
+       "n_images_with_occlusion": 6563,
+       "clean_false_occlusion_rate": 0.053812506750189004,
+       "brier": 0.021800802183019125,
+       "ece": 0.01276078292024486,
+       "global_mae": 0.019537558278892822,
+       "region_mae": {
+        "left_eye": 0.022503592776370655,
+        "right_eye": 0.02079290372109077,
+        "nose": 0.01837414250663462,
+        "mouth": 0.02336893019765538,
+        "lower_face": 0.02644317790207565
+       }
+      },
+      "high": {
+       "n": 6670,
+       "iou": 0.9453218715394825,
+       "dice": 0.9649920913282792,
+       "n_images_with_occlusion": 6655,
+       "clean_false_occlusion_rate": 0.00016920473773265651,
+       "brier": 0.01710613505125727,
+       "ece": 0.018039120183115383,
+       "global_mae": 0.014664629264370142,
+       "region_mae": {
+        "left_eye": 0.017133652425124338,
+        "right_eye": 0.01573747885415581,
+        "nose": 0.019423719512792623,
+        "mouth": 0.01478878207954846,
+        "lower_face": 0.019616168386395027
+       }
+      }
+     },
+     "by_family_learned": {
+      "F2_sunglasses": {
+       "n": 5024,
+       "iou": 0.9404929841480681,
+       "dice": 0.9687081642989037,
+       "n_images_with_occlusion": 5024,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.009620615969934439,
+       "ece": 0.01924354815805206,
+       "global_mae": 0.0023259220445935513,
+       "region_mae": {
+        "left_eye": 0.009225663340032018,
+        "right_eye": 0.008657055758029905,
+        "nose": 0.005969841492860415,
+        "mouth": 0.00033735505471174177,
+        "lower_face": 0.00017144373673035152
+       }
+      },
+      "F3_hand_object": {
+       "n": 4923,
+       "iou": 0.9517592749031972,
+       "dice": 0.9735116780259211,
+       "n_images_with_occlusion": 4923,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.009672966859046783,
+       "ece": 0.015074227304732906,
+       "global_mae": 0.0033384794626359847,
+       "region_mae": {
+        "left_eye": 0.0058544726035854085,
+        "right_eye": 0.0053746049229434515,
+        "nose": 0.006402188473737384,
+        "mouth": 0.005662006361006252,
+        "lower_face": 0.004821593719754793
+       }
+      },
+      "F4_random_patch": {
+       "n": 5030,
+       "iou": 0.9657240485066086,
+       "dice": 0.9821192677993413,
+       "n_images_with_occlusion": 5030,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.013193979719324166,
+       "ece": 0.022251560805367797,
+       "global_mae": 0.005850015898819925,
+       "region_mae": {
+        "left_eye": 0.009186237299908214,
+        "right_eye": 0.00893204055524252,
+        "nose": 0.011467144843358153,
+        "mouth": 0.009751895864631216,
+        "lower_face": 0.010013082290570298
+       }
+      },
+      "F5_extreme_lighting": {
+       "n": 5023,
+       "iou": 0.7110091315702982,
+       "dice": 0.7470557010760035,
+       "n_images_with_occlusion": 4563,
+       "clean_false_occlusion_rate": 0.012447583314941514,
+       "brier": 0.03758568935696457,
+       "ece": 0.027794856905968286,
+       "global_mae": 0.05026479424468081,
+       "region_mae": {
+        "left_eye": 0.052044339354477415,
+        "right_eye": 0.04658921900434472,
+        "nose": 0.04009168934014644,
+        "mouth": 0.05413144782867586,
+        "lower_face": 0.07004143293789743
+       }
+      }
+     }
+    },
+    "clean_test_images": {
+     "n": 65304,
+     "learned_global_mae": 0.005973815295234454,
+     "learned_false_occlusion_cell_rate": 0.002580279171573076,
+     "heuristic_global_mae": 0.2016447185459034,
+     "heuristic_false_occlusion_cell_rate": 0.034611105329673215,
+     "learned_brier": 0.0023015157309341696
+    }
+   },
+   "F2_sunglasses": {
+    "ood": {
+     "n_renders": 18094,
+     "families": [
+      "F2_sunglasses"
+     ],
+     "learned": {
+      "n": 18094,
+      "iou": 0.8652800279017271,
+      "dice": 0.91317585473446,
+      "n_images_with_occlusion": 18094,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.01651905105836076,
+      "ece": 0.012706865551076548,
+      "global_mae": 0.011849725169680733,
+      "region_mae": {
+       "left_eye": 0.05734745881430841,
+       "right_eye": 0.05555476086753924,
+       "nose": 0.013274197708264246,
+       "mouth": 0.005484072534898605,
+       "lower_face": 0.004704599293016609
+      }
+     },
+     "heuristic": {
+      "n": 18094,
+      "iou": 2.2974652533465276e-06,
+      "dice": 4.56913212552286e-06,
+      "n_images_with_occlusion": 18094,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.15311523881448583,
+      "ece": 0.12200628115561983,
+      "global_mae": 0.08344883549648599,
+      "region_mae": {
+       "left_eye": 0.7287005567280299,
+       "right_eye": 0.728967831321621,
+       "nose": 0.16597816406445942,
+       "mouth": 0.217750027427032,
+       "lower_face": 0.2185672636348504
+      }
+     },
+     "oracle_discretisation_global_mae": 0.0005020034964838908,
+     "by_level_learned": {
+      "low": {
+       "n": 6111,
+       "iou": 0.7906800394028887,
+       "dice": 0.8571542296144072,
+       "n_images_with_occlusion": 6111,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.0174446950622419,
+       "ece": 0.00943977802772399,
+       "global_mae": 0.014760141091362654,
+       "region_mae": {
+        "left_eye": 0.09052892843068708,
+        "right_eye": 0.09732232370194772,
+        "nose": 0.008201191893328526,
+        "mouth": 0.0067200975023897925,
+        "lower_face": 0.005826215022091271
+       }
+      },
+      "medium": {
+       "n": 6028,
+       "iou": 0.8846559548800059,
+       "dice": 0.9296169357651453,
+       "n_images_with_occlusion": 6028,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.01575895455767122,
+       "ece": 0.013173487726464608,
+       "global_mae": 0.010646014635796988,
+       "region_mae": {
+        "left_eye": 0.052327492497873856,
+        "right_eye": 0.04456487668361668,
+        "nose": 0.012025064947456537,
+        "mouth": 0.005084842880033942,
+        "lower_face": 0.0044494060397881445
+       }
+      },
+      "high": {
+       "n": 5955,
+       "iou": 0.922220824189105,
+       "dice": 0.9540224231065288,
+       "n_images_with_occlusion": 5955,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.016338572670189302,
+       "ece": 0.01791486311564861,
+       "global_mae": 0.010081532961595596,
+       "region_mae": {
+        "left_eye": 0.028378255813431397,
+        "right_eye": 0.023817640024485484,
+        "nose": 0.01974454377328877,
+        "mouth": 0.00461979172602968,
+        "lower_face": 0.0038119227539882127
+       }
+      }
+     }
+    },
+    "id": {
+     "n_renders": 20000,
+     "families": [
+      "F1_mask",
+      "F3_hand_object",
+      "F4_random_patch",
+      "F5_extreme_lighting"
+     ],
+     "learned": {
+      "n": 20000,
+      "iou": 0.914987074245646,
+      "dice": 0.9370474429855175,
+      "n_images_with_occlusion": 19484,
+      "clean_false_occlusion_rate": 0.01989139416833904,
+      "brier": 0.015758965799955893,
+      "ece": 0.013697127998407556,
+      "global_mae": 0.01121718235041111,
+      "region_mae": {
+       "left_eye": 0.014477237076648837,
+       "right_eye": 0.014076265597147948,
+       "nose": 0.013722116013071894,
+       "mouth": 0.01277993966817496,
+       "lower_face": 0.015655403921568615
+      }
+     },
+     "heuristic": {
+      "n": 20000,
+      "iou": 0.2774649173994179,
+      "dice": 0.3402220445082624,
+      "n_images_with_occlusion": 19484,
+      "clean_false_occlusion_rate": 0.09636308188722308,
+      "brier": 0.20443132619637414,
+      "ece": 0.11137816556442495,
+      "global_mae": 0.206831627641274,
+      "region_mae": {
+       "left_eye": 0.2828665024958579,
+       "right_eye": 0.2822141526831231,
+       "nose": 0.30315505227106715,
+       "mouth": 0.34449904418906246,
+       "lower_face": 0.33029408713012326
+      }
+     },
+     "oracle_discretisation_global_mae": 0.0011253734635843292,
+     "by_level_learned": {
+      "low": {
+       "n": 6716,
+       "iou": 0.8732336864167953,
+       "dice": 0.898694810297258,
+       "n_images_with_occlusion": 6328,
+       "clean_false_occlusion_rate": 0.0007130148097754985,
+       "brier": 0.012606516164483432,
+       "ece": 0.01097786650509129,
+       "global_mae": 0.009414007758593065,
+       "region_mae": {
+        "left_eye": 0.01089515128158578,
+        "right_eye": 0.010371964043617335,
+        "nose": 0.008439508421990993,
+        "mouth": 0.011325849348306691,
+        "lower_face": 0.013662427448644716
+       }
+      },
+      "medium": {
+       "n": 6578,
+       "iou": 0.9124645092912128,
+       "dice": 0.9358576479397771,
+       "n_images_with_occlusion": 6470,
+       "clean_false_occlusion_rate": 0.09090054521526603,
+       "brier": 0.01983151053479334,
+       "ece": 0.013702138411006651,
+       "global_mae": 0.015124400615106882,
+       "region_mae": {
+        "left_eye": 0.018714680653764585,
+        "right_eye": 0.017469320573249892,
+        "nose": 0.01862849426788046,
+        "mouth": 0.01729156147806551,
+        "lower_face": 0.019822903439271716
+       }
+      },
+      "high": {
+       "n": 6706,
+       "iou": 0.9569458587859019,
+       "dice": 0.9744978518394279,
+       "n_images_with_occlusion": 6686,
+       "clean_false_occlusion_rate": 0.00850253807106599,
+       "brier": 0.014921305866474286,
+       "ece": 0.01723110298982195,
+       "global_mae": 0.009190406152003896,
+       "region_mae": {
+        "left_eye": 0.0139081026223357,
+        "right_eye": 0.014457800580851048,
+        "nose": 0.014199872711784781,
+        "mouth": 0.009810691580309658,
+        "lower_face": 0.013563399472523866
+       }
+      }
+     },
+     "by_family_learned": {
+      "F1_mask": {
+       "n": 5029,
+       "iou": 0.9727458977455896,
+       "dice": 0.9859436434804948,
+       "n_images_with_occlusion": 5029,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.010093476641211685,
+       "ece": 0.022070096357420414,
+       "global_mae": 0.002793859041595023,
+       "region_mae": {
+        "left_eye": 0.0027928566896669475,
+        "right_eye": 0.003298125772480387,
+        "nose": 0.0037158662762513408,
+        "mouth": 3.928946649403295e-06,
+        "lower_face": 0.005267799702899653
+       }
+      },
+      "F3_hand_object": {
+       "n": 5000,
+       "iou": 0.9533111759311454,
+       "dice": 0.9752850350073436,
+       "n_images_with_occlusion": 5000,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.009263739740864996,
+       "ece": 0.013611276998108893,
+       "global_mae": 0.003604916473138428,
+       "region_mae": {
+        "left_eye": 0.005851265597147946,
+        "right_eye": 0.0055156149732620285,
+        "nose": 0.006354150326797385,
+        "mouth": 0.00571574660633484,
+        "lower_face": 0.004948486274509786
+       }
+      },
+      "F4_random_patch": {
+       "n": 4967,
+       "iou": 0.9634520561950557,
+       "dice": 0.9808821081867422,
+       "n_images_with_occlusion": 4967,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.013185829245086888,
+       "ece": 0.02046640704132492,
+       "global_mae": 0.005784373804286946,
+       "region_mae": {
+        "left_eye": 0.009257283454040874,
+        "right_eye": 0.009288936212514181,
+        "nose": 0.011272634683025617,
+        "mouth": 0.008669921329948094,
+        "lower_face": 0.009172696660705748
+       }
+      },
+      "F5_extreme_lighting": {
+       "n": 5004,
+       "iou": 0.7539319946664506,
+       "dice": 0.7911442044710666,
+       "n_images_with_occlusion": 4488,
+       "clean_false_occlusion_rate": 0.01989139416833904,
+       "brier": 0.03049690435767242,
+       "ece": 0.00458988636700876,
+       "global_mae": 0.03268140744133801,
+       "region_mae": {
+        "left_eye": 0.04002042572715446,
+        "right_eye": 0.03821399208618844,
+        "nose": 0.03357180268856809,
+        "mouth": 0.03675795411935911,
+        "lower_face": 0.04322803717810063
+       }
+      }
+     }
+    },
+    "clean_test_images": {
+     "n": 65304,
+     "learned_global_mae": 0.01039972444346769,
+     "learned_false_occlusion_cell_rate": 0.00643171293692045,
+     "heuristic_global_mae": 0.2205439869063843,
+     "heuristic_false_occlusion_cell_rate": 0.049799880214856984,
+     "learned_brier": 0.005538134892245877
+    }
+   },
+   "F3_hand_object": {
+    "ood": {
+     "n_renders": 18012,
+     "families": [
+      "F3_hand_object"
+     ],
+     "learned": {
+      "n": 18012,
+      "iou": 0.8859243833855295,
+      "dice": 0.9233366209883006,
+      "n_images_with_occlusion": 18012,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.0213516436173064,
+      "ece": 0.014410318361352146,
+      "global_mae": 0.018817849720300865,
+      "region_mae": {
+       "left_eye": 0.018659881330845784,
+       "right_eye": 0.02047406106366799,
+       "nose": 0.022662605829955048,
+       "mouth": 0.021015016300512245,
+       "lower_face": 0.019135312841547892
+      }
+     },
+     "heuristic": {
+      "n": 18012,
+      "iou": 0.21472391599786742,
+      "dice": 0.2576346691089828,
+      "n_images_with_occlusion": 18012,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.15585511170338703,
+      "ece": 0.03526159840417824,
+      "global_mae": 0.10877111419758502,
+      "region_mae": {
+       "left_eye": 0.24810760590361827,
+       "right_eye": 0.24754175265617867,
+       "nose": 0.2708568013231947,
+       "mouth": 0.2412563441729211,
+       "lower_face": 0.20452509569938448
+      }
+     },
+     "oracle_discretisation_global_mae": 0.0007237743160121005,
+     "by_level_learned": {
+      "low": {
+       "n": 6033,
+       "iou": 0.8441812450795656,
+       "dice": 0.8923778004661429,
+       "n_images_with_occlusion": 6033,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.016056110077741916,
+       "ece": 0.011221464322392165,
+       "global_mae": 0.014123612911115154,
+       "region_mae": {
+        "left_eye": 0.013720171853380382,
+        "right_eye": 0.01479314749271165,
+        "nose": 0.018921936971926737,
+        "mouth": 0.01781076377560421,
+        "lower_face": 0.015563290789546377
+       }
+      },
+      "medium": {
+       "n": 5926,
+       "iou": 0.8882302924719859,
+       "dice": 0.9260880930834408,
+       "n_images_with_occlusion": 5926,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.023731591897335137,
+       "ece": 0.016055878914831,
+       "global_mae": 0.020860908690587092,
+       "region_mae": {
+        "left_eye": 0.021265001567159554,
+        "right_eye": 0.022668887761897624,
+        "nose": 0.028071928512658304,
+        "mouth": 0.02469015800198425,
+        "lower_face": 0.019423530735277562
+       }
+      },
+      "high": {
+       "n": 6053,
+       "iou": 0.9252720681952997,
+       "dice": 0.9514994064788634,
+       "n_images_with_occlusion": 6053,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.024299666141136284,
+       "ece": 0.01742339173734109,
+       "global_mae": 0.02149638320979387,
+       "region_mae": {
+        "left_eye": 0.02103280793866891,
+        "right_eye": 0.02398742775123957,
+        "nose": 0.021095087079382662,
+        "mouth": 0.020610649170138388,
+        "lower_face": 0.022413361710122662
+       }
+      }
+     }
+    },
+    "id": {
+     "n_renders": 20000,
+     "families": [
+      "F1_mask",
+      "F2_sunglasses",
+      "F4_random_patch",
+      "F5_extreme_lighting"
+     ],
+     "learned": {
+      "n": 20000,
+      "iou": 0.9172903501645708,
+      "dice": 0.9390437743263946,
+      "n_images_with_occlusion": 19503,
+      "clean_false_occlusion_rate": 0.0074507961474430335,
+      "brier": 0.014728459110806662,
+      "ece": 0.016693485119936246,
+      "global_mae": 0.011331190461977229,
+      "region_mae": {
+       "left_eye": 0.013799893048128346,
+       "right_eye": 0.012753155080213907,
+       "nose": 0.011648104575163404,
+       "mouth": 0.012295731523378583,
+       "lower_face": 0.014189411764705876
+      }
+     },
+     "heuristic": {
+      "n": 20000,
+      "iou": 0.2085839687829788,
+      "dice": 0.25779738769896704,
+      "n_images_with_occlusion": 19503,
+      "clean_false_occlusion_rate": 0.0884239446833284,
+      "brier": 0.20454381192641197,
+      "ece": 0.11572322658711973,
+      "global_mae": 0.20050858067217858,
+      "region_mae": {
+       "left_eye": 0.40348959490469527,
+       "right_eye": 0.400310681158438,
+       "nose": 0.2764132558433752,
+       "mouth": 0.33348165659990286,
+       "lower_face": 0.32938809318387596
+      }
+     },
+     "oracle_discretisation_global_mae": 0.001067220529661206,
+     "by_level_learned": {
+      "low": {
+       "n": 6711,
+       "iou": 0.8827401435419471,
+       "dice": 0.9062580651687533,
+       "n_images_with_occlusion": 6327,
+       "clean_false_occlusion_rate": 0.0006873942470389171,
+       "brier": 0.011745636486596971,
+       "ece": 0.01408897330215991,
+       "global_mae": 0.010251095629623059,
+       "region_mae": {
+        "left_eye": 0.012621946409319202,
+        "right_eye": 0.012697247794147529,
+        "nose": 0.008448717986176248,
+        "mouth": 0.011361527291475488,
+        "lower_face": 0.01359016656878814
+       }
+      },
+      "medium": {
+       "n": 6733,
+       "iou": 0.910195572365105,
+       "dice": 0.9342822915953525,
+       "n_images_with_occlusion": 6632,
+       "clean_false_occlusion_rate": 0.034025229934160926,
+       "brier": 0.018332655464923697,
+       "ece": 0.01585373488403706,
+       "global_mae": 0.014771790111642357,
+       "region_mae": {
+        "left_eye": 0.01665873754008577,
+        "right_eye": 0.015020598520655307,
+        "nose": 0.014100387419683958,
+        "mouth": 0.016416094251339445,
+        "lower_face": 0.01828586738423276
+       }
+      },
+      "high": {
+       "n": 6556,
+       "iou": 0.9578850512139897,
+       "dice": 0.9755678170086478,
+       "n_images_with_occlusion": 6544,
+       "clean_false_occlusion_rate": 0.00021150592216582064,
+       "brier": 0.01408029995565126,
+       "ece": 0.021347010417723692,
+       "global_mae": 0.00890333185592682,
+       "region_mae": {
+        "left_eye": 0.012069661188564404,
+        "right_eye": 0.010481723889289484,
+        "nose": 0.012404642556636238,
+        "mouth": 0.009020417666292123,
+        "lower_face": 0.010595772170979428
+       }
+      }
+     },
+     "by_family_learned": {
+      "F1_mask": {
+       "n": 4914,
+       "iou": 0.9775305067843212,
+       "dice": 0.9884481105593294,
+       "n_images_with_occlusion": 4914,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.009843711468799048,
+       "ece": 0.022856637701865128,
+       "global_mae": 0.00254278015607242,
+       "region_mae": {
+        "left_eye": 0.001609211413132994,
+        "right_eye": 0.0015016936585564118,
+        "nose": 0.0024583955139510934,
+        "mouth": 1.252308944616637e-05,
+        "lower_face": 0.0036389986193907766
+       }
+      },
+      "F2_sunglasses": {
+       "n": 4973,
+       "iou": 0.9437176568075089,
+       "dice": 0.970455553307633,
+       "n_images_with_occlusion": 4973,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.008900151693996576,
+       "ece": 0.019297289868124474,
+       "global_mae": 0.00165536035777053,
+       "region_mae": {
+        "left_eye": 0.005907838154913539,
+        "right_eye": 0.006159105874037091,
+        "nose": 0.004763533538624911,
+        "mouth": 3.897365532548448e-05,
+        "lower_face": 0.0001280798665736054
+       }
+      },
+      "F4_random_patch": {
+       "n": 5060,
+       "iou": 0.9688338100823479,
+       "dice": 0.983907117321466,
+       "n_images_with_occlusion": 5060,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.011811126564327696,
+       "ece": 0.02192244671388339,
+       "global_mae": 0.004506848024971589,
+       "region_mae": {
+        "left_eye": 0.007029443469806176,
+        "right_eye": 0.006443427532709096,
+        "nose": 0.00894740241287556,
+        "mouth": 0.007110749438115168,
+        "lower_face": 0.0072462063086103975
+       }
+      },
+      "F5_extreme_lighting": {
+       "n": 5053,
+       "iou": 0.7662251542144526,
+       "dice": 0.8016442570574299,
+       "n_images_with_occlusion": 4556,
+       "clean_false_occlusion_rate": 0.0074507961474430335,
+       "brier": 0.028136241691809137,
+       "ece": 0.017943951573261736,
+       "global_mae": 0.036234282502880584,
+       "region_mae": {
+        "left_eye": 0.04020216366056344,
+        "right_eye": 0.0365032262297719,
+        "nose": 0.030065036107457033,
+        "mouth": 0.041495920020034986,
+        "lower_face": 0.04524113417383576
+       }
+      }
+     }
+    },
+    "clean_test_images": {
+     "n": 65304,
+     "learned_global_mae": 0.004488443242400671,
+     "learned_false_occlusion_cell_rate": 0.002460431526524612,
+     "heuristic_global_mae": 0.20608564424119874,
+     "heuristic_false_occlusion_cell_rate": 0.04240325310572594,
+     "learned_brier": 0.002343634174646624
+    }
+   },
+   "F4_random_patch": {
+    "ood": {
+     "n_renders": 18135,
+     "families": [
+      "F4_random_patch"
+     ],
+     "learned": {
+      "n": 18135,
+      "iou": 0.13012342513699102,
+      "dice": 0.185730574373432,
+      "n_images_with_occlusion": 18135,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.32289196438039647,
+      "ece": 0.3374275737230496,
+      "global_mae": 0.34427150878463214,
+      "region_mae": {
+       "left_eye": 0.3895389942828273,
+       "right_eye": 0.38784830743085014,
+       "nose": 0.42905085497115864,
+       "mouth": 0.4045647754128268,
+       "lower_face": 0.27274708963817124
+      }
+     },
+     "heuristic": {
+      "n": 18135,
+      "iou": 0.2736917011615277,
+      "dice": 0.3842502192323105,
+      "n_images_with_occlusion": 18135,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.18956706680302934,
+      "ece": 0.1395093298957156,
+      "global_mae": 0.16641501374490347,
+      "region_mae": {
+       "left_eye": 0.2658295108662725,
+       "right_eye": 0.2668502598344198,
+       "nose": 0.327350615233327,
+       "mouth": 0.2499318133728131,
+       "lower_face": 0.2048187213605411
+      }
+     },
+     "oracle_discretisation_global_mae": 0.001035762814316497,
+     "by_level_learned": {
+      "low": {
+       "n": 6069,
+       "iou": 0.1468327479458923,
+       "dice": 0.20508837251359854,
+       "n_images_with_occlusion": 6069,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.15526313299214328,
+       "ece": 0.15676709480272177,
+       "global_mae": 0.16407905114573756,
+       "region_mae": {
+        "left_eye": 0.18468106965969783,
+        "right_eye": 0.18582912665957652,
+        "nose": 0.19158810390746073,
+        "mouth": 0.195544898821919,
+        "lower_face": 0.1337603184295633
+       }
+      },
+      "medium": {
+       "n": 6081,
+       "iou": 0.12977822950872236,
+       "dice": 0.18581939052418364,
+       "n_images_with_occlusion": 6081,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.31756782469636297,
+       "ece": 0.33038286571777353,
+       "global_mae": 0.33698852955710884,
+       "region_mae": {
+        "left_eye": 0.38668929053734186,
+        "right_eye": 0.3866190856004838,
+        "nose": 0.43519109666560263,
+        "mouth": 0.404476197775481,
+        "lower_face": 0.2646852588099867
+       }
+      },
+      "high": {
+       "n": 5985,
+       "iou": 0.11353031811748897,
+       "dice": 0.1660108470676021,
+       "n_images_with_occlusion": 5985,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.4982830205397809,
+       "ece": 0.5277813441403517,
+       "global_mae": 0.5343927823173006,
+       "region_mae": {
+        "left_eye": 0.6001675311272835,
+        "right_eye": 0.5939517837969851,
+        "nose": 0.6636076847893153,
+        "mouth": 0.6166082627382937,
+        "lower_face": 0.4218756957753861
+       }
+      }
+     }
+    },
+    "id": {
+     "n_renders": 20000,
+     "families": [
+      "F1_mask",
+      "F2_sunglasses",
+      "F3_hand_object",
+      "F5_extreme_lighting"
+     ],
+     "learned": {
+      "n": 20000,
+      "iou": 0.9463407458615359,
+      "dice": 0.9657787661903627,
+      "n_images_with_occlusion": 19453,
+      "clean_false_occlusion_rate": 0.01035644354531872,
+      "brier": 0.010449000224435349,
+      "ece": 0.01756723001891114,
+      "global_mae": 0.005400298492970609,
+      "region_mae": {
+       "left_eye": 0.006639233511586455,
+       "right_eye": 0.006584295900178254,
+       "nose": 0.005930433006535952,
+       "mouth": 0.005823039215686274,
+       "lower_face": 0.006255207843137252
+      }
+     },
+     "heuristic": {
+      "n": 20000,
+      "iou": 0.1433952104019625,
+      "dice": 0.173740899165255,
+      "n_images_with_occlusion": 19453,
+      "clean_false_occlusion_rate": 0.08040627696990507,
+      "brier": 0.2017614155073231,
+      "ece": 0.09341403101125131,
+      "global_mae": 0.1920280870902845,
+      "region_mae": {
+       "left_eye": 0.4036188182224909,
+       "right_eye": 0.40020927169457876,
+       "nose": 0.2730849200878547,
+       "mouth": 0.35148620142905895,
+       "lower_face": 0.3379066008334096
+      }
+     },
+     "oracle_discretisation_global_mae": 0.0009884189593906323,
+     "by_level_learned": {
+      "low": {
+       "n": 6671,
+       "iou": 0.9247314910406854,
+       "dice": 0.9497122698729537,
+       "n_images_with_occlusion": 6274,
+       "clean_false_occlusion_rate": 0.0006073469805265378,
+       "brier": 0.0074130895065047,
+       "ece": 0.013052774281369159,
+       "global_mae": 0.0033457452376204036,
+       "region_mae": {
+        "left_eye": 0.005370519857279933,
+        "right_eye": 0.005574852281845676,
+        "nose": 0.0026747810001930164,
+        "mouth": 0.003331544903052834,
+        "lower_face": 0.003807654436381054
+       }
+      },
+      "medium": {
+       "n": 6555,
+       "iou": 0.9393748259505554,
+       "dice": 0.9606339203634339,
+       "n_images_with_occlusion": 6435,
+       "clean_false_occlusion_rate": 0.04507191201353638,
+       "brier": 0.013935066590533266,
+       "ece": 0.01864577447097034,
+       "global_mae": 0.010438150458099937,
+       "region_mae": {
+        "left_eye": 0.010161760286945373,
+        "right_eye": 0.010296041584236497,
+        "nose": 0.009682425728999975,
+        "mouth": 0.011444984025412077,
+        "lower_face": 0.012268473400038886
+       }
+      },
+      "high": {
+       "n": 6774,
+       "iou": 0.9730907694933831,
+       "dice": 0.9856346797122656,
+       "n_images_with_occlusion": 6744,
+       "clean_false_occlusion_rate": 0.0005076142131979696,
+       "brier": 0.010065385723334604,
+       "ece": 0.02096936691614949,
+       "global_mae": 0.0025486311081194834,
+       "region_mae": {
+        "left_eye": 0.0044800108625461695,
+        "right_eye": 0.003986643910053494,
+        "nose": 0.0055058894928899605,
+        "mouth": 0.0028364596957313045,
+        "lower_face": 0.002846686002419862
+       }
+      }
+     },
+     "by_family_learned": {
+      "F1_mask": {
+       "n": 4956,
+       "iou": 0.977916972018979,
+       "dice": 0.9886652407484573,
+       "n_images_with_occlusion": 4956,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.009631346236756938,
+       "ece": 0.02363206689656276,
+       "global_mae": 0.0022929247133891602,
+       "region_mae": {
+        "left_eye": 0.0010720364160045229,
+        "right_eye": 0.0010242360940267339,
+        "nose": 0.0017862088338160297,
+        "mouth": 0.0,
+        "lower_face": 0.0023793065248698354
+       }
+      },
+      "F2_sunglasses": {
+       "n": 5064,
+       "iou": 0.9546489279399742,
+       "dice": 0.9763390076301547,
+       "n_images_with_occlusion": 5064,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.00850913515078086,
+       "ece": 0.019226051460190848,
+       "global_mae": 0.0012239121200871865,
+       "region_mae": {
+        "left_eye": 0.004236362791562123,
+        "right_eye": 0.004430983940323221,
+        "nose": 0.002873029148468233,
+        "mouth": 6.552627126923172e-07,
+        "lower_face": 2.106371774617374e-06
+       }
+      },
+      "F3_hand_object": {
+       "n": 4983,
+       "iou": 0.9712061659404148,
+       "dice": 0.9850976594369262,
+       "n_images_with_occlusion": 4983,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.007538741548214517,
+       "ece": 0.015643880943990406,
+       "global_mae": 0.0015275585664879883,
+       "region_mae": {
+        "left_eye": 0.002919981412739142,
+        "right_eye": 0.0029007001702401345,
+        "nose": 0.0034526212652430037,
+        "mouth": 0.002852140717353027,
+        "lower_face": 0.002201382740533498
+       }
+      },
+      "F5_extreme_lighting": {
+       "n": 4997,
+       "iou": 0.8738758471796145,
+       "dice": 0.9066397829075207,
+       "n_images_with_occlusion": 4450,
+       "clean_false_occlusion_rate": 0.01035644354531872,
+       "brier": 0.016127925355419733,
+       "ece": 0.012089046998419069,
+       "global_mae": 0.01657644980326683,
+       "region_mae": {
+        "left_eye": 0.018304672643158083,
+        "right_eye": 0.017954194976879174,
+        "nose": 0.01560992150846063,
+        "mouth": 0.020461326569697475,
+        "lower_face": 0.020478718603711237
+       }
+      }
+     }
+    },
+    "clean_test_images": {
+     "n": 65304,
+     "learned_global_mae": 0.0011518472818814146,
+     "learned_false_occlusion_cell_rate": 0.0007792636073172378,
+     "heuristic_global_mae": 0.20092696659033027,
+     "heuristic_false_occlusion_cell_rate": 0.02710603719620888,
+     "learned_brier": 0.0006709991914726656
+    }
+   },
+   "F5_extreme_lighting": {
+    "ood": {
+     "n_renders": 18279,
+     "families": [
+      "F5_extreme_lighting"
+     ],
+     "learned": {
+      "n": 18279,
+      "iou": 0.004747375529270568,
+      "dice": 0.006463888612465967,
+      "n_images_with_occlusion": 16428,
+      "clean_false_occlusion_rate": 0.0,
+      "brier": 0.4864803548813348,
+      "ece": 0.48686132995371456,
+      "global_mae": 0.4914785132603195,
+      "region_mae": {
+       "left_eye": 0.45875845566232804,
+       "right_eye": 0.45649795958250206,
+       "nose": 0.48473688689510125,
+       "mouth": 0.47263825981351404,
+       "lower_face": 0.49080952856004256
+      }
+     },
+     "heuristic": {
+      "n": 18279,
+      "iou": 0.11845542934677422,
+      "dice": 0.15455728084438328,
+      "n_images_with_occlusion": 16428,
+      "clean_false_occlusion_rate": 0.08530853126448318,
+      "brier": 0.3022373933681579,
+      "ece": 0.3175613983324902,
+      "global_mae": 0.39453447915134693,
+      "region_mae": {
+       "left_eye": 0.44753625436034017,
+       "right_eye": 0.44532888078665034,
+       "nose": 0.3799340417346414,
+       "mouth": 0.4577907146771639,
+       "lower_face": 0.4435865559696376
+      }
+     },
+     "oracle_discretisation_global_mae": 0.0004509258126400997,
+     "by_level_learned": {
+      "low": {
+       "n": 5964,
+       "iou": 0.00025892522184998827,
+       "dice": 0.00038899524213447686,
+       "n_images_with_occlusion": 4598,
+       "clean_false_occlusion_rate": 0.0,
+       "brier": 0.3740605854526047,
+       "ece": 0.37406402517156623,
+       "global_mae": 0.3779608294290844,
+       "region_mae": {
+        "left_eye": 0.3719309021090297,
+        "right_eye": 0.3717773964045712,
+        "nose": 0.3693037308820242,
+        "mouth": 0.3720477212192208,
+        "lower_face": 0.37925199563393436
+       }
+      },
+      "medium": {
+       "n": 6125,
+       "iou": 0.003068559998506406,
+       "dice": 0.004230297944896461,
+       "n_images_with_occlusion": 5718,
+       "clean_false_occlusion_rate": 0.0,
+       "brier": 0.47532263460415525,
+       "ece": 0.47552841563021153,
+       "global_mae": 0.4807875933948756,
+       "region_mae": {
+        "left_eye": 0.44222055367601587,
+        "right_eye": 0.4387921568627451,
+        "nose": 0.46378097905828997,
+        "mouth": 0.4641749376673746,
+        "lower_face": 0.4882800608243297
+       }
+      },
+      "high": {
+       "n": 6190,
+       "iou": 0.009694587852312012,
+       "dice": 0.013123579573517443,
+       "n_images_with_occlusion": 6112,
+       "clean_false_occlusion_rate": 0.0,
+       "brier": 0.6058361774291008,
+       "ece": 0.6067728011142459,
+       "global_mae": 0.6114302661755584,
+       "region_mae": {
+        "left_eye": 0.5587801324083752,
+        "right_eye": 0.5556452100593505,
+        "nose": 0.6166913744496183,
+        "mouth": 0.5779306378945265,
+        "lower_face": 0.6007969463714403
+       }
+      }
+     }
+    },
+    "id": {
+     "n_renders": 20000,
+     "families": [
+      "F1_mask",
+      "F2_sunglasses",
+      "F3_hand_object",
+      "F4_random_patch"
+     ],
+     "learned": {
+      "n": 20000,
+      "iou": 0.9729099749712304,
+      "dice": 0.9860237102194571,
+      "n_images_with_occlusion": 20000,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.008689402199856752,
+      "ece": 0.020917409674529736,
+      "global_mae": 0.001396722581990036,
+      "region_mae": {
+       "left_eye": 0.0017576737967914468,
+       "right_eye": 0.001741363636363637,
+       "nose": 0.0018446895424836626,
+       "mouth": 0.0010811463046757168,
+       "lower_face": 0.0011541450980392164
+      }
+     },
+     "heuristic": {
+      "n": 20000,
+      "iou": 0.18309175320796825,
+      "dice": 0.23130412565263814,
+      "n_images_with_occlusion": 20000,
+      "clean_false_occlusion_rate": null,
+      "brier": 0.1861140836146263,
+      "ece": 0.10850426193105285,
+      "global_mae": 0.14939032757187287,
+      "region_mae": {
+       "left_eye": 0.3556315976133713,
+       "right_eye": 0.3521054654280801,
+       "nose": 0.2524741497086628,
+       "mouth": 0.2826323914176109,
+       "lower_face": 0.26992751254510333
+      }
+     },
+     "oracle_discretisation_global_mae": 0.0011260765466449254,
+     "by_level_learned": {
+      "low": {
+       "n": 6651,
+       "iou": 0.9630142269324188,
+       "dice": 0.9807437020381905,
+       "n_images_with_occlusion": 6651,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.007336749748961507,
+       "ece": 0.01748768459268343,
+       "global_mae": 0.0012712256901174625,
+       "region_mae": {
+        "left_eye": 0.002214589311620276,
+        "right_eye": 0.0021648467481469157,
+        "nose": 0.0012570471981706046,
+        "mouth": 0.0008882185352773596,
+        "lower_face": 0.0009471198492928976
+       }
+      },
+      "medium": {
+       "n": 6695,
+       "iou": 0.9735242268946735,
+       "dice": 0.9863906442970459,
+       "n_images_with_occlusion": 6695,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.009150521107371086,
+       "ece": 0.0221485961462827,
+       "global_mae": 0.0014063447613137617,
+       "region_mae": {
+        "left_eye": 0.0017042009960342348,
+        "right_eye": 0.0016683107488361627,
+        "nose": 0.0019188058594112344,
+        "mouth": 0.0012455660726978218,
+        "lower_face": 0.0011133037531666898
+       }
+      },
+      "high": {
+       "n": 6654,
+       "iou": 0.9821832246824844,
+       "dice": 0.9909321428560889,
+       "n_images_with_occlusion": 6654,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.009577484611202681,
+       "ece": 0.023106815759737453,
+       "global_mae": 0.001512481424381401,
+       "region_mae": {
+        "left_eye": 0.0013547665698517102,
+        "right_eye": 0.0013915744727817096,
+        "nose": 0.0023574939443766676,
+        "mouth": 0.0011085542168128497,
+        "lower_face": 0.0014021700053631313
+       }
+      }
+     },
+     "by_family_learned": {
+      "F1_mask": {
+       "n": 4940,
+       "iou": 0.9788334185598624,
+       "dice": 0.9891387128614532,
+       "n_images_with_occlusion": 4940,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.009335047038070076,
+       "ece": 0.02355798193833114,
+       "global_mae": 0.002212883840646702,
+       "region_mae": {
+        "left_eye": 0.0003317889540799853,
+        "right_eye": 0.00032377838879387073,
+        "nose": 0.0005920721864994383,
+        "mouth": 0.0,
+        "lower_face": 0.0013235532269588004
+       }
+      },
+      "F2_sunglasses": {
+       "n": 4986,
+       "iou": 0.9585515005736645,
+       "dice": 0.9784552558524802,
+       "n_images_with_occlusion": 4986,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.008238030867563337,
+       "ece": 0.019784657516811043,
+       "global_mae": 0.0007315056656743998,
+       "region_mae": {
+        "left_eye": 0.0024210391592001273,
+        "right_eye": 0.0024767745409070537,
+        "nose": 0.001570410220512862,
+        "mouth": 0.0,
+        "lower_face": 1.7303351344550682e-07
+       }
+      },
+      "F3_hand_object": {
+       "n": 5035,
+       "iou": 0.9782946712063961,
+       "dice": 0.9888649422021435,
+       "n_images_with_occlusion": 5035,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.0070584339900344045,
+       "ece": 0.016534753391927802,
+       "global_mae": 0.0010280515642412359,
+       "region_mae": {
+        "left_eye": 0.0016185808077857845,
+        "right_eye": 0.0015679547976995263,
+        "nose": 0.0019257679900824955,
+        "mouth": 0.0016085291346696802,
+        "lower_face": 0.0011201121560838851
+       }
+      },
+      "F4_random_patch": {
+       "n": 5039,
+       "iou": 0.975929938550187,
+       "dice": 0.9876197803503285,
+       "n_images_with_occlusion": 5039,
+       "clean_false_occlusion_rate": null,
+       "brier": 0.010132739548238708,
+       "ece": 0.024164683577975354,
+       "global_mae": 0.0016231947989678178,
+       "region_mae": {
+        "left_eye": 0.0026381390926176916,
+        "right_eye": 0.0025766932366047507,
+        "nose": 0.0032630774079824435,
+        "mouth": 0.002683862254505357,
+        "lower_face": 0.0021639058481102303
+       }
+      }
+     }
+    },
+    "clean_test_images": {
+     "n": 65304,
+     "learned_global_mae": 7.5789202971927455e-06,
+     "learned_false_occlusion_cell_rate": 7.851817684074733e-06,
+     "heuristic_global_mae": 0.15249403866580621,
+     "heuristic_false_occlusion_cell_rate": 0.028238320089152898,
+     "learned_brier": 6.813836405469414e-06
+    }
+   }
+  }
+ },
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-10-27T12:14:50.401512+00:00",
+  "git": {
+   "commit": "1b81d53bf4e7caf30884cc81f3fddb85c6e49d74",
+   "dirty": true,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.14.1",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts/evaluate_visibility.py"
+  ],
+  "extra": {}
+ }
+}

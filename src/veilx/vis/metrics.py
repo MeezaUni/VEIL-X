@@ -60,14 +60,16 @@ def calibration_scores(prob: F64, target: F64, bins: int = 10) -> dict[str, floa
 def visibility_errors(
     prob: F64, target: F64, reference_global: F64 | None = None
 ) -> dict[str, Any]:
-    """Global and regional absolute errors. ``reference_global`` defaults to the target map's
-    face-cell mean (pass the engine's pixel-level ``visibility_ratio`` to include
-    discretisation error)."""
+    """Global and regional absolute errors, plus the signed global bias (predicted - reference;
+    > 0 means visibility is OVERestimated, the direction that loosens stratified rules).
+    ``reference_global`` defaults to the target map's face-cell mean (pass the engine's
+    pixel-level ``visibility_ratio`` to include discretisation error)."""
     g_pred = global_visibility(prob)
     g_ref = global_visibility(target) if reference_global is None else np.asarray(reference_global)
     rp, rt = region_visibility(prob), region_visibility(target)
     return {
         "global_mae": float(np.mean(np.abs(g_pred - g_ref))),
+        "global_bias": float(np.mean(g_pred - g_ref)),
         "region_mae": {k: float(np.mean(np.abs(rp[k] - rt[k]))) for k in rp},
     }
 

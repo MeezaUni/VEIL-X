@@ -55,6 +55,7 @@ def test_metrics_perfect_and_inverted_predictions() -> None:
     assert cal["brier"] == pytest.approx(0.25)
     s = all_scores(t, t)
     assert s["global_mae"] == pytest.approx(0.0) and s["n"] == 1
+    assert s["global_bias"] == pytest.approx(0.0)
 
 
 def test_covisibility_definitions() -> None:
@@ -120,3 +121,14 @@ def test_samples_respect_held_out_family() -> None:
     assert out.shape == img.shape and tgt.min() < 1.0 and 0 < meta["visibility_ratio"] < 1
     clean, t2, _ = make_sample(img, None, None, 7)
     assert (t2 == 1).all() and clean is img
+
+
+def test_global_bias_sign() -> None:
+    """Predicting 'all visible' for an occluded face is a POSITIVE bias (overestimation)."""
+    from veilx.vis.metrics import visibility_errors
+
+    target = np.ones((2, 28, 28))
+    target[:, 10:20, :] = 0.0
+    pred = np.ones((2, 28, 28))
+    e = visibility_errors(pred, target)
+    assert e["global_bias"] > 0 and e["global_bias"] == pytest.approx(e["global_mae"])
