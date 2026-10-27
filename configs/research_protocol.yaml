@@ -9,7 +9,7 @@
 # =============================================================================
 schema_version: 1
 protocol_id: veilx-c3c1
-protocol_version: 0.4.0   # changes: docs/protocol_changelog.md
+protocol_version: 0.5.0   # changes: docs/protocol_changelog.md
 status: provisional
 
 project:
@@ -282,3 +282,22 @@ calibration_plan:
   independent_impostor_pairs: 3409
   best_certifiable_fmr_zero_errors: 0.000878
   note: "0.4.0: 1% selective FMR certifiable (<= 24 false matches at full coverage); 0.1% would need >= 2,995 accepted impostors with ZERO false matches, so it stays estimation-only (D-034). Per visibility stratum (delta/3) 0.1% is never certifiable. reports/data/capacity_v0.4.0.json"
+
+# =============================================================================
+# v0.5.0 Phase 3 prospective protocol (frozen before any Phase 3 training).
+# Human-readable: docs/phase3_protocol.md
+# =============================================================================
+phase3:
+  protocol_doc: docs/phase3_protocol.md
+  population_split: train          # identities never scored by any model in Phases 1-2 (verified)
+  subsplit_salt: "veilx-p3"
+  subsplit_bands: {p3_train: [0, 50], p3_val: [50, 60], p3_cal: [60, 75], p3_test: [75, 100]}
+  seed: 20261027
+  ordering_default: v2_validation_pvalue
+  ordering_comparison: v1_validation_risk
+  confirmatory_set: p3_test
+  followup_sets: [phase2_digiface_test, lfw_view2_derived_occlusion]
+  holm_families: {c3_risk_folds: 5, c1_logloss_cells: 10}
+  ve_grid: 28
+  ve_max_epochs: 30
+  ve_patience: 4

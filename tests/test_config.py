@@ -44,7 +44,7 @@ def test_registered_constants_match_approved_values() -> None:
 
 def test_v040_real_data_sections_and_frozen_constants() -> None:
     proto = load_protocol(PROTOCOL)
-    assert proto.protocol_version == "0.4.0"
+    assert proto.protocol_version == "0.5.0"
     dp = proto.data_preparation
     assert dp is not None and dp.images_final == 643_995 and dp.identities_final == 101_999
     assert len(dp.parts) == 4 and set(dp.archive_sha256) == set(dp.archive_bytes)
@@ -249,3 +249,17 @@ def test_verification_roles_require_identity_labels(registry_dict: dict[str, Any
     occ["roles"] = ["test_synth"]
     with pytest.raises(ValueError, match="identity labels"):
         DatasetRegistry.model_validate(d)
+
+
+def test_v050_phase3_protocol_section() -> None:
+    proto = load_protocol(PROTOCOL)
+    p3 = proto.phase3
+    assert p3 is not None and p3.population_split.value == "train"
+    assert set(p3.subsplit_bands) == {"p3_train", "p3_val", "p3_cal", "p3_test"}
+    assert p3.confirmatory_set == "p3_test" and p3.ordering_default == "v2_validation_pvalue"
+
+
+def test_phase3_bands_must_partition(mutable_protocol: dict[str, Any]) -> None:
+    mutable_protocol["phase3"]["subsplit_bands"]["p3_test"] = [80, 100]
+    with pytest.raises(ValueError, match="contiguous"):
+        _validate(mutable_protocol)

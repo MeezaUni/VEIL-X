@@ -346,6 +346,35 @@ class CalibrationPlanSection(_Strict):
     note: str
 
 
+class Phase3Section(_Strict):
+    """Prospective Phase 3 protocol (docs/phase3_protocol.md), frozen before training."""
+
+    protocol_doc: str
+    population_split: SplitName
+    subsplit_salt: str = Field(min_length=3)
+    subsplit_bands: dict[str, tuple[int, int]]
+    seed: int = Field(ge=0)
+    ordering_default: Literal["v2_validation_pvalue"]
+    ordering_comparison: Literal["v1_validation_risk"]
+    confirmatory_set: str
+    followup_sets: tuple[str, ...]
+    holm_families: dict[str, int]
+    ve_grid: int = Field(ge=7, le=112)
+    ve_max_epochs: int = Field(ge=1)
+    ve_patience: int = Field(ge=1)
+
+    @field_validator("subsplit_bands")
+    @classmethod
+    def _bands_partition(cls, v: dict[str, tuple[int, int]]) -> dict[str, tuple[int, int]]:
+        spans = sorted(v.values())
+        if spans[0][0] != 0 or spans[-1][1] != 100:
+            raise ValueError("phase3 sub-split bands must cover [0, 100)")
+        for (_, hi), (lo, _) in pairwise(spans):
+            if hi != lo:
+                raise ValueError("phase3 sub-split bands must be contiguous and disjoint")
+        return v
+
+
 # --------------------------------------------------------------------------- root
 
 
@@ -371,6 +400,7 @@ class ResearchProtocol(_Strict):
     data_preparation: DataPreparationSection | None = None
     occlusion: OcclusionSection | None = None
     calibration_plan: CalibrationPlanSection | None = None
+    phase3: Phase3Section | None = None
 
     @field_validator("challenge_families")
     @classmethod

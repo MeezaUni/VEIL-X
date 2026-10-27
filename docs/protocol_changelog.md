@@ -3,6 +3,14 @@
 Every revision of `configs/research_protocol.yaml` is listed here with its reason. Decision IDs
 refer to `docs/decision_log.md`. Constants change status only through an entry here.
 
+## v0.5.0 — 2026-10-27 (Phase 3 prospective protocol)
+
+| Area | Change | Reason |
+|---|---|---|
+| `phase3` (new) | Sub-splits of the never-scored DigiFace train identities (p3_train/val/cal/test = 50/10/15/25 %, salt `veilx-p3`), seed 20261027, v2 ordering default with v1 comparison, confirmatory set p3_test, follow-up sets, Holm families, visibility-estimator grid/epochs/patience | Pre-registration before any Phase 3 training (D-046); a genuinely untouched confirmatory test set |
+
+The full design is in `docs/phase3_protocol.md`. All Phase 2 constants are unchanged.
+
 ## v0.4.0 — 2026-10-27 (Phase 2: dataset expansion, bounded evaluation design)
 
 Status: **provisional** (protocol-level). No constant changed status. No test result existed
