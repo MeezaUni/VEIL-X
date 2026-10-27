@@ -1,0 +1,74 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "paired_difference_coverage",
+  "params": {
+    "g_per_id": 3,
+    "imp_per_id": 3,
+    "mu_g": 3.0,
+    "mu_i": 0.0,
+    "reps": 1000,
+    "shift": -0.1,
+    "sig_b": 0.3,
+    "sig_eta": 0.4,
+    "sig_u": 0.8,
+    "sig_v": 0.5,
+    "t_fmr": 2.6,
+    "t_fnmr": 1.0
+  },
+  "results": {
+    "identities_2000": {
+      "fmr:jackknife_t": {
+        "coverage": 0.997,
+        "mc_se": 0.0017294507798720387,
+        "mean_width_pp": 0.8046109281757654
+      },
+      "fmr:naive_pair": {
+        "coverage": 0.941,
+        "mc_se": 0.007451107300260817,
+        "mean_width_pp": 0.5620718661330018
+      },
+      "fnmr:jackknife_t": {
+        "coverage": 0.946,
+        "mc_se": 0.0071473071852271785,
+        "mean_width_pp": 1.112657693175788
+      },
+      "fnmr:naive_pair": {
+        "coverage": 0.93,
+        "mc_se": 0.008068457101577721,
+        "mean_width_pp": 1.0576712928512815
+      }
+    },
+    "identities_500": {
+      "fmr:jackknife_t": {
+        "coverage": 0.996,
+        "mc_se": 0.0019959959919799443,
+        "mean_width_pp": 1.606227255001819
+      },
+      "fmr:naive_pair": {
+        "coverage": 0.931,
+        "mc_se": 0.008014923580421711,
+        "mean_width_pp": 1.117517630427573
+      },
+      "fnmr:jackknife_t": {
+        "coverage": 0.942,
+        "mc_se": 0.007391616873188169,
+        "mean_width_pp": 2.2270919974801813
+      },
+      "fnmr:naive_pair": {
+        "coverage": 0.931,
+        "mc_se": 0.008014923580421711,
+        "mean_width_pp": 2.116284748261699
+      }
+    },
+    "truth": {
+      "fmr": 0.0024530000000000003,
+      "fmr_a": 0.0168465,
+      "fnmr": 0.024345,
+      "fnmr_a": 0.0593295
+    }
+  },
+  "scale": "full",
+  "seed": 1111,
+  "sim_version": "1.0.0"
+}

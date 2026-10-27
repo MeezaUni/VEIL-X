@@ -153,6 +153,22 @@ records:
     source: "scripts/capacity_report.py"
     artefact: "reports/data/capacity_v0.4.0.json"
     created: "2026-10-27"
+  - id: SIM-011
+    type: synthetic_simulation
+    title: "Coverage of paired-difference intervals (clean margin)"
+    statement: "Simulated (1,000 reps): the paired delete-one-identity jackknife covers FNMR differences at 0.942 (500 identities) and 0.946 (2,000), conservative for FMR differences (0.996-0.997); a naive pair-level interval undercovers (0.930-0.941)."
+    source: "scripts/run_simulations.py --only paired_difference_coverage"
+    artefact: "reports/simulations/paired_difference_coverage.json"
+    created: "2026-10-27"
+    caveats: "Gaussian score model; the 500-identity FNMR result is marginal given Monte-Carlo error."
+  - id: SIM-012
+    type: synthetic_simulation
+    title: "Validity of the adaptive LTT ordering procedure (D-042)"
+    statement: "Simulated (1,000 reps, delta 0.10): violation rates of v1, v2, v1-else-v2 and max-coverage selection are 0.000-0.012, far below delta and the union bound 2*delta; v2 certifies more often than v1 at n=300 (0.867 vs 0.792)."
+    source: "scripts/run_simulations.py --only adaptive_ordering_validity"
+    artefact: "reports/simulations/adaptive_ordering_validity.json"
+    created: "2026-10-27"
+    caveats: "Synthetic score model; does not prove the bound for real score distributions."
   # ------------------------------------------------------------------ measured (Phase 2)
   - id: RES-001
     type: real_measured_model_result

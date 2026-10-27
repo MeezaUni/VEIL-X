@@ -775,7 +775,190 @@ def interval_method_comparison(scale: Scale = "full", seed: int = 1010) -> dict[
     return _wrap("interval_method_comparison", scale, seed, params, out)
 
 
+def _paired_scores(
+    rng: np.random.Generator, g_ids: int, g_per_id: int, imp_per_id: int, p: dict[str, float]
+) -> tuple[
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.int64],
+    NDArray[np.int64],
+    NDArray[np.int64],
+]:
+    """Two systems scored on the SAME identity-clustered pairs.
+
+    System A: genuine s = mu_g + u_i + e, impostor s = mu_i + v_i + v_k + e. System B adds a
+    shift, a B-specific identity effect and pair noise: s_B = s_A + shift + b_(ids) + eta. The
+    two systems are therefore strongly but not perfectly correlated, as two backbones (or a
+    backbone with and without a module) scored on one test set would be.
+    """
+    u = rng.normal(0, p["sig_u"], g_ids)
+    v = rng.normal(0, p["sig_v"], g_ids)
+    b = rng.normal(0, p["sig_b"], g_ids)
+    gid = np.repeat(np.arange(g_ids), g_per_id)
+    ia = np.repeat(np.arange(g_ids), imp_per_id)
+    ib = (ia + rng.integers(1, g_ids, ia.size)) % g_ids
+    sg = p["mu_g"] + u[gid] + rng.normal(0, 1, gid.size)
+    si = p["mu_i"] + v[ia] + v[ib] + rng.normal(0, 1, ia.size)
+    s_a = np.concatenate([sg, si])
+    id_a = np.concatenate([gid, ia])
+    id_b = np.concatenate([gid, ib])
+    bb = np.where(id_a == id_b, b[id_a], 0.5 * (b[id_a] + b[id_b]))
+    s_b = s_a + p["shift"] + bb + rng.normal(0, p["sig_eta"], s_a.size)
+    lab = np.concatenate([np.ones(gid.size, np.int64), np.zeros(ia.size, np.int64)])
+    return s_a, s_b, lab, id_a, id_b
+
+
+def paired_difference_coverage(scale: Scale = "full", seed: int = 1111) -> dict[str, Any]:
+    """SIM-011: coverage of 95 % intervals for PAIRED differences of error rates between two
+    correlated systems on one identity-clustered test set (the clean non-inferiority margin).
+
+    Statistics: delta FNMR (genuine pairs) and delta FMR (impostor pairs) at fixed thresholds.
+    Methods: delete-one-identity jackknife on the per-pair difference (t, linear scale) - the
+    method proposed for the margin test - and a naive pair-level normal interval (reference).
+    Truth: Monte Carlo with 2 M pairs per class.
+    """
+    reps = 1000 if scale == "full" else 80
+    sizes = [500, 2000] if scale == "full" else [300]
+    params = {
+        "mu_g": 3.0,
+        "mu_i": 0.0,
+        "sig_u": 0.8,
+        "sig_v": 0.5,
+        "sig_b": 0.3,
+        "sig_eta": 0.4,
+        "shift": -0.1,
+    }
+    g_per_id, imp_per_id = 3, 3
+    t_fnmr = params["mu_g"] - 2.0  # FNMR around 3 %
+    t_fmr = 2.6  # FMR around 1 %
+    big = make_rng(seed, "truth")
+    sa, sb, lab, _, _ = _paired_scores(big, 400_000, 5, 5, params)
+    g = lab == 1
+    truth = {
+        "fnmr": float(np.mean(sb[g] < t_fnmr) - np.mean(sa[g] < t_fnmr)),
+        "fmr": float(np.mean(sb[~g] >= t_fmr) - np.mean(sa[~g] >= t_fmr)),
+        "fnmr_a": float(np.mean(sa[g] < t_fnmr)),
+        "fmr_a": float(np.mean(sa[~g] >= t_fmr)),
+    }
+    out: dict[str, Any] = {"truth": truth}
+    for g_ids in sizes:
+        hits = {(s, m): 0 for s in ("fnmr", "fmr") for m in ("jackknife_t", "naive_pair")}
+        widths: dict[tuple[str, str], list[float]] = {k: [] for k in hits}
+        for rep in range(reps):
+            rng = make_rng(seed, "rep", g_ids, rep)
+            sa, sb, lab, id_a, id_b = _paired_scores(rng, g_ids, g_per_id, imp_per_id, params)
+            gm = lab == 1
+            for stat, m, ea, eb in (
+                ("fnmr", gm, sa < t_fnmr, sb < t_fnmr),
+                ("fmr", ~gm, sa >= t_fmr, sb >= t_fmr),
+            ):
+                d = (eb.astype(np.float64) - ea.astype(np.float64))[m]
+                j = jackknife_interval(d, np.ones(d.size), id_a[m], id_b[m], scale="linear")
+                se = float(np.std(d, ddof=1) / math.sqrt(d.size))
+                for meth, lo, hi in (
+                    ("jackknife_t", j.ci_low, j.ci_high),
+                    ("naive_pair", d.mean() - 1.96 * se, d.mean() + 1.96 * se),
+                ):
+                    hits[(stat, meth)] += int(lo <= truth[stat] <= hi)
+                    widths[(stat, meth)].append(hi - lo)
+        out[f"identities_{g_ids}"] = {
+            f"{s}:{m}": {
+                "coverage": hits[(s, m)] / reps,
+                "mc_se": _mc_se(hits[(s, m)] / reps, reps),
+                "mean_width_pp": 100 * float(np.mean(widths[(s, m)])),
+            }
+            for s, m in hits
+        }
+    return _wrap(
+        "paired_difference_coverage",
+        scale,
+        seed,
+        params
+        | {
+            "g_per_id": g_per_id,
+            "imp_per_id": imp_per_id,
+            "reps": reps,
+            "t_fnmr": t_fnmr,
+            "t_fmr": t_fmr,
+        },
+        out,
+    )
+
+
+def adaptive_ordering_validity(scale: Scale = "full", seed: int = 1212) -> dict[str, Any]:
+    """SIM-012: validity of the procedure actually used in Phase 2 - fit LTT with the
+    pre-registered order (v1) and the p-value order (v2) on the SAME calibration set, then report
+    (a) v2 alone, (b) v1 if feasible else v2, (c) whichever certifies more coverage. The
+    violation rate (true class-conditional risk of the reported rule > target) is compared with
+    delta and with the union bound 2 * delta.
+    """
+    from veilx.selective.ltt import order_candidates_by_validation_pvalue
+
+    reps = 1000 if scale == "full" else 120
+    model, target, delta = BASE, 0.05, 0.1
+    rules = symmetric_rules(2.0, [round(0.1 * k, 1) for k in range(26)])
+    truth = {r: rule_truth(model, r).class_conditional_risk for r in rules}
+    out: dict[str, Any] = {}
+    for n_cal in (300, 1000):
+        viol = dict.fromkeys(("v1", "v2", "v1_else_v2", "max_coverage"), 0)
+        feas = dict.fromkeys(viol, 0)
+        for rep in range(reps):
+            rng = make_rng(seed, "e12", n_cal, rep)
+            val, cal = sample_pairs(model, 2000, rng), sample_pairs(model, n_cal, rng)
+            o1 = order_candidates_on_validation(
+                rules, val.scores, val.labels, n_cal_expected=n_cal, target=target, delta=delta
+            )
+            o2 = order_candidates_by_validation_pvalue(
+                rules,
+                val.scores,
+                val.labels,
+                n_cal_expected=n_cal,
+                target_fm=target,
+                target_fnm=target,
+                delta=delta,
+            )
+            res = {}
+            for name, order in (("v1", o1), ("v2", o2)):
+                if order:
+                    r = LTTCalibrator(order, target_fm=target, delta=delta).fit(
+                        cal.scores, cal.labels, pair_set=sim_pair_set(cal)
+                    )
+                    res[name] = (
+                        r.rule,
+                        max((c.coverage for c in r.candidates if c.rule == r.rule), default=0.0),
+                    )
+                else:
+                    res[name] = (None, 0.0)
+            picks = {
+                "v1": res["v1"][0],
+                "v2": res["v2"][0],
+                "v1_else_v2": res["v1"][0] if res["v1"][0] is not None else res["v2"][0],
+                "max_coverage": max((res["v1"], res["v2"]), key=lambda t: t[1])[0],
+            }
+            for k, rule in picks.items():
+                if rule is not None:
+                    feas[k] += 1
+                    viol[k] += int(truth[rule] > target)
+        out[f"n_cal_{n_cal}"] = {
+            k: {
+                "violation_rate": viol[k] / reps,
+                "mc_se": _mc_se(viol[k] / reps, reps),
+                "feasible_rate": feas[k] / reps,
+            }
+            for k in viol
+        }
+    return _wrap(
+        "adaptive_ordering_validity",
+        scale,
+        seed,
+        {"target": target, "delta": delta, "union_bound": 2 * delta, "reps": reps},
+        out,
+    )
+
+
 EXPERIMENTS: dict[str, Callable[..., dict[str, Any]]] = {
+    "paired_difference_coverage": paired_difference_coverage,
+    "adaptive_ordering_validity": adaptive_ordering_validity,
     "interval_method_comparison": interval_method_comparison,
     "bootstrap_coverage": bootstrap_coverage,
     "independence_vs_correlation": independence_vs_correlation,

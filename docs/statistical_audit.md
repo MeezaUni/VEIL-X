@@ -118,6 +118,45 @@ threshold is about ±0.11 pp (AdaFace, 1.42 % [1.31, 1.53]) and ±0.14 pp (ArcFa
   orderings: high error and few safe rules. Low-visibility pairs therefore abstain, which is
   the honest outcome at this capacity.
 
+### 3.6a Paired-difference intervals for the clean margin: SIM-011 (SIMULATED)
+
+`reports/simulations/paired_difference_coverage.json`: 1,000 replicates; two correlated systems
+on the same identity-clustered pairs (shared identity effects plus a system-specific identity
+effect and pair noise); true differences from 2 M Monte-Carlo pairs.
+
+| Statistic | Identities | Paired identity jackknife (t) | Naive pair-level normal |
+|---|---|---|---|
+| ΔFNMR | 500 | **0.942** (MC SE 0.007), width 2.23 pp | 0.931 |
+| ΔFNMR | 2,000 | **0.946** (0.007), width 1.11 pp | 0.930 |
+| ΔFMR | 500 | 0.996 (conservative), width 1.61 pp | 0.931 |
+| ΔFMR | 2,000 | 0.997 (conservative), width 0.80 pp | 0.941 |
+
+- **Verdict.** The paired delete-one-identity jackknife meets the ≥ 0.94 acceptance criterion
+  for FNMR differences, though at 500 identities only marginally: the Monte-Carlo interval
+  reaches 0.928. It is conservative for FMR differences. The naive pair-level interval
+  undercovers and must not be used.
+- **Margin testability.** Scaling the width to the real test set (20,374 identities, genuine
+  cap 3) gives a ΔFNMR half-width of about 0.18 pp, so a **0.5 pp clean margin is testable**.
+  This replaces the ESTIMATED statement of §3.4 with a SIMULATED one.
+- **Caveat.** The simulation uses a Gaussian score model, not real-score dependence.
+
+### 3.6b Multiplicity of the ordering amendment: SIM-012 (SIMULATED)
+
+`reports/simulations/adaptive_ordering_validity.json`: δ = 0.10, target 5 %, 1,000 replicates,
+calibration sizes 300 / 1,000.
+
+| Procedure | Violation rate, n = 300 / 1,000 | Feasible rate, n = 300 / 1,000 |
+|---|---|---|
+| v1 (pre-registered order) | 0.003 / 0.012 | 0.792 / 1.000 |
+| v2 (p-value order) | 0.000 / 0.000 | 0.867 / 1.000 |
+| v1 if feasible, else v2 (the Phase 2 practice) | 0.003 / 0.012 | 0.937 / 1.000 |
+| whichever certifies more coverage | 0.003 / 0.012 | 0.937 / 1.000 |
+
+All procedures stay far below δ, and the adaptive choices far below the union bound 2δ. The
+union-bound statement used for the v2 arms (δ ≤ 0.10) is therefore **conservative** in this
+model. It is kept, because a simulation does not prove the bound for the real score
+distribution. The finding supports adopting v2 as the pre-registered default for Phase 3.
+
 ### 3.7 Evidence labels used in Phase 2 documents
 
 | Label | Examples |

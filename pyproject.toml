@@ -71,7 +71,7 @@ warn_unused_configs = true
 
 [[tool.mypy.overrides]]
 # Optional at runtime (seeded only if installed); not a Phase 0 dependency.
-module = ["torch", "safetensors.*"]
+module = ["torch", "safetensors.*", "cv2", "onnxruntime"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

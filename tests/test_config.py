@@ -237,7 +237,7 @@ def test_test_only_dataset_cannot_be_used_for_calibration(registry_dict: dict[st
 
 def test_blocked_dataset_cannot_have_roles(registry_dict: dict[str, Any]) -> None:
     d = {**registry_dict, "datasets": [dict(e) for e in registry_dict["datasets"]]}
-    kag = next(e for e in d["datasets"] if e["id"].startswith("kaggle"))
+    kag = next(e for e in d["datasets"] if e["id"] == "kaggle_trainingdatapro_human_face_images")
     kag["roles"] = ["visibility_training"]
     with pytest.raises(ValueError, match="blocked"):
         DatasetRegistry.model_validate(d)

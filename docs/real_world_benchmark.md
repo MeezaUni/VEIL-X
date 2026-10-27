@@ -1,9 +1,44 @@
 # Real-World Benchmark Status (Phase 2)
 
-> Checked 2026-10-26/27. Labels: **MEASURED** (observed by a command in this project), **REPORTED**
-> (stated by a third party, not verified here). No real-world image was downloaded in Phase 2.
+> Labels: **MEASURED** (observed by a command in this project), **REPORTED** (stated by a
+> third party, not verified here).
+>
+> **Update 2026-10-27 (D-043).** LFW was acquired after the project owner reported
+> their professor's academic approval. §0 records the authorisation, provenance and
+> verification; results are in §7. §§1–6 below are the original blocked-status record, kept
+> for traceability.
 
-## 1. Summary
+## 0. Acquisition under user-reported academic authorisation (D-043)
+
+| Item | Record |
+|---|---|
+| Authorisation | The project owner reports that their college professor approved using the Kaggle LFW dataset for this academic project. It is recorded as **user-reported academic authorisation**: it is **not** a licence from the LFW authors or the Kaggle uploader, and the uploader's redistribution rights remain unestablished (§2 facts unchanged) |
+| Remaining restrictions found | No specific prohibition was found. The LFW creators state the dataset is for research, not for vetting commercial systems; the Kaggle licence field ("Other") contains no terms. Use: non-commercial academic evaluation; images, identity names, manifests and embeddings stay private; only aggregate metrics are published |
+| Source | `kaggle datasets download jessicali9530/lfw-dataset` (Kaggle CLI 2.2.5, authenticated with the user's own token, which is not stored in the repository), dataset **version 4** (last updated 2018-05-17) |
+| Archive | `lfw-dataset.zip`, 117,895,655 B, SHA-256 `fff0f15b1f848f0d834f8df58ca2e3273bda21e37bd9a895acf66de60521ba10` |
+| Integrity (MEASURED) | 13,243 members, CRC-32 OK, 0 rejected (name pattern, traversal, type, size, ratio). Uncompressed 117,149,434 B, equal to Kaggle's recorded `totalBytes` |
+| Content (MEASURED) | **13,233** JPEGs, all 250×250 RGB, decode OK; **5,749** identities; 0 exact pixel duplicates; deep-funneled variant |
+| Official View 2 (MEASURED) | `pairs.csv`: **6,000** pairs = 10 folds × (300 matched + 300 mismatched); 4,281 identities, 7,701 images; every referenced image present. Used **unmodified** |
+| View 1 (MEASURED) | DevTrain 2,200 pairs (1,100 matched), DevTest 1,000 (500 matched). **1,689 DevTrain identities also appear in View 2** (LFW's views share images), so anything set on DevTrain is flagged |
+| Private outputs | `<data_root>/raw/lfw_kaggle_v4/`, `extracted/lfw_kaggle_v4/`, `manifests/lfw/` (images, pairs, detections, plan), embeddings |
+| Public outputs | `reports/data/lfw_kaggle_v4_summary.json` (aggregates only), `reports/experiments/lfw_*.json` |
+
+**Training-data overlap with LFW (investigated; not verifiable locally).** Both backbones are
+trained on WebFace4M, a subset of WebFace260M.
+- WebFace260M's celebrity name list is partly borrowed from MS1M (Zhu et al., CVPR 2021).
+- Its authors report removing subjects whose feature centres are too similar to those of LFW-family
+  benchmarks. Residual overlap therefore cannot be excluded and is not measurable here: the
+  WebFace identity list is not available locally.
+- For the related MS1MV2 training set, Wu et al. (2024, arXiv:2405.09403) found **2,009 LFW
+  identities (46.9 %)** and **384 LFW images (5 %)** with a (near-)duplicate in the training set.
+  They also showed that identity overlap inflates LFW-family accuracy.
+
+**Consequence:** clean LFW accuracy of these backbones is likely **optimistic** and near
+saturation. It says little about generalisation to unseen people. Relative comparisons
+(clean vs derived occlusion, detector vs fixed crop, rule transfer) are less affected than
+absolute accuracy, but are not immune.
+
+## 1. Summary (original blocked-status record, 2026-10-26)
 
 | Item | Status |
 |---|---|

@@ -1,0 +1,80 @@
+{
+  "evidence_type": "real_measured_model_result",
+  "scope": "SCRFD detection/alignment on Kaggle LFW v4 (deep-funneled); aggregate only",
+  "detector": {
+    "weights": "InsightFace buffalo_l v0.7 det_10g.onnx",
+    "sha256": "5838f7fe053675b1c7a08b633df49e7af5495cee0493c7dcf6697200b85b5b91",
+    "input": "640x640",
+    "det_thresh": 0.5,
+    "nms_thresh": 0.4,
+    "provider": "onnxruntime CPUExecutionProvider",
+    "selection": "detection nearest the image centre"
+  },
+  "n_images": 13233,
+  "detected": 13195,
+  "failures_no_face": 38,
+  "view2_images_failed": 25,
+  "view2_pairs_with_a_failed_side": 42,
+  "multi_face_images": 2320,
+  "faces_per_image_histogram": {
+    "0": 38,
+    "1": 10875,
+    "2": 1831,
+    "3": 380,
+    "4": 80,
+    "5": 19,
+    "6": 4,
+    "7": 5,
+    "9": 1
+  },
+  "chosen_not_top_score": 157,
+  "score_quantiles": [
+    0.7122,
+    0.7743,
+    0.8416
+  ],
+  "latency_ms_cpu": {
+    "p50": 812.3,
+    "p95": 1161.1,
+    "p99": 1352.4
+  },
+  "wall_seconds": 1959.6,
+  "workers": 6,
+  "fixed_transform_from": "mean landmarks of 3433 View-1 DevTrain images",
+  "provenance": {
+    "veilx_version": "0.0.1",
+    "timestamp_utc": "2026-10-27T02:13:48.136533+00:00",
+    "git": {
+      "commit": "0c567d3f561202a3e6a89651ca60ea5554fda847",
+      "dirty": true,
+      "repo_is_project_root": true
+    },
+    "python": "3.12.14",
+    "implementation": "CPython",
+    "os": "Windows",
+    "packages": {
+      "numpy": "2.5.4",
+      "pydantic": "2.14.1",
+      "PyYAML": "6.0.3",
+      "torch": "2.11.0+cu128",
+      "onnxruntime": null,
+      "insightface": null
+    },
+    "configs": {},
+    "seed": null,
+    "argv": [
+      "scripts/lfw_detect_align.py",
+      "--workers",
+      "6"
+    ],
+    "extra": {}
+  },
+  "latency_ms_cpu_contended_note": "latency_ms_cpu was measured inside the 6-process batch run while other CPU jobs ran; not representative of single-image latency",
+  "latency_ms_cpu_isolated": {
+    "p50": 92.4,
+    "p95": 102.3,
+    "p99": 111.0,
+    "n_images": 150,
+    "setting": "single process, onnxruntime CPU default threads, 640x640"
+  }
+}

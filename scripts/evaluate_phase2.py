@@ -555,6 +555,7 @@ def final(args: argparse.Namespace) -> int:
         if isinstance(prov.get("git"), dict)
         else None,
         "splits": ["test"],
+        "note": args.note,
     }
     if not rehearse:
         run_log = ROOT / PROTO.test_access.run_log
@@ -698,7 +699,7 @@ def final(args: argparse.Namespace) -> int:
     pub = (
         layout.private_reports / "phase2_rehearsal.json"
         if rehearse
-        else ROOT / "reports" / "experiments" / "phase2_final.json"
+        else ROOT / "reports" / "experiments" / (args.out or "phase2_final.json")
     )
     with pub.open("w", encoding="utf-8", newline="\n") as fh:
         json.dump(report, fh, indent=1, default=str)
@@ -740,6 +741,8 @@ def main() -> int:
     ap.add_argument("stage", choices=["develop", "final"])
     ap.add_argument("--final", action="store_true", help="required for test-split access")
     ap.add_argument("--rehearse", action="store_true", help="run the final code path on val")
+    ap.add_argument("--note", default="", help="purpose recorded in the run log")
+    ap.add_argument("--out", default="", help="output file name (reproducibility runs)")
     args = ap.parse_args()
     return develop() if args.stage == "develop" else final(args)
 

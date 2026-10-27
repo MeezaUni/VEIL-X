@@ -120,21 +120,22 @@ datasets:
   - id: kaggle_jessicali9530_lfw
     name: "Kaggle mirror: Labelled Faces in the Wild (LFW) Dataset (deep-funneled), version 4"
     url: "https://www.kaggle.com/datasets/jessicali9530/lfw-dataset"
-    licence: "Kaggle field 'Other (specified in description)'; the description specifies no licence, only acknowledgements to the LFW authors and a pointer to the original site"
-    licence_source: "Kaggle API /datasets/view/jessicali9530/lfw-dataset (metadata only, no download), checked 2026-10-27"
+    licence: "Kaggle field 'Other (specified in description)'; the description specifies no licence, only acknowledgements to the LFW authors (Huang et al. 2007; deep funneling: Huang, Mattar, Lee, Learned-Miller 2012). The creators state LFW is for research, not for vetting commercial systems."
+    licence_source: "Kaggle API /datasets/view/jessicali9530/lfw-dataset, checked 2026-10-27"
     licence_verified_on: "2026-10-27"
-    access_status: blocked
+    access_status: conditional
     conditions:
-      - "Rights of the uploader to redistribute LFW not established; provenance not verifiable against an official checksum (official host offline)"
-      - "Kaggle CLI credentials not configured on this machine (would also be required)"
+      - "User-reported academic authorisation: the project owner's professor approved use for this non-commercial academic project (D-043). Not a licence from the LFW authors or the uploader; uploader redistribution rights remain unestablished."
+      - "Private storage only; no images, identity names, manifests or embeddings committed or uploaded; only aggregate metrics published."
+      - "Official View-2 pairs (pairs.csv) used unmodified for the official protocol; LFW is never used for fitting or calibration of VEIL-X rules (View 1 DevTrain only for preprocessing geometry and in-domain thresholds, documented)."
     identity_labels: "yes"
     n_identities: 5749
     n_images: 13233
-    download_size: "117,149,434 bytes (Kaggle totalBytes)"
-    roles: [none]
+    download_size: "117,895,655 bytes zip (SHA-256 fff0f15b1f848f0d834f8df58ca2e3273bda21e37bd9a895acf66de60521ba10), downloaded 2026-10-27 with Kaggle CLI 2.2.5"
+    roles: [test_real]
     test_only: true
-    contamination_risks: ["Same as lfw"]
-    notes: "Resolved as the sole data source of the user-referenced notebook kaggle.com/code/vividharawat/vggface-on-lfw (Kaggle kernel metadata: datasetDataSources = [jessicali9530/lfw-dataset]). Files: lfw-deepfunneled.zip, pairs.csv, people.csv, match/mismatch DevTrain/DevTest csv, lfw_allnames.csv, lfw_readme.csv. Last updated 2018-05-17. Not downloaded."
+    contamination_risks: ["Celebrity identities likely overlap with WebFace4M (backbone training data); see docs/real_world_benchmark.md", "LFW is near-saturated for modern backbones"]
+    notes: "Resolved as the sole data source of kaggle.com/code/vividharawat/vggface-on-lfw. Files: lfw-deepfunneled (13,233 jpg, 5,749 identities), pairs.csv (View 2, 10 folds x 300+300), people.csv, View-1 Dev{Train,Test} lists, lfw_allnames.csv, lfw_readme.csv."
 
   - id: celeba
     name: "CelebA"

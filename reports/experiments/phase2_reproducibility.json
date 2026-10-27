@@ -1,0 +1,42 @@
+{
+  "evidence_type": "real_measured_model_result",
+  "scope": "reproducibility audit of the Phase 2 DigiFace final run (same frozen config, same embeddings)",
+  "original_run_id": "38d853d8884c",
+  "reproduction_run_id": "0ca832e3b3b3",
+  "frozen_config_sha256": "0e8a43fb7234a52388d017308249796a000b378424aaec11a8875bf5d90fa8a1",
+  "results_body_sha256_original": "d7391dc23485dd75c4aa2a0b8423d4764d16317752a4d73daf2388fb6a6f118b",
+  "results_body_sha256_reproduction": "d7391dc23485dd75c4aa2a0b8423d4764d16317752a4d73daf2388fb6a6f118b",
+  "identical": true,
+  "n_differing_fields": 0,
+  "note": "Second logged test access, purpose recorded in results/test_runs.jsonl; no parameter changed.",
+  "provenance": {
+    "veilx_version": "0.0.1",
+    "timestamp_utc": "2026-10-27T02:24:03.859804+00:00",
+    "git": {
+      "commit": "0c567d3f561202a3e6a89651ca60ea5554fda847",
+      "dirty": true,
+      "repo_is_project_root": true
+    },
+    "python": "3.12.14",
+    "implementation": "CPython",
+    "os": "Windows",
+    "packages": {
+      "numpy": "2.5.4",
+      "pydantic": "2.14.1",
+      "PyYAML": "6.0.3",
+      "torch": null,
+      "onnxruntime": null,
+      "insightface": null
+    },
+    "configs": {},
+    "seed": null,
+    "argv": [
+      "scripts/evaluate_phase2.py",
+      "final",
+      "--final",
+      "--note",
+      "reproducibility audit"
+    ],
+    "extra": {}
+  }
+}

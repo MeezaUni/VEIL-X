@@ -1,0 +1,60 @@
+{
+  "disclaimer": "SIMULATED: synthetic scores from veilx.sim.model.ScoreModel. Characterises statistical procedures only; NOT evidence of face-recognition performance.",
+  "evidence_type": "synthetic_simulation",
+  "experiment": "adaptive_ordering_validity",
+  "params": {
+    "delta": 0.1,
+    "reps": 1000,
+    "target": 0.05,
+    "union_bound": 0.2
+  },
+  "results": {
+    "n_cal_1000": {
+      "max_coverage": {
+        "feasible_rate": 1.0,
+        "mc_se": 0.003443254274665175,
+        "violation_rate": 0.012
+      },
+      "v1": {
+        "feasible_rate": 1.0,
+        "mc_se": 0.003443254274665175,
+        "violation_rate": 0.012
+      },
+      "v1_else_v2": {
+        "feasible_rate": 1.0,
+        "mc_se": 0.003443254274665175,
+        "violation_rate": 0.012
+      },
+      "v2": {
+        "feasible_rate": 1.0,
+        "mc_se": 3.162277660168379e-08,
+        "violation_rate": 0.0
+      }
+    },
+    "n_cal_300": {
+      "max_coverage": {
+        "feasible_rate": 0.937,
+        "mc_se": 0.001729450779872038,
+        "violation_rate": 0.003
+      },
+      "v1": {
+        "feasible_rate": 0.792,
+        "mc_se": 0.001729450779872038,
+        "violation_rate": 0.003
+      },
+      "v1_else_v2": {
+        "feasible_rate": 0.937,
+        "mc_se": 0.001729450779872038,
+        "violation_rate": 0.003
+      },
+      "v2": {
+        "feasible_rate": 0.867,
+        "mc_se": 3.162277660168379e-08,
+        "violation_rate": 0.0
+      }
+    }
+  },
+  "scale": "full",
+  "seed": 1212,
+  "sim_version": "1.0.0"
+}
