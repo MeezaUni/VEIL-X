@@ -139,6 +139,153 @@ Planned LFW preprocessing (not executed): the deep-funneled images are 250×250 
 
 ## 6. Consequence for Phase 2 claims
 
-All Phase 2 measurements come from DigiFace-1M, a **synthetic** dataset, with **synthetic**
-occlusions. No statement about real-world robustness is made. The real-world gap is listed as an
-open limitation in `docs/statistical_audit.md`.
+*(Original 2026-10-26 text, superseded by §7.)* All Phase 2 measurements came from DigiFace-1M,
+a **synthetic** dataset, with **synthetic** occlusions.
+
+## 7. LFW results (MEASURED; single logged run `79331a84f520`, commit `46e55b8`)
+
+Source: `reports/experiments/lfw_final.json`. Design: D-044, fixed before any LFW score. Thresholds and LTT
+rules come from the frozen DigiFace configuration `0e8a43fb…`; nothing was fitted on View 2. The full code
+path was rehearsed on View-1 DevTest first; the rehearsal caught one bug (TAR@FAR with too few impostors),
+fixed before the logged run. Intervals: identity-jackknife 95 %; Clopper–Pearson upper bounds where a rate
+has zero events (pairs treated as independent, flagged).
+
+### 7.1 Detection and alignment (SCRFD det_10g, CPU)
+
+- **Detection.** 13,195 / 13,233 images (99.71 %) have a face. The 38 failures touch 25 View-2 images and
+  42 of 6,000 pairs.
+- **Multiple faces.** 17.5 % of images contain several faces; the centre-nearest face differed from the
+  top-scoring one in 157 cases.
+- **Isolated CPU latency:** p50 / p95 / p99 = 92 / 102 / 111 ms per image.
+- **Alignment check.** The aligned mean face matches the ArcFace template (visual check, private).
+- Figure: `reports/figures/lfw_detection_outcomes.svg`.
+
+### 7.2 Clean LFW, official protocol (View 2, 10-fold, fold-internal thresholds)
+
+| Preprocessing | AdaFace IR-101 accuracy | ArcFace IR-101 accuracy | AUC (Ada / Arc) | EER (Ada / Arc) | TAR@FAR 1 % (benchmark mode) |
+|---|---|---|---|---|---|
+| Detector, all 6,000 pairs (42 failures = forced non-match) | **99.58 % ± 0.26** | **99.57 % ± 0.24** | 0.9942 / 0.9946 | 0.77 % / 0.77 % | 99.23 % / 99.23 % |
+| Detector, 42 failed pairs excluded (n = 5,958) | 99.83 % ± 0.21 | 99.82 % ± 0.20 | 0.9991 / 0.9996 | 0.30 % / 0.30 % | 99.73 % / 99.73 % |
+| Fixed crop from View-1 DevTrain landmarks, no detector | 99.28 % ± 0.25 | 99.27 % ± 0.26 | 0.9976 / 0.9967 | 0.93 % / 1.07 % | 99.07 % / 98.93 % |
+
+- **Detection failures.** They cost about 0.25 pp of official accuracy when counted as errors.
+- **Detector-free alignment.** It costs a further 0.3 pp.
+- **Fixed-crop geometry.** It comes from development landmarks, so the fixed-crop path still uses the
+  detector indirectly, once.
+- **Interpretation.** The figures are likely **optimistic** given probable identity overlap with
+  WebFace4M (§0).
+
+### 7.3 Transfer of DigiFace-fixed operating points to real photos (no LFW fitting)
+
+At the threshold fixed on DigiFace calibration for FAR 1 % (cal_far_1pct):
+
+| | AdaFace | ArcFace |
+|---|---|---|
+| FMR on 3,000 LFW impostors | **0 / 3,000** (≤ 0.10 %, Clopper–Pearson) | **0 / 3,000** (≤ 0.10 %) |
+| FNMR (all pairs; failures = non-match) | 0.93 % [0.61, 1.43] | 1.00 % [0.66, 1.52] |
+| FNMR (failed pairs excluded) | 0.44 % [0.24, 0.80] | 0.50 % [0.28, 0.91] |
+
+- **The synthetic-calibrated threshold does not transfer nominally.** It is **conservative** on real
+  photographs: realised FMR is far below the 1 % it was set for. DigiFace impostors (similar renders
+  of synthetic people) are harder than LFW's real impostors.
+- **In-domain comparison.** The View-1 DevTrain EER threshold gives FMR 0.27 % (Ada) / 0.57 % (Arc) with
+  FNMR 0.80 % / 0.77 %. DevTrain shares identities with View 2, which is flagged.
+- **Clean-calibrated LTT rules** (DigiFace, all four target/ordering settings) stay within target on
+  clean LFW, with coverage ≥ 0.99. Their guarantee is not claimed (A1 violated); this is an empirical
+  transfer check only.
+
+### 7.4 Derived synthetic occlusion on LFW (not official LFW; not physical occlusion)
+
+Every one of the 5,958 detected View-2 pairs × 5 families × 3 levels × {side b, both sides} gives 312,795
+renders. FNMR is measured at the DigiFace cal_far_1pct threshold, pooled over levels and modes:
+
+| Family | AdaFace AUC / FNMR | ArcFace AUC / FNMR | DigiFace Test-OOD FNMR (Ada / Arc), same threshold | LFW FNMR, high severity, both sides (Ada / Arc) |
+|---|---|---|---|---|
+| F1 mask | 0.9984 / 2.9 % | 0.9982 / 3.7 % | 10.8 % / 14.5 % | 2.6 % / 2.9 % |
+| F2 sunglasses | 0.9992 / 1.1 % | 0.9994 / 0.9 % | 7.6 % / 9.8 % | 1.2 % / 1.0 % |
+| F3 hand / object | 0.9988 / 4.3 % | 0.9989 / 4.0 % | 10.1 % / 12.9 % | 13.7 % / 13.3 % |
+| F4 random patch | 0.9952 / **16.6 %** | 0.9940 / **16.6 %** | 21.6 % / 25.1 % | **48.0 % / 48.7 %** |
+| F5 extreme lighting (non-physical) | 0.9985 / 4.2 % | 0.9945 / 7.7 % | 6.8 % / 9.8 % | 12.2 % / 21.0 % |
+
+- **Same ordering of difficulty as DigiFace.** Random patch is the hardest family and severity is
+  monotone.
+- **Lower absolute degradation on real photos.** This is partly the conservative synthetic threshold and
+  partly real faces carrying more identity information.
+- Figures: `lfw_vs_digiface_occlusion_fnmr.svg`, `lfw_derived_occlusion_heatmap.svg`. The DigiFace mixture
+  (25 % clean–clean, cross-family pairs) differs from the LFW design (single family, one or both sides),
+  so the comparison is directional, not exact.
+
+### 7.5 Risk control on real photos: frozen DigiFace rules of the fold where the family was held out
+
+Primary targets (sFMR ≤ 5 %, sFNMR ≤ 5 %):
+
+| Family | `global` sFNMR (Ada / Arc), coverage | `stratified_vis` (oracle) sFNMR, coverage | `global_v2` sFNMR | `stratified_vis_v2` sFNMR, coverage |
+|---|---|---|---|---|
+| F1 mask | 0.64 % / 0.32 %, 0.99 / 0.90 | 0.23 % / NA*, 0.83 / 0.00 | 0.81 % / 0.85 % | 0.31 % / 0.30 % |
+| F2 sunglasses | 0.34 % / 0.20 % | 0.37 % / 0.26 % | 0.38 % / 0.33 % | 0.47 % / 0.45 % |
+| F3 hand / object | 0.53 % / 0.40 % | 0.23 % / 0.28 % | 0.93 % / 0.82 % | 1.32 % / 0.99 % |
+| **F4 random patch** | **7.46 % (violated) / 5.28 % (point above)**, 0.97 / 0.96 | **0.35 % / 1.72 %**, 0.43 / 0.87 | **9.96 % / 7.46 % (both violated)** | 4.92 % / 3.25 % (within), 0.96 / 0.94 |
+| F5 lighting | 0.60 % / 2.37 % | 0.21 % / 0.60 % | 1.25 % / 3.11 % | 0.39 % / 1.15 % |
+
+\* Every LFW mask render has co-visibility below fold F1's stratum edge: 0.683 from DigiFace val,
+against an LFW median of 0.49 (the synthetic mask covers more of real crops). All F1 pairs therefore fall in the
+`vis_low` stratum. ArcFace's v1 arm certified no rule there, so it abstains on all of them.
+Correct, but uninformative.
+
+- **sFMR ≤ 0.08 % in every cell.**
+- **The Phase 2 C3 finding reproduces on real photographs.**
+  - Calibration that never saw random patches fails on them: sFNMR of 5.3–10.0 % against a 5 % target.
+  - Oracle-visibility stratification restores control at a coverage cost (0.43 / 0.87 vs 0.97 / 0.96).
+  - The v2 stratified arm also stays within target here, at coverage 0.96 / 0.94.
+- Results at sFMR ≤ 1 % show the same pattern (`lfw_final.json`).
+
+### 7.6 Mask false matches: post-hoc exploratory audit (run `e97048b9c65f`, NOT pre-registered)
+
+The pre-registered analysis could not test this. At the DigiFace threshold almost no LFW impostor is
+accepted in any condition: mask-both FMR is 0.00 % for AdaFace and ≤ 0.07 % for ArcFace.
+
+The post-hoc audit compares impostor pairs with the same occlusion on both sides against the same pairs
+clean (`reports/experiments/lfw_posthoc_mask.json`):
+
+| Occlusion (high level) | Impostor score shift, Ada / Arc (95 % CI) | FMR at DevTrain EER threshold, occluded vs clean (Ada) | (Arc) |
+|---|---|---|---|
+| F1 mask | +0.0078 [0.0045, 0.0110] / +0.0103 [0.0072, 0.0133] | 1.68 % vs 0.27 % | 2.93 % vs 0.57 % |
+| F2 sunglasses | +0.0203 / +0.0153 (CIs exclude 0) | 1.48 % vs 0.27 % | 1.51 % vs 0.57 % |
+| F4 random patch | +0.0110 / +0.0112 (CIs exclude 0) | 1.28 % vs 0.27 % | 1.31 % vs 0.57 % |
+| F3 hand / object | +0.0030 / +0.0040 | 0.30 % vs 0.27 % | 0.77 % vs 0.57 % |
+| F5 lighting | +0.0014 (CI includes 0) / +0.0044 | 0.30 % vs 0.27 % | 1.51 % vs 0.57 % |
+
+- **Masks raise false matches on real photographs too.** This replicates the DigiFace finding
+  qualitatively.
+- **The effect is not mask-specific.** Identical sunglasses or patches on both faces also raise impostor
+  similarity. The mechanism is the shared occluder content.
+- **Caveats.** Post-hoc, at an in-domain threshold with identity overlap (§0), one replication. It needs
+  pre-registration in Phase 3.
+
+### 7.7 C1 on real photos (fit-free, exploratory)
+
+Among derived-occluded pairs, errors at the DigiFace threshold are ranked as follows:
+
+| Signal | AdaFace AUROC | ArcFace AUROC |
+|---|---|---|
+| Low feature norm (quality) | 0.70–0.92 | 0.52–0.90 |
+| Low oracle co-visibility | 0.56–0.83 | 0.55–0.82 |
+| Co-visibility within quality deciles | 0.46–0.63 | 0.51–0.74 |
+
+- Within quality deciles, co-visibility is highest for hand/object and random patch; it is absent for
+  lighting with AdaFace.
+- This is consistent with DigiFace: quality dominates, and co-visibility adds a residual,
+  family-dependent signal.
+
+### 7.8 Limitations of the real-world evaluation
+
+1. **Identity overlap.** Probable overlap with WebFace4M makes clean accuracy optimistic (§0).
+2. **Synthetic occluders.** The occlusions are synthetic overlays on real photographs. They are not
+   physical occlusions (no 3-D geometry, shadows, or occluder-induced detection or alignment failure),
+   and they were applied after alignment.
+3. **No detector re-run on occluded images.** Detector-inclusive occlusion results would need the
+   detector to run on occluded photographs. This was not done.
+4. **Size of LFW.** 3,000 impostors support FAR 1 % but not 0.1 %. The 6,000 pairs reuse identities;
+   intervals are identity-clustered.
+5. **Licensing.** LFW was used under user-reported academic authorisation (D-043), not a dataset-owner
+   licence.

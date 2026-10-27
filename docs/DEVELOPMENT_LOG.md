@@ -6,6 +6,50 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-10-27 — Phase 2 (milestone 3): real-photo evaluation on LFW and Phase C audit
+
+### Acquisition (D-043)
+- The project owner reported their professor's approval. It is recorded as academic
+  authorisation, not a dataset-owner licence.
+- The Kaggle CLI was authenticated with the user's own token. The token is never printed or
+  committed and stays in the user profile at the user's discretion.
+- Download: `jessicali9530/lfw-dataset` v4, SHA-256 `fff0f15b…`, CRC OK.
+- Contents: 13,233 images / 5,749 identities, 0 duplicates; official View 2 parsed unmodified.
+
+### Detection and alignment
+- SCRFD det_10g (InsightFace buffalo_l v0.7, hash-pinned) on CPU. onnxruntime-gpu 1.31 needs
+  CUDA 13; the torch stack is CUDA 12.8.
+- 13,195 / 13,233 images detected; 42 View-2 pairs have an undetected image.
+- Umeyama 5-point alignment, verified visually on a private contact sheet that was then
+  deleted. Detector-free fixed crop taken from View-1 DevTrain mean landmarks.
+
+### Embedding
+- The first LFW occlusion run was **stopped by Claude Code under memory pressure** while
+  writing one giant shard. Fix: atomic 16,384-item part shards with per-part visibility.
+- Verified by a memory-monitored pilot: peak 1.6 GB; a simulated crash recomputed only the
+  missing part; the plan hash was unchanged.
+- Restarted on the user's instruction: 312,795 renders × 2 backbones, ≥ 5.8 GB free throughout.
+- The new monitor script crashed on a process-exit race after the work had finished (fixed).
+
+### Evaluation (D-044)
+- Rehearsal on View-1 DevTest caught a TAR@FAR insufficiency crash; fixed before the run.
+- Single logged View-2 run `79331a84f520`.
+- Official accuracy: 99.58 / 99.57 % (detector, all pairs), 99.83 / 99.82 % (failed pairs
+  excluded), 99.28 / 99.27 % (fixed crop).
+- The DigiFace FAR-1 % threshold accepts 0 / 3,000 real impostors (conservative transfer).
+- Derived random patch reproduces the held-out-family LTT failure; oracle-visibility
+  stratification restores control.
+- Post-hoc mask audit `e97048b9c65f` (labelled): shared occluders raise false matches; the
+  effect is not mask-specific.
+
+### Phase C audit
+- DigiFace final reproduced bit-identically (`0ca832e3b3b3`).
+- SIM-011: paired jackknife valid for the clean margin.
+- SIM-012: union bound conservative.
+- Training-overlap investigation documented.
+
+---
+
 ## 2026-10-27 — Phase 2 (milestone 2): extraction, develop freeze, single test run, results
 
 ### Extraction

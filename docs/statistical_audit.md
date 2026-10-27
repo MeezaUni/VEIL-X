@@ -157,6 +157,24 @@ union-bound statement used for the v2 arms (δ ≤ 0.10) is therefore **conserva
 model. It is kept, because a simulation does not prove the bound for the real score
 distribution. The finding supports adopting v2 as the pre-registered default for Phase 3.
 
+### 3.6c Phase C audit: do the Phase 2 findings hold up? (2026-10-27)
+
+| Finding (Phase 2, DigiFace) | Audit | Verdict |
+|---|---|---|
+| Reproducibility of the final run | Logged rerun `0ca832e3b3b3` with the identical freeze: 0 differing result fields (RES-007) | **Reproduced exactly** |
+| Held-out **random patch** breaks risk control | LFW real photographs with derived random patches, scored with the DigiFace rules of the random-patch-held-out fold: global sFNMR 7.46 % (Ada, CI above 5 %) and 5.28 % (Arc, point above); v2 9.96 % / 7.46 % (both CI above) (RES-010) | **Reproduced on real photos** (synthetic overlays) |
+| Oracle-visibility stratification restores control at a coverage cost | LFW random patch: v1 stratified 0.35 % / 1.72 % at coverage 0.43 / 0.87 (vs 0.97 / 0.96 global); v2 stratified 4.92 % / 3.25 % at 0.96 / 0.94 | **Reproduced**; v2 strata are within target on LFW (on DigiFace they reduced but did not remove the violation) |
+| **Mask**-specific false-match increase | Pre-registered LFW test is uninformative: the DigiFace threshold is conservative on LFW, so FMR is ≈ 0 everywhere. **Post-hoc**, at the in-domain DevTrain threshold, FMR rises 0.27 → 1.68 % (Ada) and 0.57 → 2.93 % (Arc) for both-masked impostors, but also for sunglasses (1.48 / 1.51 %) and random patch (1.28 / 1.31 %) (RES-011) | **Partly reproduced.** The shared-occluder FM increase replicates; its mask *specificity* does not. Post-hoc, so it needs pre-registration |
+| Quality ranks errors better than co-visibility; co-visibility adds a residual signal | LFW (exploratory): quality AUROC 0.52–0.92, co-visibility 0.55–0.83, co-visibility within quality deciles 0.46–0.74 | **Reproduced qualitatively**; the residual is family-dependent (strongest for hand/object and random patch) |
+| Calibration ordering v2 and its multiplicity statement | SIM-012: the adaptive v1→v2 procedure violates at ≤ 0.012 ≪ δ = 0.10; v2 never violated. On LFW, v2 global violates exactly where v1 does (random patch) | **Union bound conservative.** v2 is not a substitute for stratification under family shift |
+| Paired CI for the clean margin | SIM-011: paired identity jackknife covers ΔFNMR at 0.942 / 0.946, conservative for ΔFMR | **Testable** at the real test size (≈ 0.18 pp half-width) |
+| Synthetic-calibrated thresholds | LFW: the DigiFace FAR-1 % threshold accepts 0 / 3,000 real impostors (RES-009) | **New finding.** Synthetic calibration is **conservative, not nominal**, on real photos; a deployment threshold needs in-domain calibration |
+
+Explicit non-claims:
+- Synthetic overlays on real photographs are **not** equivalent to physical occlusions.
+- The v2 arms and the mask audit are **not** pre-registered primary results.
+- No guarantee is claimed for any rule transferred from DigiFace to LFW (A1 violated).
+
 ### 3.7 Evidence labels used in Phase 2 documents
 
 | Label | Examples |

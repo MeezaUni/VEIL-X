@@ -174,9 +174,14 @@ Done:
 - Develop/final evaluation with one logged test run.
 - Results: `docs/baseline_evaluation.md` §5 and `docs/statistical_audit.md` §3.
 
+Real-photo evaluation completed (2026-10-27, D-043/D-044):
+- LFW official View 2 (detector and fixed-crop paths), transfer of the DigiFace rules, derived
+  synthetic occlusion, held-out-family risk control (`docs/real_world_benchmark.md` §7).
+- Phase C audit (`docs/statistical_audit.md` §3.6c).
+
 Not done:
-- LFW and real-world sets (D-039, a PI decision).
-- The detector-inclusive path.
+- Physical-occlusion benchmarks (ROF not approved; RMFRD, MLFW and others unresolved).
+- Detector runs on occluded photographs.
 - Train-role occlusion plans (deferred to Phase 3).
 
 ## 4f. Recommended Phase 3, tied to the measured Phase 2 failures (needs authorisation)
@@ -190,7 +195,8 @@ Not done:
 | 5 | Low-visibility strata at sFMR 1 % are capacity-limited | Coarser strata (2 instead of 3) or a pooled low-visibility arm. All five-image DigiFace parts are already used, so more calibration identities would need new sources | Feasibility at 1 % without loss of Test-ID validity |
 | 6 | Mask–mask impostors raise FMR to 2.2–2.7 % (security-relevant) | Report sFMR per family as a primary safety metric; check whether stratified targets need an FM-specific stratum | sFMR per family within target |
 | 7 | Paired-difference intervals unvalidated; 0.5 pp clean margin resolvable only if they are valid | Run SIM-011 (paired jackknife coverage) before any H4 claim | Coverage ≥ 0.94 |
-| 8 | Real-world validity untested (LFW blocked; no detector path) | After the PI decision on LFW/ROF: SCRFD detection/alignment with failure accounting, detector-inclusive results reported separately | — |
+| 8 | Real photos (LFW): the random-patch failure and the stratification fix reproduce, but **DigiFace-calibrated thresholds are conservative on real photos** (0 / 3,000 FMR at FAR 1 %) | Calibrate on approved real photographs with identity-disjoint pairs; evaluate on physical occlusions (ROF / RMFRD after approval); run detection on occluded photographs | Realised real-photo FMR within interval of the target |
+| 9 | Shared occluders raise false matches on real photos (post-hoc; masks, sunglasses, patches) | Pre-register a per-family sFMR analysis at an in-domain threshold | sFMR per family within target |
 
 ## 4d. Proposed Phase 2 (requires separate authorisation)
 1. Download the detector and backbone weights (InsightFace, AdaFace IR101): licence-check,

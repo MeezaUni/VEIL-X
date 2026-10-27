@@ -67,6 +67,62 @@ ENTRIES: list[dict[str, Any]] = [
         "splits": ["test"],
     },
     {
+        "id": "P2-EXP-007",
+        "purpose": "Reproducibility audit: logged rerun of the DigiFace final with the same freeze",
+        "script": "scripts/evaluate_phase2.py final --final --note 'reproducibility audit'",
+        "artefact": "reports/experiments/phase2_reproducibility.json",
+        "splits": ["test"],
+    },
+    {
+        "id": "P2-EXP-008",
+        "purpose": "LFW detection/alignment (SCRFD det_10g) and detector-free fixed crop",
+        "script": "scripts/lfw_detect_align.py",
+        "artefact": "reports/experiments/lfw_detection.json",
+        "splits": ["lfw (all images; no scores)"],
+        "dataset_ids": ["kaggle_jessicali9530_lfw"],
+    },
+    {
+        "id": "P2-EXP-009",
+        "purpose": "LFW embedding extraction (clean det/fixed, 312,795 derived occlusions)",
+        "script": "scripts/lfw_embed.py --part-size 16384",
+        "artefact": "reports/experiments/lfw_extraction.json",
+        "splits": ["lfw (images only; no scores)"],
+        "dataset_ids": ["kaggle_jessicali9530_lfw"],
+    },
+    {
+        "id": "P2-EXP-010",
+        "purpose": "LFW final (single logged run): official View-2 clean, DigiFace rule transfer, "
+        "derived synthetic occlusion, held-out-family risk control, C1",
+        "script": "scripts/evaluate_lfw.py --final",
+        "artefact": "reports/experiments/lfw_final.json",
+        "splits": ["lfw_view2"],
+        "dataset_ids": ["kaggle_jessicali9530_lfw"],
+    },
+    {
+        "id": "P2-EXP-011",
+        "purpose": "POST-HOC EXPLORATORY shared-occluder false-match audit on LFW",
+        "script": "scripts/lfw_posthoc_mask.py",
+        "artefact": "reports/experiments/lfw_posthoc_mask.json",
+        "splits": ["lfw_view2"],
+        "dataset_ids": ["kaggle_jessicali9530_lfw"],
+    },
+    {
+        "id": "P2-SIM-011",
+        "purpose": "Paired-difference interval coverage (clean margin)",
+        "script": "scripts/run_simulations.py --only paired_difference_coverage",
+        "artefact": "reports/simulations/paired_difference_coverage.json",
+        "splits": ["(synthetic)"],
+        "dataset_ids": [],
+    },
+    {
+        "id": "P2-SIM-012",
+        "purpose": "Validity of the adaptive LTT ordering procedure (D-042)",
+        "script": "scripts/run_simulations.py --only adaptive_ordering_validity",
+        "artefact": "reports/simulations/adaptive_ordering_validity.json",
+        "splits": ["(synthetic)"],
+        "dataset_ids": [],
+    },
+    {
         "id": "P2-CALC-001",
         "purpose": "Calibration capacity (exact binomial) at protocol v0.4.0",
         "script": "scripts/capacity_report.py",
@@ -84,7 +140,7 @@ def main() -> int:
     out: list[dict[str, Any]] = []
     for e in ENTRIES:
         path = ROOT / e["artefact"]
-        rec = dict(e) | {"dataset_ids": ["digiface1m"], "model_ids": MODELS}
+        rec = {"dataset_ids": ["digiface1m"], "model_ids": MODELS} | dict(e)
         if not path.exists():
             out.append(rec | {"status": "pending"})
             continue
@@ -108,7 +164,8 @@ def main() -> int:
     reg = {
         "schema": "veilx-experiment-registry/1",
         "phase": 2,
-        "scope": "DigiFace-1M (synthetic) with synthetic occlusions; LFW blocked (D-039)",
+        "scope": "DigiFace-1M (synthetic faces) and LFW Kaggle v4 (real photographs, D-043); "
+        "all occlusions are synthetic",
         "test_run_log": "results/test_runs.jsonl (private, git-ignored)",
         "experiments": out,
     }

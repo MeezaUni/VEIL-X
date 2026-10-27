@@ -3,13 +3,15 @@
 Research code for **risk-controlled two-image (1:1) face verification under occlusion**.
 Non-commercial academic research only.
 
-> **Status: Phase 2 complete (frozen backbones evaluated on DigiFace with synthetic occlusions).**
-> AdaFace IR-101 and ArcFace IR-101 (WebFace4M) were evaluated without any training. Results:
-> `docs/baseline_evaluation.md` and `docs/statistical_audit.md` (registry RES-001…006).
+> **Status: Phase 2 complete, including the real-photo evaluation (LFW).** AdaFace IR-101 and
+> ArcFace IR-101 (WebFace4M) were evaluated frozen, with no training.
+> - **DigiFace-1M** (synthetic faces) with synthetic occlusions: `docs/baseline_evaluation.md`.
+> - **LFW** (Kaggle v4, used under user-reported academic authorisation): official View-2 protocol
+>   plus derived synthetic occlusions on real photographs: `docs/real_world_benchmark.md` §7.
+> - Audit: `docs/statistical_audit.md`.
 >
-> **All model results are on synthetic faces (DigiFace-1M) with synthetic occlusions. They are
-> not real-world performance.** The real-world benchmark (LFW) is blocked pending a PI decision
-> (`docs/real_world_benchmark.md`).
+> Derived occlusions are synthetic overlays, **not physical occlusions**. Clean LFW accuracy is
+> likely optimistic because of probable identity overlap with the backbones' training data.
 >
 > Dataset images, manifests, embeddings and weights are never in this repository: they live in
 > a private data root (`VEILX_DATA_ROOT`). Every number in `docs/` and `reports/` is typed in

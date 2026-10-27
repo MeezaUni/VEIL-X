@@ -1,23 +1,23 @@
 {
   "schema": "veilx-experiment-registry/1",
   "phase": 2,
-  "scope": "DigiFace-1M (synthetic) with synthetic occlusions; LFW blocked (D-039)",
+  "scope": "DigiFace-1M (synthetic faces) and LFW Kaggle v4 (real photographs, D-043); all occlusions are synthetic",
   "test_run_log": "results/test_runs.jsonl (private, git-ignored)",
   "experiments": [
     {
-      "id": "P2-EXP-001",
-      "purpose": "Backbone verification: strict load, equality with authors' modules, channel order, precision agreement, determinism, throughput",
-      "script": "scripts/verify_models.py --pairs 20000",
-      "artefact": "reports/models/model_verification.json",
-      "splits": [
-        "val"
-      ],
       "dataset_ids": [
         "digiface1m"
       ],
       "model_ids": [
         "adaface_ir101_webface4m",
         "arcface_ir101_webface4m"
+      ],
+      "id": "P2-EXP-001",
+      "purpose": "Backbone verification: strict load, equality with authors' modules, channel order, precision agreement, determinism, throughput",
+      "script": "scripts/verify_models.py --pairs 20000",
+      "artefact": "reports/models/model_verification.json",
+      "splits": [
+        "val"
       ],
       "status": "complete",
       "evidence_type": "real_measured_model_result",
@@ -30,6 +30,13 @@
       "created_utc": "2026-10-26T19:21:36.208526+00:00"
     },
     {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
       "id": "P2-EXP-002",
       "purpose": "Extraction pilot on GPU (fp16): throughput, latency, memory",
       "script": "scripts/extract_embeddings.py --pilot 2048",
@@ -37,13 +44,6 @@
       "splits": [
         "val",
         "test (images only; no scores computed)"
-      ],
-      "dataset_ids": [
-        "digiface1m"
-      ],
-      "model_ids": [
-        "adaface_ir101_webface4m",
-        "arcface_ir101_webface4m"
       ],
       "status": "complete",
       "evidence_type": "real_measured_model_result",
@@ -56,19 +56,19 @@
       "created_utc": "2026-10-26T19:45:28.369435+00:00"
     },
     {
-      "id": "P2-EXP-003",
-      "purpose": "Extraction pilot on CPU (fp32): CPU fallback throughput",
-      "script": "scripts/extract_embeddings.py --pilot 128 --device cpu --precision fp32 --kinds clean",
-      "artefact": "reports/experiments/extraction_pilot_cpu.json",
-      "splits": [
-        "(clean images of evaluation pair sets; no scores computed)"
-      ],
       "dataset_ids": [
         "digiface1m"
       ],
       "model_ids": [
         "adaface_ir101_webface4m",
         "arcface_ir101_webface4m"
+      ],
+      "id": "P2-EXP-003",
+      "purpose": "Extraction pilot on CPU (fp32): CPU fallback throughput",
+      "script": "scripts/extract_embeddings.py --pilot 128 --device cpu --precision fp32 --kinds clean",
+      "artefact": "reports/experiments/extraction_pilot_cpu.json",
+      "splits": [
+        "(clean images of evaluation pair sets; no scores computed)"
       ],
       "status": "complete",
       "evidence_type": "real_measured_model_result",
@@ -81,6 +81,13 @@
       "created_utc": "2026-10-26T19:33:17.960708+00:00"
     },
     {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
       "id": "P2-EXP-004",
       "purpose": "Full embedding extraction (clean, 20 LOFO groups, stress), both backbones",
       "script": "scripts/extract_embeddings.py",
@@ -89,13 +96,6 @@
         "val",
         "cal",
         "test (images only; no scores computed)"
-      ],
-      "dataset_ids": [
-        "digiface1m"
-      ],
-      "model_ids": [
-        "adaface_ir101_webface4m",
-        "arcface_ir101_webface4m"
       ],
       "status": "complete",
       "evidence_type": "real_measured_model_result",
@@ -108,6 +108,13 @@
       "created_utc": "2026-10-26T22:38:45.133105+00:00"
     },
     {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
       "id": "P2-EXP-005",
       "purpose": "Develop stage: thresholds, LTT candidate orders, strata edges, LTT fits (validation + calibration only)",
       "script": "scripts/evaluate_phase2.py develop",
@@ -115,13 +122,6 @@
       "splits": [
         "val",
         "cal"
-      ],
-      "dataset_ids": [
-        "digiface1m"
-      ],
-      "model_ids": [
-        "adaface_ir101_webface4m",
-        "arcface_ir101_webface4m"
       ],
       "status": "complete",
       "evidence_type": "real_measured_model_result",
@@ -134,19 +134,19 @@
       "created_utc": "2026-10-26T21:01:33.610554+00:00"
     },
     {
-      "id": "P2-EXP-006",
-      "purpose": "Final evaluation (single logged test run): clean baselines, LOFO degradation, realised selective risk, C1 exploratory, stress, audit",
-      "script": "scripts/evaluate_phase2.py final --final",
-      "artefact": "reports/experiments/phase2_final.json",
-      "splits": [
-        "test"
-      ],
       "dataset_ids": [
         "digiface1m"
       ],
       "model_ids": [
         "adaface_ir101_webface4m",
         "arcface_ir101_webface4m"
+      ],
+      "id": "P2-EXP-006",
+      "purpose": "Final evaluation (single logged test run): clean baselines, LOFO degradation, realised selective risk, C1 exploratory, stress, audit",
+      "script": "scripts/evaluate_phase2.py final --final",
+      "artefact": "reports/experiments/phase2_final.json",
+      "splits": [
+        "test"
       ],
       "status": "complete",
       "evidence_type": "real_measured_model_result",
@@ -159,6 +159,181 @@
       "created_utc": "2026-10-26T22:39:11.301731+00:00"
     },
     {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P2-EXP-007",
+      "purpose": "Reproducibility audit: logged rerun of the DigiFace final with the same freeze",
+      "script": "scripts/evaluate_phase2.py final --final --note 'reproducibility audit'",
+      "artefact": "reports/experiments/phase2_reproducibility.json",
+      "splits": [
+        "test"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "0c567d3f561202a3e6a89651ca60ea5554fda847",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": "0e8a43fb7234a52388d017308249796a000b378424aaec11a8875bf5d90fa8a1",
+      "artefact_sha256": "0cb71c3c186fd942bae6b77479a7261e28ff6732a79b4a0dfadd34e6bd7214af",
+      "created_utc": "2026-10-27T02:24:03.859804+00:00"
+    },
+    {
+      "dataset_ids": [
+        "kaggle_jessicali9530_lfw"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P2-EXP-008",
+      "purpose": "LFW detection/alignment (SCRFD det_10g) and detector-free fixed crop",
+      "script": "scripts/lfw_detect_align.py",
+      "artefact": "reports/experiments/lfw_detection.json",
+      "splits": [
+        "lfw (all images; no scores)"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "0c567d3f561202a3e6a89651ca60ea5554fda847",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "39b67528530af9b3540e74086d860581708d10d82bb635c94ddcd58ec66743f4",
+      "created_utc": "2026-10-27T02:13:48.136533+00:00"
+    },
+    {
+      "dataset_ids": [
+        "kaggle_jessicali9530_lfw"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P2-EXP-009",
+      "purpose": "LFW embedding extraction (clean det/fixed, 312,795 derived occlusions)",
+      "script": "scripts/lfw_embed.py --part-size 16384",
+      "artefact": "reports/experiments/lfw_extraction.json",
+      "splits": [
+        "lfw (images only; no scores)"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "8003a8431ddc29304ecf38241bc1e92eb01fafad",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "5f2585b147d5a0262af38a1f82502f33631b4c07a5238b4f2f42f87f0fa316e7",
+      "created_utc": "2026-10-27T05:06:01.243072+00:00"
+    },
+    {
+      "dataset_ids": [
+        "kaggle_jessicali9530_lfw"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P2-EXP-010",
+      "purpose": "LFW final (single logged run): official View-2 clean, DigiFace rule transfer, derived synthetic occlusion, held-out-family risk control, C1",
+      "script": "scripts/evaluate_lfw.py --final",
+      "artefact": "reports/experiments/lfw_final.json",
+      "splits": [
+        "lfw_view2"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "46e55b8a708659cc9995e9b311633837e82dcb1f",
+      "git_dirty": false,
+      "run_id": "79331a84f520",
+      "frozen_config_sha256": null,
+      "artefact_sha256": "f6213bfea72bcdfce01fb74e87f2df5ab4dc3726b95716d7de1d63433f8ecf8e",
+      "created_utc": "2026-10-27T05:09:37.053227+00:00"
+    },
+    {
+      "dataset_ids": [
+        "kaggle_jessicali9530_lfw"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P2-EXP-011",
+      "purpose": "POST-HOC EXPLORATORY shared-occluder false-match audit on LFW",
+      "script": "scripts/lfw_posthoc_mask.py",
+      "artefact": "reports/experiments/lfw_posthoc_mask.json",
+      "splits": [
+        "lfw_view2"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "46e55b8a708659cc9995e9b311633837e82dcb1f",
+      "git_dirty": true,
+      "run_id": "e97048b9c65f",
+      "frozen_config_sha256": null,
+      "artefact_sha256": "ddaad72349ebde64f467f99bea198d8807b4b8d8ef2151182d524a922fc111c6",
+      "created_utc": "2026-10-27T05:11:35.114439+00:00"
+    },
+    {
+      "dataset_ids": [],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P2-SIM-011",
+      "purpose": "Paired-difference interval coverage (clean margin)",
+      "script": "scripts/run_simulations.py --only paired_difference_coverage",
+      "artefact": "reports/simulations/paired_difference_coverage.json",
+      "splits": [
+        "(synthetic)"
+      ],
+      "status": "complete",
+      "evidence_type": "synthetic_simulation",
+      "protocol_version": null,
+      "git_commit": null,
+      "git_dirty": null,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "30aff07abf90416c613cc62a100bf2667be1b6bf76e779f0e4bf4b618b0bcd84",
+      "created_utc": null
+    },
+    {
+      "dataset_ids": [],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P2-SIM-012",
+      "purpose": "Validity of the adaptive LTT ordering procedure (D-042)",
+      "script": "scripts/run_simulations.py --only adaptive_ordering_validity",
+      "artefact": "reports/simulations/adaptive_ordering_validity.json",
+      "splits": [
+        "(synthetic)"
+      ],
+      "status": "complete",
+      "evidence_type": "synthetic_simulation",
+      "protocol_version": null,
+      "git_commit": null,
+      "git_dirty": null,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "921e63e39ced0bfe2e2082a116505e68bade13a9daeaa60de9256eb82b7a848f",
+      "created_utc": null
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [],
       "id": "P2-CALC-001",
       "purpose": "Calibration capacity (exact binomial) at protocol v0.4.0",
       "script": "scripts/capacity_report.py",
@@ -166,10 +341,6 @@
       "splits": [
         "cal (pair counts only)"
       ],
-      "dataset_ids": [
-        "digiface1m"
-      ],
-      "model_ids": [],
       "status": "complete",
       "evidence_type": "mathematical_calculation",
       "protocol_version": "0.4.0",

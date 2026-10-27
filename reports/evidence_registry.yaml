@@ -241,6 +241,74 @@ records:
       split: "val, cal, test (images only)"
       protocol_version: "0.4.0"
       final_run_log_entry: "not applicable (no scores computed)"
+  # ------------------------------------------------------------------ measured (Phase 2, real photographs)
+  - id: RES-007
+    type: real_measured_model_result
+    title: "Reproducibility of the DigiFace final run"
+    statement: "A logged rerun (0ca832e3b3b3) of the Phase 2 final evaluation with the same frozen config and embeddings reproduced every result field of run 38d853d8884c exactly (0 differing fields)."
+    source: "scripts/evaluate_phase2.py final --final --note 'reproducibility audit'"
+    artefact: "reports/experiments/phase2_reproducibility.json"
+    created: "2026-10-27"
+    provenance:
+      git_commit: "f3376ea47680e49e7cbde0aacf16ea9e9dec7959"
+      dataset_ids: ["digiface1m"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m"]
+      split: "test"
+      protocol_version: "0.4.0"
+      final_run_log_entry: "0ca832e3b3b3 (reproducibility audit of 38d853d8884c)"
+  - id: RES-008
+    type: real_measured_model_result
+    title: "LFW detection and alignment"
+    statement: "SCRFD det_10g (CPU) found a face in 13,195 of 13,233 LFW images (99.71%); 42 of 6,000 View-2 pairs contain an undetected image; 17.5% of images contain several faces; isolated CPU latency p50/p95/p99 = 92/102/111 ms."
+    source: "scripts/lfw_detect_align.py"
+    artefact: "reports/experiments/lfw_detection.json"
+    created: "2026-10-27"
+    provenance: &lfw_prep
+      git_commit: "8003a8431ddc29304ecf38241bc1e92eb01fafad"
+      dataset_ids: ["kaggle_jessicali9530_lfw"]
+      model_ids: ["insightface_buffalo_l_det_10g"]
+      split: "lfw_all_images"
+      protocol_version: "0.4.0"
+      final_run_log_entry: "not applicable (no verification scores)"
+  - id: RES-009
+    type: real_measured_model_result
+    title: "Clean LFW, official View-2 protocol, and transfer of DigiFace thresholds"
+    statement: "Official 10-fold accuracy with detector alignment (all 6,000 pairs, failures as non-match) 99.58% / 99.57% (AdaFace / ArcFace); 99.83% / 99.82% excluding the 42 failed pairs; 99.28% / 99.27% with the detector-free fixed crop. The DigiFace-calibrated FAR-1% threshold accepted 0 of 3,000 LFW impostors (conservative transfer) with FNMR 0.93% / 1.00%."
+    source: "scripts/evaluate_lfw.py --final"
+    artefact: "reports/experiments/lfw_final.json"
+    created: "2026-10-27"
+    provenance: &lfw_final
+      git_commit: "46e55b8a708659cc9995e9b311633837e82dcb1f"
+      dataset_ids: ["kaggle_jessicali9530_lfw"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m", "insightface_buffalo_l_det_10g"]
+      split: "lfw_view2"
+      protocol_version: "0.4.0"
+      final_run_log_entry: "79331a84f520 (frozen DigiFace config 0e8a43fb7234a52388d017308249796a000b378424aaec11a8875bf5d90fa8a1)"
+    caveats: "Probable identity overlap between LFW and WebFace4M makes clean accuracy optimistic; LFW used under user-reported academic authorisation (D-043)."
+  - id: RES-010
+    type: real_measured_model_result
+    title: "Derived synthetic occlusion on LFW and held-out-family risk control"
+    statement: "On real photographs with synthetic overlays, FNMR at the DigiFace threshold is 16.6% for random patch (both backbones) and 0.9-7.7% for the other families; the DigiFace rules calibrated without random patches give sFNMR 7.46% / 5.28% (global) and 9.96% / 7.46% (global v2) against a 5% target on random-patch pairs, while oracle-visibility stratification gives 0.35% / 1.72% at coverage 0.43 / 0.87."
+    source: "scripts/evaluate_lfw.py --final"
+    artefact: "reports/experiments/lfw_final.json"
+    created: "2026-10-27"
+    provenance: *lfw_final
+    caveats: "Synthetic overlays applied after alignment, not physical occlusions; not official LFW results; oracle visibility."
+  - id: RES-011
+    type: real_measured_model_result
+    title: "POST-HOC exploratory: shared-occluder false matches on LFW"
+    statement: "Post-hoc (not pre-registered): impostor pairs with the same high-level occlusion on both sides show higher FMR at the View-1 DevTrain EER threshold than the same pairs clean - masks 1.68% vs 0.27% (AdaFace) and 2.93% vs 0.57% (ArcFace), sunglasses 1.48% / 1.51%, random patch 1.28% / 1.31% - with positive impostor-score shifts whose intervals exclude zero."
+    source: "scripts/lfw_posthoc_mask.py"
+    artefact: "reports/experiments/lfw_posthoc_mask.json"
+    created: "2026-10-27"
+    provenance:
+      git_commit: "46e55b8a708659cc9995e9b311633837e82dcb1f"
+      dataset_ids: ["kaggle_jessicali9530_lfw"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m"]
+      split: "lfw_view2"
+      protocol_version: "0.4.0"
+      final_run_log_entry: "e97048b9c65f (post-hoc exploratory, on embeddings of 79331a84f520)"
+    caveats: "Exploratory; in-domain threshold from DevTrain, which shares identities with View 2; requires pre-registration in Phase 3."
   # ------------------------------------------------------------------ hypotheses
   - id: HYP-001
     type: unverified_hypothesis
