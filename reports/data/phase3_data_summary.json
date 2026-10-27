@@ -1,0 +1,347 @@
+{
+  "evidence_type": "real_data_preparation_statistics",
+  "note": "Phase 3 sub-splits of never-scored DigiFace train identities; aggregates only.",
+  "protocol_version": "0.5.0",
+  "stats": {
+    "identities_per_subsplit": {
+      "p3_train": 30517,
+      "p3_cal": 9219,
+      "p3_test": 15148,
+      "p3_val": 6183
+    },
+    "images_per_subsplit": {
+      "p3_train": 191177,
+      "p3_cal": 58557,
+      "p3_test": 94366,
+      "p3_val": 38821
+    },
+    "p3_train_pairs": {
+      "mode": "clustered",
+      "n_pairs": 40000,
+      "n_genuine": 20000,
+      "n_impostor": 20000,
+      "n_identities": 27679,
+      "n_images": 66210,
+      "max_pairs_per_identity": 8,
+      "max_pairs_per_image": 5,
+      "max_pairs_per_source_image": 5,
+      "identity_disjoint": false,
+      "effective_independent_pairs": null,
+      "max_identity_disjoint_subset": 19328,
+      "strata": {
+        "clean_clean": 40000
+      },
+      "note": "pairs share identities/images: NOT independent; use identity-cluster bootstrap",
+      "seconds": 2.6
+    },
+    "p3_val_pairs": {
+      "mode": "clustered",
+      "n_pairs": 24732,
+      "n_genuine": 12366,
+      "n_impostor": 12366,
+      "n_identities": 6183,
+      "n_images": 26762,
+      "max_pairs_per_identity": 16,
+      "max_pairs_per_image": 7,
+      "max_pairs_per_source_image": 7,
+      "identity_disjoint": false,
+      "effective_independent_pairs": null,
+      "max_identity_disjoint_subset": 4910,
+      "strata": {
+        "clean_clean": 24732
+      },
+      "note": "pairs share identities/images: NOT independent; use identity-cluster bootstrap",
+      "seconds": 0.9
+    },
+    "p3_cal_independent": {
+      "mode": "independent",
+      "n_pairs": 6146,
+      "n_genuine": 3073,
+      "n_impostor": 3073,
+      "n_identities": 9219,
+      "n_images": 12292,
+      "max_pairs_per_identity": 1,
+      "max_pairs_per_image": 1,
+      "max_pairs_per_source_image": 1,
+      "identity_disjoint": true,
+      "effective_independent_pairs": 6146,
+      "max_identity_disjoint_subset": 6146,
+      "strata": {
+        "clean_clean": 6146
+      },
+      "note": "identity-disjoint: pair outcomes independent under i.i.d. identity sampling",
+      "seconds": 0.4
+    },
+    "p3_test_pairs": {
+      "mode": "clustered",
+      "n_pairs": 60592,
+      "n_genuine": 30296,
+      "n_impostor": 30296,
+      "n_identities": 15148,
+      "n_images": 65304,
+      "max_pairs_per_identity": 15,
+      "max_pairs_per_image": 9,
+      "max_pairs_per_source_image": 9,
+      "identity_disjoint": false,
+      "effective_independent_pairs": null,
+      "max_identity_disjoint_subset": 12024,
+      "strata": {
+        "clean_clean": 60592
+      },
+      "note": "pairs share identities/images: NOT independent; use identity-cluster bootstrap",
+      "seconds": 2.5
+    },
+    "plans": {
+      "F1_mask:train:p3_train_pairs": {
+        "n_pairs": 40000,
+        "n_occluded_sides": 50000,
+        "strata": {
+          "clean_clean": 10000,
+          "clean_occluded": 10000,
+          "occluded_occluded_cross_family": 10000,
+          "occluded_occluded_same_family": 10000
+        }
+      },
+      "F1_mask:val:p3_val_pairs": {
+        "n_pairs": 24732,
+        "n_occluded_sides": 30915,
+        "strata": {
+          "clean_occluded": 6183,
+          "occluded_occluded_cross_family": 6183,
+          "occluded_occluded_same_family": 6183,
+          "clean_clean": 6183
+        }
+      },
+      "F1_mask:cal:p3_cal_independent": {
+        "n_pairs": 6146,
+        "n_occluded_sides": 7681,
+        "strata": {
+          "clean_occluded": 1537,
+          "occluded_occluded_cross_family": 1536,
+          "clean_clean": 1537,
+          "occluded_occluded_same_family": 1536
+        }
+      },
+      "F1_mask:test_id:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "clean_occluded": 15148,
+          "clean_clean": 15148,
+          "occluded_occluded_same_family": 15148,
+          "occluded_occluded_cross_family": 15148
+        }
+      },
+      "F1_mask:test_ood:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "occluded_occluded_same_family": 15148,
+          "clean_clean": 15148,
+          "clean_occluded": 15148,
+          "occluded_occluded_cross_family": 15148
+        }
+      },
+      "F2_sunglasses:train:p3_train_pairs": {
+        "n_pairs": 40000,
+        "n_occluded_sides": 50000,
+        "strata": {
+          "occluded_occluded_same_family": 10000,
+          "occluded_occluded_cross_family": 10000,
+          "clean_occluded": 10000,
+          "clean_clean": 10000
+        }
+      },
+      "F2_sunglasses:val:p3_val_pairs": {
+        "n_pairs": 24732,
+        "n_occluded_sides": 30915,
+        "strata": {
+          "occluded_occluded_same_family": 6183,
+          "occluded_occluded_cross_family": 6183,
+          "clean_occluded": 6183,
+          "clean_clean": 6183
+        }
+      },
+      "F2_sunglasses:cal:p3_cal_independent": {
+        "n_pairs": 6146,
+        "n_occluded_sides": 7681,
+        "strata": {
+          "occluded_occluded_cross_family": 1536,
+          "occluded_occluded_same_family": 1536,
+          "clean_clean": 1537,
+          "clean_occluded": 1537
+        }
+      },
+      "F2_sunglasses:test_id:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "clean_occluded": 15148,
+          "clean_clean": 15148,
+          "occluded_occluded_cross_family": 15148,
+          "occluded_occluded_same_family": 15148
+        }
+      },
+      "F2_sunglasses:test_ood:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "occluded_occluded_same_family": 15148,
+          "occluded_occluded_cross_family": 15148,
+          "clean_occluded": 15148,
+          "clean_clean": 15148
+        }
+      },
+      "F3_hand_object:train:p3_train_pairs": {
+        "n_pairs": 40000,
+        "n_occluded_sides": 50000,
+        "strata": {
+          "clean_clean": 10000,
+          "occluded_occluded_same_family": 10000,
+          "clean_occluded": 10000,
+          "occluded_occluded_cross_family": 10000
+        }
+      },
+      "F3_hand_object:val:p3_val_pairs": {
+        "n_pairs": 24732,
+        "n_occluded_sides": 30915,
+        "strata": {
+          "occluded_occluded_same_family": 6183,
+          "clean_clean": 6183,
+          "occluded_occluded_cross_family": 6183,
+          "clean_occluded": 6183
+        }
+      },
+      "F3_hand_object:cal:p3_cal_independent": {
+        "n_pairs": 6146,
+        "n_occluded_sides": 7681,
+        "strata": {
+          "occluded_occluded_cross_family": 1536,
+          "clean_occluded": 1537,
+          "clean_clean": 1537,
+          "occluded_occluded_same_family": 1536
+        }
+      },
+      "F3_hand_object:test_id:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "clean_occluded": 15148,
+          "clean_clean": 15148,
+          "occluded_occluded_same_family": 15148,
+          "occluded_occluded_cross_family": 15148
+        }
+      },
+      "F3_hand_object:test_ood:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "clean_occluded": 15148,
+          "occluded_occluded_cross_family": 15148,
+          "occluded_occluded_same_family": 15148,
+          "clean_clean": 15148
+        }
+      },
+      "F4_random_patch:train:p3_train_pairs": {
+        "n_pairs": 40000,
+        "n_occluded_sides": 50000,
+        "strata": {
+          "occluded_occluded_cross_family": 10000,
+          "occluded_occluded_same_family": 10000,
+          "clean_occluded": 10000,
+          "clean_clean": 10000
+        }
+      },
+      "F4_random_patch:val:p3_val_pairs": {
+        "n_pairs": 24732,
+        "n_occluded_sides": 30915,
+        "strata": {
+          "occluded_occluded_same_family": 6183,
+          "clean_occluded": 6183,
+          "clean_clean": 6183,
+          "occluded_occluded_cross_family": 6183
+        }
+      },
+      "F4_random_patch:cal:p3_cal_independent": {
+        "n_pairs": 6146,
+        "n_occluded_sides": 7681,
+        "strata": {
+          "occluded_occluded_same_family": 1536,
+          "clean_occluded": 1537,
+          "occluded_occluded_cross_family": 1536,
+          "clean_clean": 1537
+        }
+      },
+      "F4_random_patch:test_id:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "clean_clean": 15148,
+          "occluded_occluded_cross_family": 15148,
+          "occluded_occluded_same_family": 15148,
+          "clean_occluded": 15148
+        }
+      },
+      "F4_random_patch:test_ood:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "clean_clean": 15148,
+          "clean_occluded": 15148,
+          "occluded_occluded_cross_family": 15148,
+          "occluded_occluded_same_family": 15148
+        }
+      },
+      "F5_extreme_lighting:train:p3_train_pairs": {
+        "n_pairs": 40000,
+        "n_occluded_sides": 50000,
+        "strata": {
+          "occluded_occluded_same_family": 10000,
+          "clean_occluded": 10000,
+          "occluded_occluded_cross_family": 10000,
+          "clean_clean": 10000
+        }
+      },
+      "F5_extreme_lighting:val:p3_val_pairs": {
+        "n_pairs": 24732,
+        "n_occluded_sides": 30915,
+        "strata": {
+          "clean_clean": 6183,
+          "clean_occluded": 6183,
+          "occluded_occluded_cross_family": 6183,
+          "occluded_occluded_same_family": 6183
+        }
+      },
+      "F5_extreme_lighting:cal:p3_cal_independent": {
+        "n_pairs": 6146,
+        "n_occluded_sides": 7681,
+        "strata": {
+          "clean_occluded": 1537,
+          "clean_clean": 1537,
+          "occluded_occluded_same_family": 1536,
+          "occluded_occluded_cross_family": 1536
+        }
+      },
+      "F5_extreme_lighting:test_id:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "occluded_occluded_same_family": 15148,
+          "occluded_occluded_cross_family": 15148,
+          "clean_clean": 15148,
+          "clean_occluded": 15148
+        }
+      },
+      "F5_extreme_lighting:test_ood:p3_test_pairs": {
+        "n_pairs": 60592,
+        "n_occluded_sides": 75740,
+        "strata": {
+          "occluded_occluded_same_family": 15148,
+          "clean_clean": 15148,
+          "occluded_occluded_cross_family": 15148,
+          "clean_occluded": 15148
+        }
+      }
+    }
+  }
+}

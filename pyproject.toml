@@ -76,7 +76,7 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 # torch is optional (GPU environment only); without it nn.Module resolves to Any.
-module = ["veilx.models.architectures"]
+module = ["veilx.models.architectures", "veilx.vis.model"]
 disallow_subclassing_any = false
 
 [tool.pydantic-mypy]

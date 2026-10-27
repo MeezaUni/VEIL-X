@@ -1,0 +1,26 @@
+# Phase 3 visibility estimator, held-out family F5_extreme_lighting (docs/phase3_protocol.md section 3).
+# Authorised by the project owner (D-046); launching also requires VEILX_PHASE2_AUTHORIZED=1.
+schema_version: 1
+run_id: p3-ve-f5-extreme-lighting
+phase: phase3
+authorized: true
+purpose: "Train the lightweight visibility estimator without the held-out family F5_extreme_lighting."
+seed: 20261027
+device: cuda
+backbone_id: none-visibility-estimator
+backbone_frozen: true
+heldout_family: F5_extreme_lighting
+train_pairs: manifests/phase3/subsplits.json#p3_train
+val_pairs: manifests/phase3/subsplits.json#p3_val
+batch_size: 128
+grad_accumulation: 1
+max_epochs: 30
+learning_rate: 0.001
+precision:
+  mode: fp16
+  allow_tf32: false
+  deterministic: true
+checkpoint:
+  directory: models/phase3/ve/F5_extreme_lighting
+  keep_last: 2
+  save_every_steps: 1
