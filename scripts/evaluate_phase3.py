@@ -5,10 +5,12 @@ develop  (p3_train / p3_val / p3_cal only; no p3_test access)
     (p3_val, registered rule), fusion ladder per fold (train fit, C on val), MLP diagnostic,
     strata edges (val), LTT candidate orders v1/v2 (val), all calibration arms (p3_cal),
     frozen with SHA-256.
-final --final  (p3_test, once, logged)
+final --final  (p3_test, once, logged; --rehearse runs the same path on p3_val)
     C3 primary (A4 vs A3 on Test-OOD, Holm over folds, verdict rule), C1 primary (M1 vs M4
     log-loss, Holm over 10 cells), H4 clean margin, secondary arms/orderings/targets, AUGRC,
     risk-coverage, per family / severity, abstention-reason mix.
+followup --final  (frozen config; Phase 2 DigiFace test held-out-family plans + LFW View 2
+    derived occlusions, logged; --rehearse runs LFW View 1 DevTest only)
 """
 
 from __future__ import annotations
@@ -47,7 +49,7 @@ from veilx.selective.ltt import (
     order_candidates_on_validation,
 )
 from veilx.stats.jackknife import jackknife_interval
-from veilx.stats.paired import holm, jackknife_ratio_difference
+from veilx.stats.paired import holm, jackknife_ratio_difference, normal_p_value
 from veilx.vis.covis import DEFINITIONS
 from veilx.vis.heuristic import fit_link_cells
 
@@ -596,6 +598,132 @@ def _sel(d: np.ndarray, y: np.ndarray) -> dict[str, np.ndarray]:
     }
 
 
+def evaluate_occluded(
+    t: dict[str, np.ndarray], sc: dict[str, np.ndarray], ff: dict[str, Any], cv_def: str
+) -> dict[str, Any]:
+    """Models, all arms, abstention reasons, C3 (A4 - A3) and C1 (M1 - M4) on one table."""
+    y = t["label"]
+    block: dict[str, Any] = {"n_pairs": len(y), "models": {}, "arms": {}}
+    occm = t["occluded"]
+    for m, p in sc.items():
+        ll = log_loss(p, y)
+        eer_t = ff["eer_threshold"].get(m)
+        mrec = {
+            "auc": roc_auc(p, y),
+            "log_loss": float(ll.mean()),
+            "auc_occluded": roc_auc(p[occm], y[occm]),
+        }
+        if eer_t is not None:
+            fail = ((p >= eer_t) != (y == 1)).astype(np.int64)
+            conf = np.abs(p - eer_t)
+            mrec["augrc_occluded"] = augrc(conf[occm], fail[occm])
+            rc = risk_coverage_curve(conf[occm], fail[occm])
+            idx = np.linspace(0, len(rc.coverage) - 1, 41).astype(int)
+            mrec["risk_coverage"] = {
+                "coverage": rc.coverage[idx].tolist(),
+                "selective_risk": [
+                    None if not np.isfinite(v) else float(v) for v in rc.selective_risk[idx]
+                ],
+            }
+        block["models"][m] = mrec
+    for key, rec in ff["arms"].items():
+        _arm, tname, _ordering = key.split("|")
+        st = strata_labels(rec["strata"], t, ff["edges"], cv_def)
+        d = decide(rec, sc[rec["model"]], st)
+        summ = selective_summary(d, as_sp(t, sc[rec["model"]]), *TARGETS[tname])
+        block["arms"][key] = {
+            k: summ[k]
+            for k in (
+                "coverage",
+                "coverage_genuine",
+                "coverage_impostor",
+                "selective_fmr",
+                "selective_fnmr",
+                "verdict_fm",
+                "verdict_fnm",
+            )
+        }
+        if key in ("A4_predvis|primary|v2", "A3_quality|primary|v2"):
+            block["arms"][key]["by_level"] = {
+                str(lv): {
+                    k: v
+                    for k, v in selective_summary(
+                        d[t["max_level"] == lv],
+                        as_sp(t, sc[rec["model"]], t["max_level"] == lv),
+                        *TARGETS[tname],
+                    ).items()
+                    if k in ("coverage", "selective_fnmr", "selective_fmr")
+                }
+                for lv in range(4)
+                if (t["max_level"] == lv).any()
+            }
+            if key.startswith("A4"):
+                ab = d == ABSTAIN
+                uncert = np.array([rec["rules"].get(s) is None for s in st])
+                lo_v, _ = ff["edges"]["cv"]
+                reasons = {
+                    "uncertifiable_stratum": int((ab & uncert).sum()),
+                    "insufficient_covisibility_vlow": int((ab & (t[f"ve_{cv_def}"] < lo_v)).sum()),
+                    "poor_quality_qlow": int((ab & (t["q"] < ff["edges"]["q"][0])).sum()),
+                    "conflicting_models": int(
+                        (ab & (np.abs(t["s"] - t["s_arc"]) > ff["edges"]["disagree_p95"])).sum()
+                    ),
+                    "uncertain_score_in_band": int((ab & ~uncert).sum()),
+                    "n_abstained": int(ab.sum()),
+                }
+                block["arms"][key]["abstention_reasons_nonexclusive"] = reasons
+    # C3 paired comparison A4 vs A3 (primary, v2)
+    r4, r3 = ff["arms"]["A4_predvis|primary|v2"], ff["arms"]["A3_quality|primary|v2"]
+    d4 = decide(r4, sc["M4"], strata_labels("predvis", t, ff["edges"], cv_def))
+    d3 = decide(r3, sc["M1"], strata_labels("quality", t, ff["edges"], cv_def))
+    a, b = _sel(d4, y), _sel(d3, y)
+    comp = {}
+    for nm, (na, da, nb, db) in {
+        "sFNMR": (a["fnm"], a["acc_g"], b["fnm"], b["acc_g"]),
+        "sFMR": (a["fm"], a["acc_i"], b["fm"], b["acc_i"]),
+        "coverage": (a["acc"], np.ones(len(y)), b["acc"], np.ones(len(y))),
+    }.items():
+        if da.sum() > 0 and db.sum() > 0:
+            pdiff = jackknife_ratio_difference(na, da, nb, db, t["id_a"], t["id_b"])
+            comp[nm] = pdiff.__dict__
+    block["c3_A4_minus_A3"] = comp
+    # C1: M1 - M4 log-loss on occluded pairs
+    ll1, ll4 = log_loss(sc["M1"], y), log_loss(sc["M4"], y)
+    d_ll = (ll1 - ll4)[occm]
+    j = jackknife_interval(
+        d_ll, np.ones(d_ll.size), t["id_a"][occm], t["id_b"][occm], scale="linear"
+    )
+    block["c1_logloss_M1_minus_M4"] = {
+        "estimate": j.estimate,
+        "se": j.se,
+        "ci": [j.ci_low, j.ci_high],
+        "p_value": normal_p_value(j.estimate, j.se),
+        "n_identities": j.n_identities,
+    }
+    return block
+
+
+def evaluate_clean_h4(
+    tc: dict[str, np.ndarray], sc: dict[str, np.ndarray], ff: dict[str, Any]
+) -> dict[str, Any]:
+    """Clean FNMR / FMR of M4 vs M0 at their own frozen clean-cal FAR-1 % thresholds."""
+    y = tc["label"]
+    g = y == 1
+    f4 = (sc["M4"] < ff["h4_thresholds"]["M4"]).astype(float)
+    f0 = (sc["M0"] < ff["h4_thresholds"]["M0"]).astype(float)
+    dd = jackknife_ratio_difference(
+        f4 * g, g.astype(float), f0 * g, g.astype(float), tc["id_a"], tc["id_b"]
+    )
+    return {
+        "fnmr_M4": float(f4[g].mean()),
+        "fnmr_M0": float(f0[g].mean()),
+        "fmr_M4": float((sc["M4"] >= ff["h4_thresholds"]["M4"])[~g].mean()),
+        "fmr_M0": float((sc["M0"] >= ff["h4_thresholds"]["M0"])[~g].mean()),
+        "delta_fnmr_M4_minus_M0": dd.__dict__,
+        "non_inferior_at_0.5pp": bool(dd.ci_high < 0.005),
+    }
+
+
 def final(args: argparse.Namespace) -> int:
     ctx = Ctx()
     fz = json.loads((ctx.layout.private_reports / "phase3_frozen.json").read_text("utf-8"))
@@ -645,133 +773,13 @@ def final(args: argparse.Namespace) -> int:
             for r, t in tabs.items()
         }
         for role in ("test_id", "test_ood"):
-            t = tabs[role]
-            y = t["label"]
-            block: dict[str, Any] = {"n_pairs": len(y), "models": {}, "arms": {}}
-            occm = t["occluded"]
-            for m, p in scores[role].items():
-                ll = log_loss(p, y)
-                eer_t = ff["eer_threshold"].get(m)
-                mrec = {
-                    "auc": roc_auc(p, y),
-                    "log_loss": float(ll.mean()),
-                    "auc_occluded": roc_auc(p[occm], y[occm]),
-                }
-                if eer_t is not None:
-                    fail = ((p >= eer_t) != (y == 1)).astype(np.int64)
-                    conf = np.abs(p - eer_t)
-                    mrec["augrc_occluded"] = augrc(conf[occm], fail[occm])
-                    rc = risk_coverage_curve(conf[occm], fail[occm])
-                    idx = np.linspace(0, len(rc.coverage) - 1, 41).astype(int)
-                    mrec["risk_coverage"] = {
-                        "coverage": rc.coverage[idx].tolist(),
-                        "selective_risk": [
-                            None if not np.isfinite(v) else float(v) for v in rc.selective_risk[idx]
-                        ],
-                    }
-                block["models"][m] = mrec
-            for key, rec in ff["arms"].items():
-                _arm, tname, _ordering = key.split("|")
-                st = strata_labels(rec["strata"], t, ff["edges"], cv_def)
-                d = decide(rec, scores[role][rec["model"]], st)
-                summ = selective_summary(d, as_sp(t, scores[role][rec["model"]]), *TARGETS[tname])
-                block["arms"][key] = {
-                    k: summ[k]
-                    for k in (
-                        "coverage",
-                        "coverage_genuine",
-                        "coverage_impostor",
-                        "selective_fmr",
-                        "selective_fnmr",
-                        "verdict_fm",
-                        "verdict_fnm",
-                    )
-                }
-                if key in ("A4_predvis|primary|v2", "A3_quality|primary|v2"):
-                    block["arms"][key]["by_level"] = {
-                        str(lv): {
-                            k: v
-                            for k, v in selective_summary(
-                                d[t["max_level"] == lv],
-                                as_sp(t, scores[role][rec["model"]], t["max_level"] == lv),
-                                *TARGETS[tname],
-                            ).items()
-                            if k in ("coverage", "selective_fnmr", "selective_fmr")
-                        }
-                        for lv in range(4)
-                        if (t["max_level"] == lv).any()
-                    }
-                    if key.startswith("A4"):
-                        ab = d == ABSTAIN
-                        uncert = np.array([rec["rules"].get(s) is None for s in st])
-                        lo_v, _ = ff["edges"]["cv"]
-                        reasons = {
-                            "uncertifiable_stratum": int((ab & uncert).sum()),
-                            "insufficient_covisibility_vlow": int(
-                                (ab & (t[f"ve_{cv_def}"] < lo_v)).sum()
-                            ),
-                            "poor_quality_qlow": int((ab & (t["q"] < ff["edges"]["q"][0])).sum()),
-                            "conflicting_models": int(
-                                (
-                                    ab & (np.abs(t["s"] - t["s_arc"]) > ff["edges"]["disagree_p95"])
-                                ).sum()
-                            ),
-                            "uncertain_score_in_band": int((ab & ~uncert).sum()),
-                            "n_abstained": int(ab.sum()),
-                        }
-                        block["arms"][key]["abstention_reasons_nonexclusive"] = reasons
-            # C3 paired comparison A4 vs A3 (primary, v2)
-            r4, r3 = ff["arms"]["A4_predvis|primary|v2"], ff["arms"]["A3_quality|primary|v2"]
-            d4 = decide(r4, scores[role]["M4"], strata_labels("predvis", t, ff["edges"], cv_def))
-            d3 = decide(r3, scores[role]["M1"], strata_labels("quality", t, ff["edges"], cv_def))
-            a, b = _sel(d4, y), _sel(d3, y)
-            comp = {}
-            for nm, (na, da, nb, db) in {
-                "sFNMR": (a["fnm"], a["acc_g"], b["fnm"], b["acc_g"]),
-                "sFMR": (a["fm"], a["acc_i"], b["fm"], b["acc_i"]),
-                "coverage": (a["acc"], np.ones(len(y)), b["acc"], np.ones(len(y))),
-            }.items():
-                if da.sum() > 0 and db.sum() > 0:
-                    pdiff = jackknife_ratio_difference(na, da, nb, db, t["id_a"], t["id_b"])
-                    comp[nm] = pdiff.__dict__
-            block["c3_A4_minus_A3"] = comp
+            block = evaluate_occluded(tabs[role], scores[role], ff, cv_def)
             if role == "test_ood":
-                c3_p.append(comp.get("sFNMR", {}).get("p_value", 1.0))
-            # C1: M1 - M4 log-loss on occluded pairs
-            ll1, ll4 = log_loss(scores[role]["M1"], y), log_loss(scores[role]["M4"], y)
-            d_ll = (ll1 - ll4)[occm]
-            j = jackknife_interval(
-                d_ll, np.ones(d_ll.size), t["id_a"][occm], t["id_b"][occm], scale="linear"
-            )
-            from veilx.stats.paired import normal_p_value
-
-            block["c1_logloss_M1_minus_M4"] = {
-                "estimate": j.estimate,
-                "se": j.se,
-                "ci": [j.ci_low, j.ci_high],
-                "p_value": normal_p_value(j.estimate, j.se),
-                "n_identities": j.n_identities,
-            }
+                c3_p.append(block["c3_A4_minus_A3"].get("sFNMR", {}).get("p_value", 1.0))
             c1_p.append(block["c1_logloss_M1_minus_M4"]["p_value"])
             c1_keys.append((fold, role))
             fr[role] = block
-        # H4 clean margin: FNMR of M4 vs M0 at their own clean-cal FAR-1 % thresholds
-        tc = tabs["test_clean"]
-        y = tc["label"]
-        g = y == 1
-        f4 = (scores["test_clean"]["M4"] < ff["h4_thresholds"]["M4"]).astype(float)
-        f0 = (scores["test_clean"]["M0"] < ff["h4_thresholds"]["M0"]).astype(float)
-        dd = jackknife_ratio_difference(
-            f4 * g, g.astype(float), f0 * g, g.astype(float), tc["id_a"], tc["id_b"]
-        )
-        fr["h4_clean"] = {
-            "fnmr_M4": float(f4[g].mean()),
-            "fnmr_M0": float(f0[g].mean()),
-            "fmr_M4": float((scores["test_clean"]["M4"] >= ff["h4_thresholds"]["M4"])[~g].mean()),
-            "fmr_M0": float((scores["test_clean"]["M0"] >= ff["h4_thresholds"]["M0"])[~g].mean()),
-            "delta_fnmr_M4_minus_M0": dd.__dict__,
-            "non_inferior_at_0.5pp": bool(dd.ci_high < 0.005),
-        }
+        fr["h4_clean"] = evaluate_clean_h4(tabs["test_clean"], scores["test_clean"], ff)
         res["folds"][fold] = fr
         print(fold, "done", flush=True)
         del clean, tabs, scores
@@ -843,15 +851,175 @@ def final(args: argparse.Namespace) -> int:
     return 0
 
 
+# ----------------------------------------------------------------- follow-up (gate 3G)
+
+
+def _subset(t: dict[str, np.ndarray], m: np.ndarray) -> dict[str, np.ndarray]:
+    return {k: v[m] for k, v in t.items()}
+
+
+def _lfw_tables(
+    layout: Any, pairs_names: tuple[str, ...]
+) -> tuple[list[PairRecord], dict[str, str], list[dict[str, Any]], dict[str, Any]]:
+    lfw = layout.manifests / "lfw"
+    with (lfw / "detections.jsonl").open(encoding="utf-8") as fh:
+        ok = {d["image_id"] for line in fh if (d := json.loads(line))["ok"]}
+    pairs = [
+        p
+        for name in pairs_names
+        for p in read_jsonl(lfw / f"{name}.jsonl", PairRecord)
+        if p.image_a in ok and p.image_b in ok
+    ]
+    ident = {r.image_id: r.identity_id for r in read_jsonl(lfw / "images.jsonl", ImageRecord)}
+    want = {p.pair_id for p in pairs}
+    with gzip.open(lfw / "occlusion_plan.jsonl.gz", "rt", encoding="utf-8") as fh:
+        rows = [r for line in fh if (r := json.loads(line))["pair_id"] in want]
+    vis = json.loads((lfw / "occlusion_visibility.json").read_text("utf-8"))
+    return pairs, ident, rows, vis
+
+
+def _lfw_fold(
+    pairs: list[PairRecord], rows: list[dict[str, Any]], vis: dict[str, Any], fold: str
+) -> tuple[list[PairRecord], dict[str, dict[str, Any]]]:
+    """One pseudo-pair per LFW plan row of family ``fold`` (pair x level x one/both)."""
+    by_id = {p.pair_id: p for p in pairs}
+    out_pairs, out_rows = [], {}
+    for r in rows:
+        if r["family"] != fold:
+            continue
+        p = by_id[r["pair_id"]]
+        pid = f"{p.pair_id}|{r['level']}|{r['mode']}"
+
+        def spec(sd: dict[str, Any] | None, r: dict[str, Any] = r) -> dict[str, Any] | None:
+            if sd is None:
+                return None
+            key = occluded_key(sd["image_id"], fold, r["level"], int(sd["seed"]))
+            return {
+                "family": fold,
+                "severity_level": r["level"],
+                "seed": int(sd["seed"]),
+                "visibility_ratio": float(vis[key]["visibility_ratio"]),
+            }
+
+        out_pairs.append(p.model_copy(update={"pair_id": pid}))
+        out_rows[pid] = {"stratum": r["mode"], "a": spec(r["a"]), "b": spec(r["b"])}
+    return out_pairs, out_rows
+
+
+def followup(args: argparse.Namespace) -> int:
+    """Follow-up sets with the FROZEN Phase 3 configuration (no fitting of any kind)."""
+    layout = resolve_data_root()
+    fz = json.loads((layout.private_reports / "phase3_frozen.json").read_text("utf-8"))
+    if _sha({k: v for k, v in fz.items() if k != "sha256"}) != fz["sha256"]:
+        raise RuntimeError("phase3 frozen config modified")
+    if args.final == args.rehearse:
+        raise RuntimeError("choose exactly one of --final or --rehearse (LFW View 1 DevTest)")
+    cv_def = fz["cv_selection"]["selected"]
+    fdir = layout.root / "features" / "phase3" / "followup"
+    ccols = ("emb_ada", "emb_arc", "norm_ada", "norm_arc", "z")
+    ocols = (*ccols, "ve", "gt", "vis")
+    run_id = uuid.uuid4().hex[:12]
+    prov = collect_provenance(ROOT, argv=sys.argv)
+    sets = ("lfw",) if args.rehearse else ("p2test", "lfw")
+    if args.final:
+        with (ROOT / PROTO.test_access.run_log).open("a", encoding="utf-8", newline="\n") as fh:
+            rec = {
+                "run_id": run_id,
+                "utc": datetime.now(tz=UTC).isoformat(),
+                "script": "scripts/evaluate_phase3.py followup",
+                "splits": ["test (Phase 2 test_balanced)", "lfw_view2"],
+                "frozen_config_sha256": fz["sha256"],
+                "git_commit": (prov.get("git") or {}).get("commit"),
+                "note": "Phase 3 follow-up with frozen models/rules; LFW View 2 re-used (3rd look)",
+            }
+            fh.write(json.dumps(rec) + "\n")
+    res: dict[str, Any] = {}
+    if "p2test" in sets:
+        pairs = list(read_jsonl(layout.manifests / "pairs" / "test_balanced.jsonl", PairRecord))
+        need = {i for p in pairs for i in (p.image_a, p.image_b)}
+        ident = {
+            r.image_id: r.identity_id
+            for r in read_jsonl(layout.manifests / "digiface_final.jsonl", ImageRecord)
+            if r.image_id in need
+        }
+        res["phase2_digiface_test"] = {}
+        for fold in FAMILIES:
+            ff = fz["folds"][fold]
+            link = LogisticModel.from_dict(ff["heuristic_link"])
+            models = {m: LogisticModel.from_dict(d) for m, d in ff["models"].items()}
+            clean = Group(fdir, "p2_clean", (*ccols, f"ve_{fold[:2]}"))
+            occ = Group(fdir, f"p2__{fold}__test_ood", ocols)
+            plan = _rows(
+                layout.manifests / "occlusion" / f"{fold}__test_ood__test_balanced.jsonl.gz"
+            )
+            t = build_table(pairs, plan, clean, occ, fold, link, ident)
+            tc = build_table(pairs, None, clean, None, fold, link, ident)
+            sc = {m: mdl.predict_proba(design(t, m, cv_def)[0]) for m, mdl in models.items()}
+            scc = {m: mdl.predict_proba(design(tc, m, cv_def)[0]) for m, mdl in models.items()}
+            res["phase2_digiface_test"][fold] = {
+                "test_ood": evaluate_occluded(t, sc, ff, cv_def),
+                "h4_clean": evaluate_clean_h4(tc, scc, ff),
+            }
+            print("p2test", fold, "done", flush=True)
+            del clean, occ, t, tc
+    lfw_names = ("view1_devtest_pairs",) if args.rehearse else ("view2_pairs",)
+    pairs, ident, rows, vis = _lfw_tables(layout, lfw_names)
+    res["lfw_derived"] = {}
+    for fold in FAMILIES:
+        ff = fz["folds"][fold]
+        link = LogisticModel.from_dict(ff["heuristic_link"])
+        models = {m: LogisticModel.from_dict(d) for m, d in ff["models"].items()}
+        clean = Group(fdir, "lfw_clean", (*ccols, f"ve_{fold[:2]}"))
+        occ = Group(fdir, f"lfw__{fold}", ocols)
+        fpairs, frows = _lfw_fold(pairs, rows, vis, fold)
+        t = build_table(fpairs, frows, clean, occ, fold, link, ident)
+        tc = build_table(pairs, None, clean, None, fold, link, ident)
+        sc = {m: mdl.predict_proba(design(t, m, cv_def)[0]) for m, mdl in models.items()}
+        scc = {m: mdl.predict_proba(design(tc, m, cv_def)[0]) for m, mdl in models.items()}
+        block = {"all": evaluate_occluded(t, sc, ff, cv_def)}
+        for mode in ("one", "both"):
+            m = t["stratum"] == mode
+            block[mode] = evaluate_occluded(
+                _subset(t, m), {k: v[m] for k, v in sc.items()}, ff, cv_def
+            )
+        block["h4_clean"] = evaluate_clean_h4(tc, scc, ff)
+        res["lfw_derived"][fold] = block
+        print("lfw", fold, "done", flush=True)
+        del clean, occ, t, tc
+    report = {
+        "evidence_type": "real_measured_model_result",
+        "scope": (
+            "Phase 3 FOLLOW-UP with the frozen Phase 3 models and rules: Phase 2 DigiFace "
+            "test_balanced (held-out-family plans) and LFW View 2 derived synthetic occlusions "
+            "(View 2 re-used; no tuning on it)"
+        ),
+        "run_id": run_id,
+        "frozen_sha256": fz["sha256"],
+        "cv_definition": cv_def,
+        "results": res,
+        "provenance": prov,
+    }
+    if args.rehearse:
+        report["scope"] = "REHEARSAL on LFW View 1 DevTest (code-path check only)"
+        out = layout.private_reports / "phase3_followup_rehearsal.json"
+    else:
+        out = ROOT / "reports" / "experiments" / "phase3_followup.json"
+    with out.open("w", encoding="utf-8", newline="\n") as fh:
+        json.dump(report, fh, indent=1, default=str)
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    ap.add_argument("stage", choices=["develop", "final"])
+    ap.add_argument("stage", choices=["develop", "final", "followup"])
     ap.add_argument("--final", action="store_true")
     ap.add_argument("--rehearse", action="store_true")
     args = ap.parse_args()
-    return develop() if args.stage == "develop" else final(args)
+    if args.stage == "develop":
+        return develop()
+    return final(args) if args.stage == "final" else followup(args)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,15 @@ Groups (part shards of 16,384 items under ``<data_root>/features/phase3/``; resu
 The oracle map is stored for reference/upper-bound analyses only; it is never an input to the
 estimator. Heuristic statistics (per-cell mean/sd) come from 20,000 clean p3_train images.
 
-    .venv-gpu\\Scripts\\python.exe scripts\\extract_phase3.py [--pilot N]
+Follow-up sets (``--set``; written to ``features/phase3/followup/``; same arrays):
+
+* ``p2test``  Phase 2 DigiFace ``test_balanced`` pairs: ``p2_clean`` and, per fold, the Phase 2
+              held-out-family plan ``p2__<fold>__test_ood`` (identities never used in Phase 3);
+* ``lfw``     LFW detector-aligned crops of View 2 (+ View 1 DevTest for rehearsal):
+              ``lfw_clean`` and ``lfw__<fold>`` = the Phase 2 derived-occlusion plan rows of
+              family <fold> (synthetic overlays on real photographs).
+
+    .venv-gpu\\Scripts\\python.exe scripts\\extract_phase3.py [--set p3|p2test|lfw] [--pilot N]
 """
 
 from __future__ import annotations
@@ -32,7 +40,7 @@ from typing import Any
 import numpy as np
 
 from veilx.config import load_protocol
-from veilx.data.images import load_rgb
+from veilx.data.images import load_rgb, pixel_sha256
 from veilx.data.manifest import ImageRecord, PairRecord, read_jsonl
 from veilx.data.paths import resolve_data_root
 from veilx.embeddings.jobs import occluded_key
@@ -59,7 +67,9 @@ Items = list[tuple[str, str, str | None, str | None, int]]  # key, image, family
 _W: dict[str, Any] = {}
 
 
-def _init(root: str, recs: dict[str, tuple[str, str]], mu: np.ndarray, sd: np.ndarray) -> None:
+def _init(
+    root: str, recs: dict[str, tuple[str, str | None]], mu: np.ndarray, sd: np.ndarray
+) -> None:
     _W.update(root=Path(root), recs=recs, mu=mu, sd=sd)
 
 
@@ -77,6 +87,8 @@ def _render(items: list[tuple[str, str, str | None, str | None, int]]) -> dict[s
         if fam is None:
             out["img"][k], out["gt"][k], out["vis"][k] = img, 255, 1.0
         else:
+            if psha is None:  # LFW crops: hash the aligned crop exactly as lfw_embed.py did
+                psha = pixel_sha256(img)
             res = apply_occlusion(img, fam, lvl, seed, source_pixel_sha256=psha)  # type: ignore[arg-type]
             out["img"][k] = res.image
             out["gt"][k] = np.rint(255 * visibility_target(res.mask)).astype(np.uint8)
@@ -108,6 +120,33 @@ def _rows(path: Path) -> Iterator[dict[str, Any]]:
             yield json.loads(line)
 
 
+def _side_items(rows: Iterator[dict[str, Any]], pairs: dict[str, tuple[str, str]]) -> Items:
+    """Occluded sides of Phase 2/3 plan rows (spec carries family/severity_level/seed)."""
+    items: Items = []
+    for r in rows:
+        for side, img in zip(("a", "b"), pairs[r["pair_id"]], strict=True):
+            sp = r[side]
+            if sp is not None:
+                fam, lvl, seed = sp["family"], sp["severity_level"], int(sp["seed"])
+                items.append((occluded_key(img, fam, lvl, seed), img, fam, lvl, seed))
+    return items
+
+
+def _lfw_items(rows: list[dict[str, Any]], pairs: dict[str, tuple[str, str]], fold: str) -> Items:
+    """Occluded sides of the LFW plan (row-level family/level; spec carries image_id/seed)."""
+    seen: dict[str, tuple[str, str, str | None, str | None, int]] = {}
+    for r in rows:
+        if r["family"] != fold or r["pair_id"] not in pairs:
+            continue
+        for side in ("a", "b"):
+            sp = r[side]
+            if sp is not None:
+                img, lvl, seed = sp["image_id"], r["level"], int(sp["seed"])
+                key = occluded_key(img, fold, lvl, seed)
+                seen[key] = (key, img, fold, lvl, seed)
+    return [seen[k] for k in sorted(seen)]
+
+
 def main() -> int:
     import torch
     from safetensors.torch import load_file
@@ -120,31 +159,66 @@ def main() -> int:
     ap.add_argument("--pilot", type=int, default=0)
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--folds", default=",".join(FAMILIES), help="pilot only: subset of fold models")
+    ap.add_argument("--set", default="p3", choices=["p3", "p2test", "lfw"])
     args = ap.parse_args()
     layout = resolve_data_root()
     p3 = layout.manifests / "phase3"
-    out_dir = layout.root / "features" / "phase3" / ("pilot" if args.pilot else "")
+    base = layout.root / "features" / "phase3" / ("followup" if args.set != "p3" else "")
+    out_dir = base / ("pilot" if args.pilot else "")
     out_dir.mkdir(parents=True, exist_ok=True)
-    sub = json.loads((p3 / "subsplits.json").read_text("utf-8"))
-    pairs = {  # pair_id -> (image_a, image_b); plain tuples keep the parent process small
-        tag: {
-            p.pair_id: (p.image_a, p.image_b)
-            for p in read_jsonl(p3 / "pairs" / f"{tag}.jsonl", PairRecord)
-        }
-        for _, tag in ROLES
-    }
-    used = sorted({i for ps in pairs.values() for ab in ps.values() for i in ab})
     hs = layout.root / "models" / "phase3" / "heuristic_stats.npz"
-    tr = sorted(k for k, v in sub.items() if v == "p3_train")
-    hpick = [tr[j] for j in np.random.default_rng(P3.seed).choice(len(tr), 20_000, replace=False)]
-    del sub, tr
-    need = set(used) | set(hpick)
-    recs = {
-        r.image_id: (r.relpath, r.pixel_sha256 or r.sha256)
-        for r in read_jsonl(layout.manifests / "digiface_final.jsonl", ImageRecord)
-        if r.image_id in need
-    }
-    del need
+    img_root = layout.extracted
+    hpick: list[str] = []
+    lfw_rows: list[dict[str, Any]] = []
+    # pair_id -> (image_a, image_b); plain tuples keep the parent process small
+    if args.set == "p3":
+        sub = json.loads((p3 / "subsplits.json").read_text("utf-8"))
+        pairs = {
+            tag: {
+                p.pair_id: (p.image_a, p.image_b)
+                for p in read_jsonl(p3 / "pairs" / f"{tag}.jsonl", PairRecord)
+            }
+            for _, tag in ROLES
+        }
+        tr = sorted(k for k, v in sub.items() if v == "p3_train")
+        rng = np.random.default_rng(P3.seed)
+        hpick = [tr[j] for j in rng.choice(len(tr), 20_000, replace=False)]
+        del sub, tr
+    elif args.set == "p2test":
+        pairs = {
+            "test_balanced": {
+                p.pair_id: (p.image_a, p.image_b)
+                for p in read_jsonl(layout.manifests / "pairs" / "test_balanced.jsonl", PairRecord)
+            }
+        }
+    else:
+        lfw = layout.manifests / "lfw"
+        with (lfw / "detections.jsonl").open(encoding="utf-8") as fh:
+            ok = {d["image_id"] for line in fh if (d := json.loads(line))["ok"]}
+        pairs = {
+            "lfw": {
+                p.pair_id: (p.image_a, p.image_b)
+                for name in ("view2_pairs", "view1_devtest_pairs")
+                for p in read_jsonl(lfw / f"{name}.jsonl", PairRecord)
+                if p.image_a in ok and p.image_b in ok
+            }
+        }
+        lfw_rows = list(_rows(lfw / "occlusion_plan.jsonl.gz"))
+        img_root = layout.extracted / "lfw_aligned" / "det"
+    used = sorted({i for ps in pairs.values() for ab in ps.values() for i in ab})
+    if args.set != "p3" and not hs.exists():
+        raise SystemExit("run --set p3 first (heuristic statistics come from p3_train)")
+    recs: dict[str, tuple[str, str | None]]
+    if args.set == "lfw":
+        recs = {i: (i.replace(":", "__") + ".png", None) for i in used}  # = lfw_embed.crop_name
+    else:
+        need = set(used) | set(hpick)
+        recs = {
+            r.image_id: (r.relpath, r.pixel_sha256 or r.sha256)
+            for r in read_jsonl(layout.manifests / "digiface_final.jsonl", ImageRecord)
+            if r.image_id in need
+        }
+        del need
     # ---- heuristic statistics from clean p3_train images (training data only)
     if not hs.exists():
         cms = []
@@ -195,31 +269,34 @@ def main() -> int:
             p = torch.sigmoid(model(torch.from_numpy(to_input(imgs)).to(dev)).float())
         return np.rint(255 * p.cpu().numpy()).astype(np.uint8)
 
-    def plan_items(name: str, tag: str) -> Items:
-        items: Items = []
-        for r in _rows(p3 / "occlusion" / f"{name}.jsonl.gz"):
-            for side, img in zip(("a", "b"), pairs[tag][r["pair_id"]], strict=True):
-                sp = r[side]
-                if sp is not None:
-                    fam, lvl, seed = sp["family"], sp["severity_level"], int(sp["seed"])
-                    items.append((occluded_key(img, fam, lvl, seed), img, fam, lvl, seed))
-        return items
+    clean_name = {"p3": "p3_clean", "p2test": "p2_clean", "lfw": "lfw_clean"}[args.set]
 
     def groups() -> Iterator[tuple[str, Items, tuple[str, ...]]]:
         """Built lazily, one group at a time (plans hold 1.2 M occluded sides in total)."""
         n = args.pilot or None
-        yield "p3_clean", [(i, i, None, None, 0) for i in used][:n], folds_used
-        for role, tag in ROLES:
+        yield clean_name, [(i, i, None, None, 0) for i in used][:n], folds_used
+        roles = ROLES if args.set == "p3" else (("-", "-"),)
+        for role, tag in roles:
             for fold in FAMILIES:
-                name = f"{fold}__{role}__{tag}"
-                yield name, plan_items(name, tag)[:n], (fold,)
+                if args.set == "p3":
+                    name = f"{fold}__{role}__{tag}"
+                    items = _side_items(_rows(p3 / "occlusion" / f"{name}.jsonl.gz"), pairs[tag])
+                elif args.set == "p2test":
+                    name = f"p2__{fold}__test_ood"
+                    plan = (
+                        layout.manifests / "occlusion" / f"{fold}__test_ood__test_balanced.jsonl.gz"
+                    )
+                    items = _side_items(_rows(plan), pairs["test_balanced"])
+                else:
+                    name, items = f"lfw__{fold}", _lfw_items(lfw_rows, pairs["lfw"], fold)
+                yield name, items[:n], (fold,)
                 if args.pilot:
                     return
 
     log: dict[str, Any] = {}
     t_all = time.perf_counter()
     with ProcessPoolExecutor(
-        args.workers, initializer=_init, initargs=(str(layout.extracted), recs, mu, sd)
+        args.workers, initializer=_init, initargs=(str(img_root), recs, mu, sd)
     ) as pool:
         for name, items, folds in groups():
             t0, computed = time.perf_counter(), 0
@@ -236,7 +313,7 @@ def main() -> int:
                             e.embeddings.astype(np.float16)
                         )
                         acc.setdefault(f"norm_{bb.backbone_id[:3]}", []).append(e.feature_norms)
-                    if name == "p3_clean":
+                    if name == clean_name:
                         for fam in folds:
                             acc.setdefault(f"ve_{fam[:2]}", []).append(ve_maps(ve[fam], b["img"]))
                     else:
@@ -264,14 +341,15 @@ def main() -> int:
             print(name, log[name], flush=True)
     report = {
         "evidence_type": "real_measured_model_result",
-        "scope": "Phase 3 feature extraction (throughput only; no accuracy numbers)",
+        "scope": f"Phase 3 feature extraction, set {args.set} (throughput only; no accuracy)",
         "pilot": bool(args.pilot),
         "groups": log,
         "wall_seconds": round(time.perf_counter() - t_all, 1),
         "provenance": collect_provenance(ROOT, argv=sys.argv),
     }
     if not args.pilot:
-        with (ROOT / "reports" / "experiments" / "phase3_extraction.json").open(
+        suffix = "" if args.set == "p3" else f"_{args.set}"
+        with (ROOT / "reports" / "experiments" / f"phase3_extraction{suffix}.json").open(
             "w", encoding="utf-8", newline="\n"
         ) as fh:
             json.dump(report, fh, indent=1)
