@@ -1,0 +1,220 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Phase 3 feature extraction, set p3 (throughput only; no accuracy)",
+ "pilot": false,
+ "groups": {
+  "p3_clean": {
+   "n": 170568,
+   "parts": 11,
+   "computed": 170568,
+   "seconds": 1018.6,
+   "items_per_s": 167.4
+  },
+  "F1_mask__train__p3_train_pairs": {
+   "n": 50000,
+   "parts": 4,
+   "computed": 50000,
+   "seconds": 229.5,
+   "items_per_s": 217.9
+  },
+  "F2_sunglasses__train__p3_train_pairs": {
+   "n": 50000,
+   "parts": 4,
+   "computed": 50000,
+   "seconds": 227.5,
+   "items_per_s": 219.8
+  },
+  "F3_hand_object__train__p3_train_pairs": {
+   "n": 50000,
+   "parts": 4,
+   "computed": 50000,
+   "seconds": 224.2,
+   "items_per_s": 223.0
+  },
+  "F4_random_patch__train__p3_train_pairs": {
+   "n": 50000,
+   "parts": 4,
+   "computed": 50000,
+   "seconds": 224.3,
+   "items_per_s": 222.9
+  },
+  "F5_extreme_lighting__train__p3_train_pairs": {
+   "n": 50000,
+   "parts": 4,
+   "computed": 50000,
+   "seconds": 224.3,
+   "items_per_s": 222.9
+  },
+  "F1_mask__val__p3_val_pairs": {
+   "n": 30915,
+   "parts": 2,
+   "computed": 30915,
+   "seconds": 139.6,
+   "items_per_s": 221.4
+  },
+  "F2_sunglasses__val__p3_val_pairs": {
+   "n": 30915,
+   "parts": 2,
+   "computed": 30915,
+   "seconds": 138.9,
+   "items_per_s": 222.6
+  },
+  "F3_hand_object__val__p3_val_pairs": {
+   "n": 30915,
+   "parts": 2,
+   "computed": 30915,
+   "seconds": 139.1,
+   "items_per_s": 222.2
+  },
+  "F4_random_patch__val__p3_val_pairs": {
+   "n": 30915,
+   "parts": 2,
+   "computed": 30915,
+   "seconds": 139.1,
+   "items_per_s": 222.2
+  },
+  "F5_extreme_lighting__val__p3_val_pairs": {
+   "n": 30915,
+   "parts": 2,
+   "computed": 30915,
+   "seconds": 139.1,
+   "items_per_s": 222.3
+  },
+  "F1_mask__cal__p3_cal_independent": {
+   "n": 7681,
+   "parts": 1,
+   "computed": 7681,
+   "seconds": 36.4,
+   "items_per_s": 211.0
+  },
+  "F2_sunglasses__cal__p3_cal_independent": {
+   "n": 7681,
+   "parts": 1,
+   "computed": 7681,
+   "seconds": 36.0,
+   "items_per_s": 213.7
+  },
+  "F3_hand_object__cal__p3_cal_independent": {
+   "n": 7681,
+   "parts": 1,
+   "computed": 7681,
+   "seconds": 35.1,
+   "items_per_s": 219.0
+  },
+  "F4_random_patch__cal__p3_cal_independent": {
+   "n": 7681,
+   "parts": 1,
+   "computed": 7681,
+   "seconds": 35.3,
+   "items_per_s": 217.6
+  },
+  "F5_extreme_lighting__cal__p3_cal_independent": {
+   "n": 7681,
+   "parts": 1,
+   "computed": 7681,
+   "seconds": 35.3,
+   "items_per_s": 217.7
+  },
+  "F1_mask__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 342.0,
+   "items_per_s": 221.4
+  },
+  "F2_sunglasses__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 341.5,
+   "items_per_s": 221.8
+  },
+  "F3_hand_object__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 344.2,
+   "items_per_s": 220.0
+  },
+  "F4_random_patch__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 337.4,
+   "items_per_s": 224.5
+  },
+  "F5_extreme_lighting__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 337.2,
+   "items_per_s": 224.6
+  },
+  "F1_mask__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 337.7,
+   "items_per_s": 224.3
+  },
+  "F2_sunglasses__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 334.7,
+   "items_per_s": 226.3
+  },
+  "F3_hand_object__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 339.5,
+   "items_per_s": 223.1
+  },
+  "F4_random_patch__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 340.7,
+   "items_per_s": 222.3
+  },
+  "F5_extreme_lighting__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 336.4,
+   "items_per_s": 225.1
+  }
+ },
+ "wall_seconds": 6424.5,
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-10-27T11:49:25.281461+00:00",
+  "git": {
+   "commit": "8bbab7d43f6cef46cd6ef7a81c2ead7183e2ce20",
+   "dirty": true,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.14.1",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts\\extract_phase3.py",
+   "--set",
+   "p3",
+   "--workers",
+   "6"
+  ],
+  "extra": {}
+ }
+}
