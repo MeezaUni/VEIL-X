@@ -10,6 +10,8 @@
                    feat  VE-C bottleneck feature (float16, 256): input to the novelty score
                  Groups: ``p3_clean`` (per-fold columns ``vec_F1``... for all 5 VE-C models)
                  and ``<fold>__<role>__<pairset>`` (that fold's VE-C only).
+``--set p6``     Phase 6 replication partition p6_test (``docs/phase6_protocol.md``): identical to
+                 ``--set p4`` with the p6 manifests, stored under ``features/phase6/p6``.
 ``--set p4``     CONFIRMATORY p4_test (never scored before; extraction stores features only,
                  with no decisions or scores). Everything is stored: AdaFace/ArcFace embeddings
                  and norms, the Phase 3 VE map (uint8), VE-C vec / vecf / feat, GT map, visibility
@@ -18,7 +20,7 @@
 
 Part shards of 16,384 items; resumable; torch-free render workers.
 
-    .venv-gpu\\Scripts\\python.exe scripts\\extract_phase4.py --set p3dev|p4 [--pilot N]
+    .venv-gpu\\Scripts\\python.exe scripts\\extract_phase4.py --set p3dev|p4|p6 [--pilot N]
 """
 
 from __future__ import annotations
@@ -40,6 +42,7 @@ from veilx.config import load_protocol
 from veilx.data.images import load_rgb
 from veilx.data.manifest import ImageRecord, PairRecord, read_jsonl
 from veilx.data.paths import resolve_data_root
+from veilx.data.untouched import PARTITIONS
 from veilx.embeddings.jobs import occluded_key
 from veilx.embeddings.store import is_complete, write_array_shard
 from veilx.occlusion.engine import apply_occlusion
@@ -118,13 +121,15 @@ def main() -> int:
     from veilx.vis.model import VisNet, to_input
 
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--set", required=True, choices=["p3dev", "p4"])
+    ap.add_argument("--set", required=True, choices=["p3dev", *PARTITIONS])
     ap.add_argument("--followup", action="store_true", help="p3dev: also p3_test test_id/test_ood")
     ap.add_argument("--pilot", type=int, default=0)
     ap.add_argument("--workers", type=int, default=5)
     args = ap.parse_args()
     lay = resolve_data_root()
-    out_dir = lay.root / "features" / "phase4" / args.set / ("pilot" if args.pilot else "")
+    part = PARTITIONS.get(args.set)  # None for p3dev
+    sub = part.directory if part is not None else "phase4"
+    out_dir = lay.root / "features" / sub / args.set / ("pilot" if args.pilot else "")
     out_dir.mkdir(parents=True, exist_ok=True)
     dev = torch.device("cuda")
 
@@ -135,7 +140,7 @@ def main() -> int:
 
     vec = {f: load_vis(lay.root / "models/phase4/vec" / f / "best.safetensors") for f in FAMILIES}
     ve3 = backbones = None
-    if args.set == "p4":
+    if part is not None:
         from veilx.models.extractor import FrozenExtractor
         from veilx.models.spec import BACKBONES
 
@@ -217,10 +222,11 @@ def main() -> int:
                     )
                 )
     else:
-        p4 = lay.manifests / "phase4"
+        assert part is not None
+        p4 = lay.manifests / part.directory
         pairs4 = {
             p.pair_id: (p.image_a, p.image_b)
-            for p in read_jsonl(p4 / "p4_test_pairs.jsonl", PairRecord)
+            for p in read_jsonl(p4 / f"{part.pairs_name}.jsonl", PairRecord)
         }
         used = sorted({i for ab in pairs4.values() for i in ab})
         used_set = set(used)  # built once (membership test per manifest record)
@@ -229,13 +235,15 @@ def main() -> int:
             for r in read_jsonl(p4 / "images.jsonl", ImageRecord)
             if r.image_id in used_set
         }
-        root = lay.extracted / "phase4"
-        groups.append(("p4_clean", [(i, i, None, None, 0) for i in used], FAMILIES))
+        root = lay.extracted / part.directory
+        groups.append((part.clean_group, [(i, i, None, None, 0) for i in used], FAMILIES))
         groups.append(
             (
                 "e1",
                 _side_items(
-                    _rows(p4 / "occlusion" / "E1_hair_strands__test_e1__p4_test_pairs.jsonl.gz"),
+                    _rows(
+                        p4 / "occlusion" / f"E1_hair_strands__test_e1__{part.pairs_name}.jsonl.gz"
+                    ),
                     pairs4,
                 ),
                 FAMILIES,
@@ -243,7 +251,7 @@ def main() -> int:
         )
         for role in ("test_id", "test_ood"):
             for fold in FAMILIES:
-                name = f"{fold}__{role}__p4_test_pairs"
+                name = f"{fold}__{role}__{part.pairs_name}"
                 groups.append(
                     (
                         name,
@@ -310,7 +318,7 @@ def main() -> int:
         "provenance": collect_provenance(ROOT, argv=sys.argv),
     }
     if not args.pilot:
-        with (ROOT / "reports" / "experiments" / f"phase4_extraction_{args.set}.json").open(
+        with (ROOT / "reports" / "experiments" / f"{sub}_extraction_{args.set}.json").open(
             "w", encoding="utf-8", newline="\n"
         ) as fh:
             json.dump(report, fh, indent=1)

@@ -1,4 +1,10 @@
-"""Phase 4 untouched confirmatory partition: DigiFace-1M 72-image parts 2000-3999 and 4000-5999.
+"""Untouched confirmatory partitions of DigiFace-1M (``veilx.data.untouched``).
+
+``--partition p4`` (default): Phase 4, 72-image parts 2000-3999 and 4000-5999 (unchanged).
+``--partition p6``: Phase 6 replication, 72-image parts 6000-7999 and 8000-9999
+(``docs/phase6_protocol.md``); dedup also excludes every Phase 4 image. Text below says
+"phase4" / "p4_test"; for p6 read "phase6" / "p6_test".
+
 
 These identities were never downloaded before Phase 4 (owner approval 2026-11-01), so no model,
 threshold or rule has ever seen them. They are kept in a SEPARATE private manifest and extraction
@@ -44,6 +50,7 @@ from veilx.data.digiface import DigiFaceAdapter
 from veilx.data.images import decode_rgb, pixel_sha256
 from veilx.data.manifest import ImageRecord, PairRecord, read_jsonl, write_jsonl
 from veilx.data.paths import resolve_data_root
+from veilx.data.untouched import P4, PARTITIONS, UntouchedPartition
 from veilx.occlusion.engine import apply_occlusion
 from veilx.occlusion.plan import assert_plan_isolation, plan_conditions
 from veilx.pairs import PairSpec, build_pairs
@@ -53,28 +60,24 @@ ROOT = Path(__file__).resolve().parents[1]
 PROTO = load_protocol(ROOT / "configs" / "research_protocol.yaml")
 REGISTRY = load_dataset_registry(ROOT / "configs" / "datasets.yaml")
 FAMILIES = tuple(PROTO.family_ids)
-SEED = 20261101
-PARTS = {
-    "subjects_2000-3999_72_imgs.zip": 2_936_098_225,
-    "subjects_4000-5999_72_imgs.zip": 2_936_895_527,
-}
+P: UntouchedPartition = P4  # set by --partition (default p4: Phase 4, unchanged)
 MEMBER_RE = re.compile(r"\d{1,6}/\d{1,3}\.png")
 _W: dict[str, Any] = {}
 
 
 def _layout() -> Any:
     lay = resolve_data_root()
-    (lay.manifests / "phase4" / "occlusion").mkdir(parents=True, exist_ok=True)
-    (lay.extracted / "phase4").mkdir(parents=True, exist_ok=True)
+    (lay.manifests / P.directory / "occlusion").mkdir(parents=True, exist_ok=True)
+    (lay.extracted / P.directory).mkdir(parents=True, exist_ok=True)
     return lay
 
 
 def stage_extract() -> None:
     lay = _layout()
     reports: dict[str, Any] = {}
-    for name, size in PARTS.items():
+    for name, size in P.parts:
         part = name.removesuffix(".zip")
-        if (lay.extracted / "phase4" / part).exists():
+        if (lay.extracted / P.directory / part).exists():
             print(f"{part}: already extracted")
             continue
         t0 = time.perf_counter()
@@ -82,20 +85,20 @@ def stage_extract() -> None:
         print(f"{name}: members={rep.n_members} crc_ok={rep.crc_ok} rejected={len(rep.rejected)}")
         if rep.rejected or not rep.crc_ok:
             raise SystemExit(f"{name}: integrity check failed")
-        safe_extract(lay.raw / name, lay.extracted / "phase4", rep, wrap_dir=part)
+        safe_extract(lay.raw / name, lay.extracted / P.directory, rep, wrap_dir=part)
         reports[name] = rep.to_dict() | {"seconds": round(time.perf_counter() - t0, 1)}
         print(f"  extracted in {time.perf_counter() - t0:.0f}s", flush=True)
-    path = lay.private_reports / "phase4_archive_reports.json"
+    path = lay.private_reports / f"{P.directory}_archive_reports.json"
     old = json.loads(path.read_text("utf-8")) if path.exists() else {}
     path.write_text(json.dumps(old | reports, indent=1), encoding="utf-8")
 
 
 def stage_scan() -> None:
     lay = _layout()
-    adapter = DigiFaceAdapter(lay.extracted / "phase4", PROTO.splits.bands, REGISTRY)
+    adapter = DigiFaceAdapter(lay.extracted / P.directory, PROTO.splits.bands, REGISTRY)
     records, report = adapter.scan()
     recs = [r.model_copy(update={"split": SplitName.TEST}) for r in records]
-    write_jsonl(lay.manifests / "phase4" / "scan.jsonl", recs)
+    write_jsonl(lay.manifests / P.directory / "scan.jsonl", recs)
     print(
         f"scanned {len(recs):,} images; issues={report.issue_counts()} "
         f"per-identity={report.images_per_identity_histogram}"
@@ -119,18 +122,19 @@ def _init(root: str) -> None:
 
 def stage_dedup() -> None:
     lay = _layout()
-    recs = list(read_jsonl(lay.manifests / "phase4" / "scan.jsonl", ImageRecord))
+    recs = list(read_jsonl(lay.manifests / P.directory / "scan.jsonl", ImageRecord))
     with ProcessPoolExecutor(
         min(8, max(1, (os.cpu_count() or 2) - 4)),
         initializer=_init,
-        initargs=(str(lay.extracted / "phase4"),),
+        initargs=(str(lay.extracted / P.directory),),
     ) as pool:
         res = list(pool.map(_hash, [(r.image_id, r.relpath) for r in recs], chunksize=512))
     failed = [(i, e) for i, _, e in res if e is not None]
     psha = {i: h for i, h, e in res if e is None}
     existing = {
         r.pixel_sha256
-        for r in read_jsonl(lay.manifests / "digiface_final.jsonl", ImageRecord)
+        for m in ("digiface_final.jsonl", *P.earlier)
+        for r in read_jsonl(lay.manifests / m, ImageRecord)
         if r.pixel_sha256
     }
     seen: set[str] = set()
@@ -147,7 +151,7 @@ def stage_dedup() -> None:
             continue
         seen.add(h)
         keep.append(r.model_copy(update={"pixel_sha256": h}))
-    write_jsonl(lay.manifests / "phase4" / "images.jsonl", keep)
+    write_jsonl(lay.manifests / P.directory / "images.jsonl", keep)
     stats = {
         "scanned": len(recs),
         "decode_or_shape_failures": len(failed),
@@ -156,26 +160,28 @@ def stage_dedup() -> None:
         "kept": len(keep),
         "identities": len({r.identity_id for r in keep}),
     }
-    (lay.private_reports / "phase4_dedup.json").write_text(json.dumps(stats, indent=1), "utf-8")
+    (lay.private_reports / f"{P.directory}_dedup.json").write_text(
+        json.dumps(stats, indent=1), "utf-8"
+    )
     print(stats)
 
 
 def stage_pairs() -> None:
     lay = _layout()
-    imgs = list(read_jsonl(lay.manifests / "phase4" / "images.jsonl", ImageRecord))
+    imgs = list(read_jsonl(lay.manifests / P.directory / "images.jsonl", ImageRecord))
     n_ids = len({r.identity_id for r in imgs})
     spec = PairSpec(
         "clustered",
         12 * n_ids,
         0.5,
         SplitName.TEST,
-        SEED,
+        P.seed,
         genuine_cap_per_identity=6,
-        pair_id_prefix="p4te",
+        pair_id_prefix=P.pair_prefix,
     )
     ps = build_pairs(imgs, spec)
-    write_jsonl(lay.manifests / "phase4" / "p4_test_pairs.jsonl", ps.pairs)
-    (lay.manifests / "phase4" / "p4_test_pairs.summary.json").write_text(
+    write_jsonl(lay.manifests / P.directory / f"{P.pairs_name}.jsonl", ps.pairs)
+    (lay.manifests / P.directory / f"{P.pairs_name}.summary.json").write_text(
         json.dumps(asdict(ps.summary), indent=1, default=str), "utf-8"
     )
     print(
@@ -200,19 +206,19 @@ def _init_plan(root: str, recs: dict[str, tuple[str, str]]) -> None:
 def stage_plans() -> None:
     lay = _layout()
     imgs = {
-        r.image_id: r for r in read_jsonl(lay.manifests / "phase4" / "images.jsonl", ImageRecord)
+        r.image_id: r for r in read_jsonl(lay.manifests / P.directory / "images.jsonl", ImageRecord)
     }
-    pairs = list(read_jsonl(lay.manifests / "phase4" / "p4_test_pairs.jsonl", PairRecord))
+    pairs = list(read_jsonl(lay.manifests / P.directory / f"{P.pairs_name}.jsonl", PairRecord))
     by_id = {p.pair_id: p for p in pairs}
     recs = {i: (r.relpath, r.pixel_sha256 or r.sha256) for i, r in imgs.items()}
     with ProcessPoolExecutor(
         min(8, max(1, (os.cpu_count() or 2) - 4)),
         initializer=_init_plan,
-        initargs=(str(lay.extracted / "phase4"), recs),
+        initargs=(str(lay.extracted / P.directory), recs),
     ) as pool:
         for heldout in FAMILIES:
             for role in ("test_id", "test_ood"):
-                plan = plan_conditions(pairs, FAMILIES, heldout, role, global_seed=SEED)  # type: ignore[arg-type]
+                plan = plan_conditions(pairs, FAMILIES, heldout, role, global_seed=P.seed)  # type: ignore[arg-type]
                 assert_plan_isolation(plan)
                 jobs, where = [], []
                 for k, c in enumerate(plan):
@@ -241,9 +247,9 @@ def stage_plans() -> None:
                     rows[k][side] = sp
                 path = (
                     lay.manifests
-                    / "phase4"
+                    / P.directory
                     / "occlusion"
-                    / f"{heldout}__{role}__p4_test_pairs.jsonl.gz"
+                    / f"{heldout}__{role}__{P.pairs_name}.jsonl.gz"
                 )
                 with gzip.open(path, "wt", encoding="utf-8", newline="\n") as fh:
                     for row in rows:
@@ -264,24 +270,27 @@ def stage_e1plan() -> None:
     seeded permutation; one plan shared by all folds (no fold has ever seen E1)."""
     lay = _layout()
     imgs = {
-        r.image_id: r for r in read_jsonl(lay.manifests / "phase4" / "images.jsonl", ImageRecord)
+        r.image_id: r for r in read_jsonl(lay.manifests / P.directory / "images.jsonl", ImageRecord)
     }
-    pairs = list(read_jsonl(lay.manifests / "phase4" / "p4_test_pairs.jsonl", PairRecord))
+    pairs = list(read_jsonl(lay.manifests / P.directory / f"{P.pairs_name}.jsonl", PairRecord))
     recs = {i: (r.relpath, r.pixel_sha256 or r.sha256) for i, r in imgs.items()}
-    rng = np.random.default_rng(derive_seed(SEED, "e1-levels"))
+    rng = np.random.default_rng(derive_seed(P.seed, "e1-levels"))
     levels = np.array(["low", "medium", "high"])[rng.permutation(len(pairs)) % 3]
     jobs = [
-        (p.image_b, "E1_hair_strands", str(lvl), derive_seed(SEED, "e1", p.pair_id))
+        (p.image_b, "E1_hair_strands", str(lvl), derive_seed(P.seed, "e1", p.pair_id))
         for p, lvl in zip(pairs, levels, strict=True)
     ]
     with ProcessPoolExecutor(
         min(8, max(1, (os.cpu_count() or 2) - 4)),
         initializer=_init_plan,
-        initargs=(str(lay.extracted / "phase4"), recs),
+        initargs=(str(lay.extracted / P.directory), recs),
     ) as pool:
         specs = list(pool.map(_spec, jobs, chunksize=256))
     path = (
-        lay.manifests / "phase4" / "occlusion" / "E1_hair_strands__test_e1__p4_test_pairs.jsonl.gz"
+        lay.manifests
+        / P.directory
+        / "occlusion"
+        / f"E1_hair_strands__test_e1__{P.pairs_name}.jsonl.gz"
     )
     with gzip.open(path, "wt", encoding="utf-8", newline="\n") as fh:
         for p, sp in zip(pairs, specs, strict=True):
@@ -303,19 +312,21 @@ def stage_e1plan() -> None:
 
 def stage_summary() -> None:
     lay = _layout()
-    dd = json.loads((lay.private_reports / "phase4_dedup.json").read_text("utf-8"))
-    ps = json.loads((lay.manifests / "phase4" / "p4_test_pairs.summary.json").read_text("utf-8"))
-    imgs = list(read_jsonl(lay.manifests / "phase4" / "images.jsonl", ImageRecord))
+    dd = json.loads((lay.private_reports / f"{P.directory}_dedup.json").read_text("utf-8"))
+    ps = json.loads(
+        (lay.manifests / P.directory / f"{P.pairs_name}.summary.json").read_text("utf-8")
+    )
+    imgs = list(read_jsonl(lay.manifests / P.directory / "images.jsonl", ImageRecord))
     per_id = Counter(r.identity_id for r in imgs)
     summary = {
         "evidence_type": "real_data_statistic",
-        "scope": "Phase 4 untouched partition: DigiFace-1M 72-image parts 2000-3999, 4000-5999",
+        "scope": P.scope,
         "dedup": dd,
         "images_per_identity_histogram": dict(Counter(per_id.values())),
-        "p4_test_pairs": {k: ps[k] for k in ("n_pairs", "n_genuine", "n_impostor", "n_identities")},
-        "plan_seed": SEED,
+        P.pairs_name: {k: ps[k] for k in ("n_pairs", "n_genuine", "n_impostor", "n_identities")},
+        "plan_seed": P.seed,
     }
-    out = ROOT / "reports" / "data" / "phase4_data_summary.json"
+    out = ROOT / "reports" / "data" / f"{P.directory}_data_summary.json"
     out.write_text(json.dumps(summary, indent=1), encoding="utf-8")
     print(json.dumps(summary, indent=1))
 
@@ -336,7 +347,11 @@ def main() -> int:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     ap.add_argument("stages", nargs="+", choices=list(STAGES))
-    for s in ap.parse_args().stages:
+    ap.add_argument("--partition", choices=list(PARTITIONS), default="p4")
+    args = ap.parse_args()
+    global P
+    P = PARTITIONS[args.partition]
+    for s in args.stages:
         STAGES[s]()
     return 0
 

@@ -8,6 +8,9 @@ github.com/microsoft/DigiFace1M). Approved parts only:
 * Phase 4:  subjects_2000-3999_72_imgs.zip     (2,000 identities x 72 images)
             subjects_4000-5999_72_imgs.zip     (2,000 identities x 72 images)
             -> untouched Phase 4 confirmatory partition (owner approval 2026-11-01)
+* Phase 6:  subjects_6000-7999_72_imgs.zip     (2,000 identities x 72 images)
+            subjects_8000-9999_72_imgs.zip     (2,000 identities x 72 images)
+            -> untouched Phase 6 replication partition (owner approval 2026-11-02, D-053)
 
 Expected sizes are the official host's Content-Length values (recorded 2026-10-26).
 Already-complete archives are skipped; the download log is merged, never overwritten.
@@ -35,6 +38,8 @@ APPROVED_PARTS: dict[str, int] = {
     "subjects_166666-199998_5_imgs.zip": 3_400_932_852,
     "subjects_2000-3999_72_imgs.zip": 2_936_098_225,  # Phase 4 (HEAD 2026-11-01)
     "subjects_4000-5999_72_imgs.zip": 2_936_895_527,  # Phase 4 (HEAD 2026-11-01)
+    "subjects_6000-7999_72_imgs.zip": 2_940_940_004,  # Phase 6 (HEAD 2026-11-02)
+    "subjects_8000-9999_72_imgs.zip": 2_927_632_784,  # Phase 6 (HEAD 2026-11-02)
 }
 
 

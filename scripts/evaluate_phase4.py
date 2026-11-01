@@ -32,6 +32,7 @@ import numpy as np
 from veilx.config import load_protocol
 from veilx.data.manifest import ImageRecord, PairRecord, read_jsonl
 from veilx.data.paths import resolve_data_root
+from veilx.data.untouched import PARTITIONS
 from veilx.embeddings.jobs import occluded_key
 from veilx.fusion.features import LADDER_P4, covis_columns, design
 from veilx.fusion.logreg import LogisticModel, log_loss, select_c
@@ -785,6 +786,9 @@ def final(args: argparse.Namespace) -> int:
     ctx = Ctx()
     if ctx.fz3["sha256"] != fz4["phase3_frozen_sha256"]:
         raise RuntimeError("phase3 freeze changed since phase4 develop")
+    part = PARTITIONS[args.partition]
+    if args.rehearse and part.key != "p4":
+        raise RuntimeError("--rehearse is defined for the Phase 4 code path only")
     run_id = uuid.uuid4().hex[:12]
     prov = collect_provenance(ROOT, argv=sys.argv)
     if args.final:
@@ -795,10 +799,12 @@ def final(args: argparse.Namespace) -> int:
                         "run_id": run_id,
                         "utc": datetime.now(tz=UTC).isoformat(),
                         "script": "scripts/evaluate_phase4.py final",
-                        "splits": ["p4_test"],
+                        "splits": [part.split],
                         "frozen_config_sha256": fz4["sha256"],
                         "git_commit": (prov.get("git") or {}).get("commit"),
-                        "note": "Phase 4 confirmatory run",
+                        "note": "Phase 4 confirmatory run"
+                        if part.key == "p4"
+                        else "Phase 6 replication run (docs/phase6_protocol.md)",
                     }
                 )
                 + "\n"
@@ -826,28 +832,30 @@ def final(args: argparse.Namespace) -> int:
             clean_res[fold] = clean_margin(tc, f3, f4)
             print("rehearse", fold, flush=True)
     else:
-        p4dir = lay.root / "features" / "phase4" / "p4"
-        man = lay.manifests / "phase4"
-        pairs = list(read_jsonl(man / "p4_test_pairs.jsonl", PairRecord))
+        p4dir = lay.root / "features" / part.directory / part.key
+        man = lay.manifests / part.directory
+        pairs = list(read_jsonl(man / f"{part.pairs_name}.jsonl", PairRecord))
         ident = {r.image_id: r.identity_id for r in read_jsonl(man / "images.jsonl", ImageRecord)}
         base = ("emb_ada", "emb_arc", "norm_ada", "norm_arc")
-        e1_rows = ev3._rows(man / "occlusion" / "E1_hair_strands__test_e1__p4_test_pairs.jsonl.gz")
+        e1_rows = ev3._rows(
+            man / "occlusion" / f"E1_hair_strands__test_e1__{part.pairs_name}.jsonl.gz"
+        )
         for fold in FAMILIES:
             f3, f4 = ctx.fz3["folds"][fold], fz4["folds"][fold]
             link = LogisticModel.from_dict(f3["heuristic_link"])
             nov = MahalanobisNovelty.from_dict(f4["novelty"])
             percol = tuple(f"{x}_{fold[:2]}" for x in ("ve", "vec", "vecf", "feat"))
-            clean = _p4_group(p4dir, "p4_clean", (*base, *percol), fold)
+            clean = _p4_group(p4dir, part.clean_group, (*base, *percol), fold)
             groups = {
                 "test_id": _p4_group(
                     p4dir,
-                    f"{fold}__test_id__p4_test_pairs",
+                    f"{fold}__test_id__{part.pairs_name}",
                     (*base, "ve", "vec", "vecf", "feat", "gt", "vis"),
                     None,
                 ),
                 "test_ood": _p4_group(
                     p4dir,
-                    f"{fold}__test_ood__p4_test_pairs",
+                    f"{fold}__test_ood__{part.pairs_name}",
                     (*base, "ve", "vec", "vecf", "feat", "gt", "vis"),
                     None,
                 ),
@@ -855,10 +863,10 @@ def final(args: argparse.Namespace) -> int:
             }
             plans = {
                 "test_id": ev3._rows(
-                    man / "occlusion" / f"{fold}__test_id__p4_test_pairs.jsonl.gz"
+                    man / "occlusion" / f"{fold}__test_id__{part.pairs_name}.jsonl.gz"
                 ),
                 "test_ood": ev3._rows(
-                    man / "occlusion" / f"{fold}__test_ood__p4_test_pairs.jsonl.gz"
+                    man / "occlusion" / f"{fold}__test_ood__{part.pairs_name}.jsonl.gz"
                 ),
                 "e1": e1_rows,
             }
@@ -918,7 +926,9 @@ def final(args: argparse.Namespace) -> int:
             del clean, groups
     report = {
         "evidence_type": "real_measured_model_result",
-        "scope": "Phase 4 CONFIRMATORY run on p4_test (DigiFace identities never downloaded before Phase 4; synthetic occlusions)",
+        "scope": "Phase 4 CONFIRMATORY run on p4_test (DigiFace identities never downloaded before Phase 4; synthetic occlusions)"
+        if part.key == "p4"
+        else "Phase 6 REPLICATION run on p6_test (DigiFace identities never downloaded before Phase 6; frozen Phase 3/4 systems; synthetic occlusions)",
         "run_id": run_id,
         "frozen_sha256": fz4["sha256"],
         "phase3_frozen_sha256": ctx.fz3["sha256"],
@@ -933,7 +943,7 @@ def final(args: argparse.Namespace) -> int:
         report["scope"] = "REHEARSAL on p3_val (code-path check only; not a result)"
         out = lay.private_reports / "phase4_final_rehearsal.json"
     else:
-        out = ROOT / "reports" / "experiments" / "phase4_final.json"
+        out = ROOT / "reports" / "experiments" / f"{part.directory}_final.json"
     with out.open("w", encoding="utf-8", newline="\n") as fh:
         json.dump(report, fh, indent=1, default=str)
     print("endpoints", json.dumps(report["endpoints"], default=str)[:2000])
@@ -1021,6 +1031,7 @@ def main() -> int:
     ap.add_argument("stage", choices=["develop", "final", "followup"])
     ap.add_argument("--final", action="store_true")
     ap.add_argument("--rehearse", action="store_true")
+    ap.add_argument("--partition", choices=list(PARTITIONS), default="p4")
     args = ap.parse_args()
     if args.stage == "develop":
         return develop()
