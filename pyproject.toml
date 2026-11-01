@@ -19,6 +19,8 @@ dependencies = [
 gpu = ["torch>=2.4", "safetensors>=0.4", "huggingface_hub>=0.24"]
 # Figures for reports (scripts/make_figures.py); not needed by the library or the tests.
 viz = ["matplotlib>=3.8"]
+# Phase 5 local research application (scripts/run_app.py); install together with [gpu].
+app = ["gradio>=5,<6", "onnxruntime>=1.17", "opencv-python-headless>=4.8", "psutil>=5.9"]
 
 [dependency-groups]
 dev = [
@@ -71,7 +73,7 @@ warn_unused_configs = true
 
 [[tool.mypy.overrides]]
 # Optional at runtime (seeded only if installed); not a Phase 0 dependency.
-module = ["torch", "safetensors.*", "cv2", "onnxruntime"]
+module = ["torch", "safetensors.*", "cv2", "onnxruntime", "gradio", "fastapi", "psutil"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]

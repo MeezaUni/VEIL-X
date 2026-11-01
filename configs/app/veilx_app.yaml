@@ -1,0 +1,52 @@
+# VEIL-X Phase 5 local research application: frozen inference configuration.
+# Every value below is FROZEN from earlier phases (provenance in comments). Changing any of them
+# changes the system that was evaluated; the app refuses to start if the frozen files differ.
+schema_version: 1
+research_only: true
+
+decision:
+  # A3 quality-stratified three-way rule (Phase 3 freeze 34409779..., recommended by D-050).
+  # Five frozen A3 systems exist (one per Phase 3 LOFO fold); no all-family system was fitted.
+  # Default = first registered fold (choice independent of any result; D-051).
+  default_fold: F1_mask
+  folds: [F1_mask, F2_sunglasses, F3_hand_object, F4_random_patch, F5_extreme_lighting]
+  arm: A3_quality
+  target: primary            # selective FNMR <= 5 %, selective FMR <= 5 %, delta 0.05
+  ordering: v2
+  fused_score: M1            # logistic(s, q, s*q): AdaFace cosine, feature-norm quality (Phase 3)
+  phase3_frozen_sha256: 34409779ae8f69f35218f4b7dca050f29525a9a163c4105b2758d182e3a782c3
+  phase3_frozen_file: reports/phase3_frozen.json       # private, under VEILX_DATA_ROOT
+
+diagnostics:
+  # Explanatory only: never enter the decision (tested). Phase 4 VE-C + Mahalanobis novelty.
+  phase4_frozen_sha256: bba129002cf8fa067f6823db7c118c4e68649a92b5187ce1b48c7ce5cfff84cc
+  phase4_frozen_file: reports/phase4_frozen.json
+  vec_dir: models/phase4/vec
+
+detector:
+  # SCRFD det_10g (InsightFace buffalo_l v0.7), as in Phase 2 / Phase 4F.
+  model: models/insightface_buffalo_l_v0.7/det_10g.onnx
+  sha256: 5838f7fe053675b1c7a08b633df49e7af5495cee0493c7dcf6697200b85b5b91
+  det_thresh: 0.5
+  nms_thresh: 0.4
+  min_score: 0.6                           # Phase 4F registered
+  max_residual: 7.335444161413329          # p99 clean LFW View-1 DevTrain residual (Phase 4F)
+
+fallback:
+  # Detector-free fixed crop (Phase 2 fixed transform from LFW View-1 DevTrain mean landmarks;
+  # aggregate geometry, no identity data). Registered Phase 4F policy for no-face / low-quality.
+  # Assumes LFW-like framing: the image is resized to reference_size x reference_size first.
+  reference_size: 250
+  matrix: [[0.8631705563203315, -0.009020340790117288, -51.4118899759529],
+           [0.00902034079011729, 0.8631705563203315, -46.16445069608585]]
+
+inputs:
+  max_bytes: 20000000
+  min_side: 64
+  max_side: 4096
+  formats: [JPEG, PNG, BMP, WEBP]
+
+server:
+  host: 127.0.0.1        # local only; never 0.0.0.0
+  share: false           # no Gradio public link
+  analytics: false

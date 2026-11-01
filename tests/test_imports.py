@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import subprocess
 import sys
 
 import pytest
@@ -36,9 +37,10 @@ def test_python_version_supported() -> None:
 
 
 def test_no_heavy_ml_dependency_imported() -> None:
-    for name in MODULES:
-        importlib.import_module(name)
-    # Phase 0 must not pull in model frameworks.
-    assert "torch" not in sys.modules
-    assert "insightface" not in sys.modules
-    assert "onnxruntime" not in sys.modules
+    # Core modules must not pull in model frameworks. Checked in a fresh interpreter, because other
+    # test files (model tests in the GPU environment) legitimately import torch into this process.
+    code = (
+        f"import importlib, sys; [importlib.import_module(n) for n in {MODULES!r}]; "
+        "sys.exit(any(m in sys.modules for m in ('torch', 'insightface', 'onnxruntime')))"
+    )
+    assert subprocess.run([sys.executable, "-c", code], check=False).returncode == 0
