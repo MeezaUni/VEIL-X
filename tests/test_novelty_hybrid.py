@@ -95,3 +95,15 @@ def test_novelty_forced_strata_and_tertiles() -> None:
     ]
     st = novelty_forced_strata(np.array([True, False]), np.array([0.95, 0.95]), (0.4, 0.7))
     assert st.tolist() == ["v_low", "v_high"]
+
+
+def test_exact_shift_accounts_for_clipping() -> None:
+    from veilx.vis.conservative import lower_bound_shift_maps
+
+    rng = np.random.default_rng(6)
+    p = rng.uniform(0.0, 1.0, (3000, 28, 28))
+    true = global_visible(p) - rng.normal(0.08, 0.05, 3000)  # optimistic predictor
+    c = lower_bound_shift_maps(p, true)
+    g = global_visible(np.clip(p - c, 0, 1))
+    assert float(((g - true) > 0.10).mean()) <= 0.05  # holds for the map actually applied
+    assert c >= lower_bound_shift(global_visible(p), true)  # clipping needs at least as much

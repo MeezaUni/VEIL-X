@@ -173,13 +173,15 @@ def main() -> int:
     if args.set == "p3dev":
         p3 = lay.manifests / "phase3"
         sub = json.loads((p3 / "subsplits.json").read_text("utf-8"))
+        # development roles; --followup extracts ONLY the p3_test follow-up roles, with their
+        # clean images in a separate group (never rebuilds p3_clean: resume checks part sizes)
         roles = [
             ("train", "p3_train_pairs"),
             ("val", "p3_val_pairs"),
             ("cal", "p3_cal_independent"),
         ]
         if args.followup:
-            roles += [("test_id", "p3_test_pairs"), ("test_ood", "p3_test_pairs")]
+            roles = [("test_id", "p3_test_pairs"), ("test_ood", "p3_test_pairs")]
         tags = sorted({t for _, t in roles})
         pairs = {
             t: {
@@ -194,7 +196,7 @@ def main() -> int:
         extra = [
             tr[j] for j in np.random.default_rng(20261101).choice(len(tr), 20_000, replace=False)
         ]
-        clean_ids = sorted(set(used) | set(extra))
+        clean_ids = sorted(set(used)) if args.followup else sorted(set(used) | set(extra))
         need = set(clean_ids)
         recs = {
             r.image_id: (r.relpath, r.pixel_sha256 or r.sha256)
@@ -202,7 +204,8 @@ def main() -> int:
             if r.image_id in need
         }
         root = lay.extracted
-        groups.append(("p3_clean", [(i, i, None, None, 0) for i in clean_ids], FAMILIES))
+        clean_name = "p3test_clean" if args.followup else "p3_clean"
+        groups.append((clean_name, [(i, i, None, None, 0) for i in clean_ids], FAMILIES))
         for role, tag in roles:
             for fold in FAMILIES:
                 name = f"{fold}__{role}__{tag}"

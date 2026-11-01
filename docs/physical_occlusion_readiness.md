@@ -59,3 +59,25 @@ confirmatory evidence.
 Physical-occlusion evaluation is the most informative next external test of C3. It should be a
 **Phase 4 item**, gated on steps 1–3. Until then, every Phase 3 statement about occlusion is
 explicitly limited to synthetic occluders (DigiFace renders and LFW composites).
+
+## 6. Phase 4H update (2026-11-01): wider search and recommendations
+
+Documentation only. Nothing was downloaded, requested or deserialised. All statements are as
+stated by the sources and must be re-verified before any request.
+
+| Dataset | Real occlusions | Identities / protocol | Access and terms (as stated) | Fit for VEIL-X |
+|---|---|---|---|---|
+| **IJB-C** (IARPA Janus Benchmark C; [NIST face challenges](http://www.nist.gov/programs-projects/face-challenges), [Idiap interface notes](https://www.idiap.ch/software/bob/docs/bob/bob.db.ijbc/stable/)) | Natural occlusions in a large share of faces, with **annotated occlusion locations** (spatial occlusion grid) | Defined 1:1 verification and identification protocols | Distributed by NIST under Creative Commons variants; eligibility-gated request | **Best candidate.** Real occlusion annotations allow an occlusion-stratified evaluation with a standard protocol. Needs an access request and a licence review. Possible identity overlap with web-crawled backbone training data must be checked |
+| **RMFRD / RMFD** ([GitHub](https://github.com/X-zhangyang/Real-World-Masked-Face-Dataset)) | Real masks: 5,000 masked + 90,000 unmasked faces of 525 people; a verification subset of 426 people, 3,589 + 3,589 pairs | Identity-organised; verification pairs | **No licence stated** in the repository; web-crawled; mirrors on Google Drive / Baidu (`.rar`) | Masks only. The licence and consent status is unclear, so the owner must clarify before any use |
+| **MFR2** ([MaskTheFace](https://gitee.com/Egrt/MaskTheFace)) | Real masks; 53 identities, 269 images, 848 pairs | `pairs.txt` | Web-collected; distributed through a tool download; no explicit licence found | Too small for confirmatory claims; at most a smoke test |
+| **CelebA** ([TFDS catalogue](https://www.tensorflow.org/datasets/catalog/celeb_a)) | Mild real occluders through the `Eyeglasses` / `Wearing_Hat` attributes; 10,177 identities | Identity labels; no verification protocol (pairs would be built) | Non-commercial research agreement | Mild occlusion only, with attribute-level (not pixel) labels. Celebrity identities may overlap the backbone training data |
+| ROF, AR Face | See §2 | See §2 | Pickles + licence conflict (ROF); on request (AR) | Unchanged |
+
+**Recommendation (Phase 5 or later, owner decision).**
+1. Request **IJB-C** access for an occlusion-stratified 1:1 evaluation of the frozen A3 system.
+   Use its occlusion annotations to compare quality-stratified and visibility-aware decisions on
+   **physical** occluders.
+2. For masks specifically, ask the RMFRD authors for terms first.
+3. Before any of these, check the identity overlap with WebFace4M (backbone training), as was done
+   for LFW in Phase 2.
+4. The never-deserialise-pickles rule stays.

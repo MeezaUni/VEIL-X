@@ -47,7 +47,7 @@ from veilx.vis.conservative import (
     conservative_map,
     fit_temperature,
     global_visible,
-    lower_bound_shift,
+    lower_bound_shift_maps,
     pair_max,
     tta_disagreement,
 )
@@ -91,11 +91,24 @@ def _sha(o: Any) -> str:
 # ----------------------------------------------------------------- feature joins
 
 
-def attach(group: Any, src: Any, mapping: dict[str, str]) -> None:
-    """Copy columns of ``src`` into ``group`` aligned by key (src may hold more keys)."""
-    idx = np.array([src.index[str(k)] for k in group.keys.tolist()], dtype=np.int64)
+def attach(group: Any, src: Any, mapping: dict[str, str], *, allow_missing: bool = False) -> None:
+    """Copy columns of ``src`` into ``group`` aligned by key (src may hold more keys). With
+    ``allow_missing`` keys absent from ``src`` get zeros; callers must never read those rows
+    (follow-up tables only touch images present in ``src``)."""
+    keys = [str(k) for k in group.keys.tolist()]
+    if not allow_missing:
+        idx = np.array([src.index[k] for k in keys], dtype=np.int64)
+        for dst, col in mapping.items():
+            group.arr[dst] = src.arr[col][idx]
+        return
+    have = np.array([k in src.index for k in keys], dtype=bool)
+    idx = np.array([src.index[k] for k, h in zip(keys, have, strict=True) if h], dtype=np.int64)
     for dst, col in mapping.items():
-        group.arr[dst] = src.arr[col][idx]
+        ref = src.arr[col]
+        out = np.zeros((len(keys), *ref.shape[1:]), ref.dtype)
+        out[have] = ref[idx]
+        group.arr[dst] = out
+    group.arr["_p4_present"] = have
 
 
 def side_rows(
@@ -141,6 +154,9 @@ def extend_table(
 ) -> None:
     """Add VE-C conservative co-visibility (prefix vc_), novelty pair score and TTA disagreement."""
     store, row = side_rows(pairs, rows, clean, occ)
+    present = clean.arr.get("_p4_present")
+    if present is not None and not present[row[store == 0]].all():
+        raise RuntimeError("table uses clean images missing from the Phase 4 extraction")
     n = len(pairs)
     parts: dict[str, list[np.ndarray]] = defaultdict(list)
     for i in range(0, n, 8192):
@@ -333,8 +349,13 @@ class Ctx:
         d = ev3.Group(
             self.dev, "p3_clean", tuple(f"{x}_{fold[:2]}" for x in ("vec", "vecf", "feat"))
         )
+        # the Phase 3 clean store also holds p3_test images, absent from the development
+        # extraction: attach partially; development code reads only rows marked present
         attach(
-            c, d, {"vec": f"vec_{fold[:2]}", "vecf": f"vecf_{fold[:2]}", "feat": f"feat_{fold[:2]}"}
+            c,
+            d,
+            {"vec": f"vec_{fold[:2]}", "vecf": f"vecf_{fold[:2]}", "feat": f"feat_{fold[:2]}"},
+            allow_missing=True,
         )
         return c
 
@@ -364,11 +385,21 @@ def develop() -> int:
         link = LogisticModel.from_dict(f3["heuristic_link"])
         clean = ctx.clean(fold)
         occ = {r: ctx.occ(fold, r) for r in ("train", "val", "cal")}
-        # 1) temperature and lower-bound shift on p3_val (seen families + clean val images)
+        # 1) temperature and lower-bound shift on p3_val (seen families + clean val images).
+        # Lighting renders are EXCLUDED: lighting is a corruption handled by quality (protocol
+        # 2.7 / 4.2) and their Phase 3 GT counts darkened pixels as occluded, contradicting the
+        # VE-C target (D-049).
         rng = np.random.default_rng(P4.seed)  # type: ignore[union-attr]
         ov = occ["val"]
-        pick = rng.choice(len(ov.keys), min(6000, len(ov.keys)), replace=False)
-        val_imgs = [i for i, s in sub.items() if s == "p3_val" and i in clean.index]
+        present = clean.arr["_p4_present"]
+        fam_v = np.array([str(k).split("|")[1] for k in ov.keys.tolist()])
+        phys = np.flatnonzero(fam_v != "F5_extreme_lighting")
+        pick = rng.choice(phys, min(6000, len(phys)), replace=False)
+        val_imgs = [
+            i
+            for i, s in sub.items()
+            if s == "p3_val" and i in clean.index and present[clean.index[i]]
+        ]
         cpick = rng.choice(len(val_imgs), min(2000, len(val_imgs)), replace=False)
         cidx = np.array([clean.index[val_imgs[i]] for i in cpick])
         lg = np.concatenate(
@@ -377,26 +408,22 @@ def develop() -> int:
         vis_t = np.concatenate([ov.arr["gt"][pick] >= 128, np.ones((len(cidx), 28, 28), bool)])
         temp = fit_temperature(lg, vis_t)
         occl = ov.arr["gt"][pick].astype(np.float64) / 255
-        pred_g = global_visible(conservative_map(ov.arr["vec"][pick], temp, 0.0))
-        shift = lower_bound_shift(pred_g, global_visible(occl), margin=0.10, max_rate=0.05)
-        # sanity (protocol 7): VE-C vs Phase 3 VE overestimation on val seen families
         g_true = global_visible(occl)
-        bias_vec = float(
-            (global_visible(conservative_map(ov.arr["vec"][pick], temp, shift)) - g_true).mean()
+        shift = lower_bound_shift_maps(
+            conservative_map(ov.arr["vec"][pick], temp, 0.0), g_true, margin=0.10, max_rate=0.05
         )
-        bias_ve3 = float(
-            (global_visible(ov.arr["ve"][pick].astype(np.float64) / 255) - g_true).mean()
-        )
-        over_vec = float(
-            (
-                (global_visible(conservative_map(ov.arr["vec"][pick], temp, shift)) - g_true) > 0.10
-            ).mean()
-        )
-        over_ve3 = float(
-            ((global_visible(ov.arr["ve"][pick].astype(np.float64) / 255) - g_true) > 0.10).mean()
-        )
+        # sanity (protocol 7): VE-C vs Phase 3 VE overestimation on val seen PHYSICAL families
+        gvec = global_visible(conservative_map(ov.arr["vec"][pick], temp, shift))
+        gve3 = global_visible(ov.arr["ve"][pick].astype(np.float64) / 255)
+        bias_vec, bias_ve3 = float((gvec - g_true).mean()), float((gve3 - g_true).mean())
+        over_vec = float(((gvec - g_true) > 0.10).mean())
+        over_ve3 = float(((gve3 - g_true) > 0.10).mean())
         # 2) novelty Gaussian on p3_train renders (seen families + clean train images)
-        tr_imgs = [i for i, s in sub.items() if s == "p3_train" and i in clean.index]
+        tr_imgs = [
+            i
+            for i, s in sub.items()
+            if s == "p3_train" and i in clean.index and present[clean.index[i]]
+        ]
         feats = np.concatenate(
             [
                 occ["train"].arr["feat"].astype(np.float64),
@@ -913,15 +940,91 @@ def final(args: argparse.Namespace) -> int:
     return 0
 
 
+def followup(args: argparse.Namespace) -> int:
+    """FOLLOW-UP on p3_test (Phase 3 confirmatory set, observed once): frozen Phase 4 rules,
+    Test-OOD and Test-ID cells (no E1 renders exist for p3_test). Logged; descriptive only."""
+    if not args.final:
+        raise RuntimeError("p3_test follow-up access requires --final")
+    lay = resolve_data_root()
+    fz4 = json.loads((lay.private_reports / "phase4_frozen.json").read_text("utf-8"))
+    if _sha({k: v for k, v in fz4.items() if k != "sha256"}) != fz4["sha256"]:
+        raise RuntimeError("phase4 frozen config modified")
+    ctx = Ctx()
+    run_id = uuid.uuid4().hex[:12]
+    prov = collect_provenance(ROOT, argv=sys.argv)
+    with (ROOT / PROTO.test_access.run_log).open("a", encoding="utf-8", newline="\n") as fh:
+        fh.write(
+            json.dumps(
+                {
+                    "run_id": run_id,
+                    "utc": datetime.now(tz=UTC).isoformat(),
+                    "script": "scripts/evaluate_phase4.py followup",
+                    "splits": ["p3_test"],
+                    "frozen_config_sha256": fz4["sha256"],
+                    "git_commit": (prov.get("git") or {}).get("commit"),
+                    "note": "Phase 4 FOLLOW-UP on p3_test (observed in Phase 3)",
+                }
+            )
+            + "\n"
+        )
+    cells: dict[str, dict[str, Any]] = {}
+    clean_res: dict[str, Any] = {}
+    pairs = ctx.c3.pairs["p3_test_pairs"]
+    for fold in FAMILIES:
+        f3, f4 = ctx.fz3["folds"][fold], fz4["folds"][fold]
+        link = LogisticModel.from_dict(f3["heuristic_link"])
+        nov = MahalanobisNovelty.from_dict(f4["novelty"])
+        clean = ctx.c3.clean(fold)
+        dclean = ev3.Group(
+            ctx.dev, "p3test_clean", tuple(f"{x}_{fold[:2]}" for x in ("vec", "vecf", "feat"))
+        )
+        attach(
+            clean,
+            dclean,
+            {"vec": f"vec_{fold[:2]}", "vecf": f"vecf_{fold[:2]}", "feat": f"feat_{fold[:2]}"},
+            allow_missing=True,
+        )
+        for role in ("test_id", "test_ood"):
+            occ = ctx.occ(fold, role)
+            rows = ctx.c3.plan(fold, role)
+            t = ev3.build_table(pairs, rows, clean, occ, fold, link, ctx.c3.ident)
+            extend_table(t, pairs, rows, clean, occ, f4["temperature"], f4["shift"], nov)
+            c = evaluate_cell(t, f3, f4)
+            c["paired_vs_a3"] = paired_vs_a3(c, t)
+            c.pop("decisions")
+            cells[f"{fold}|{role}"] = c
+        tc = ev3.build_table(pairs, None, clean, None, fold, link, ctx.c3.ident)
+        extend_table(tc, pairs, None, clean, None, f4["temperature"], f4["shift"], nov)
+        clean_res[fold] = clean_margin(tc, f3, f4)
+        print("followup", fold, flush=True)
+    report = {
+        "evidence_type": "real_measured_model_result",
+        "scope": "Phase 4 FOLLOW-UP on p3_test (observed once in Phase 3; frozen Phase 4 rules; descriptive)",
+        "run_id": run_id,
+        "frozen_sha256": fz4["sha256"],
+        "cells": cells,
+        "clean_margin": clean_res,
+        "endpoints_descriptive_test_ood_only": endpoints(cells),
+        "provenance": prov,
+    }
+    with (ROOT / "reports" / "experiments" / "phase4_followup_p3test.json").open(
+        "w", encoding="utf-8", newline="\n"
+    ) as fh:
+        json.dump(report, fh, indent=1, default=str)
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    ap.add_argument("stage", choices=["develop", "final"])
+    ap.add_argument("stage", choices=["develop", "final", "followup"])
     ap.add_argument("--final", action="store_true")
     ap.add_argument("--rehearse", action="store_true")
     args = ap.parse_args()
-    return develop() if args.stage == "develop" else final(args)
+    if args.stage == "develop":
+        return develop()
+    return final(args) if args.stage == "final" else followup(args)
 
 
 if __name__ == "__main__":

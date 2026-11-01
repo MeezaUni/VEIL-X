@@ -67,6 +67,27 @@ def lower_bound_shift(
     return float(C_GRID[-1])
 
 
+def lower_bound_shift_maps(
+    prob_maps: NDArray[np.floating],
+    true_global: NDArray[np.floating],
+    *,
+    margin: float = 0.10,
+    max_rate: float = 0.05,
+) -> float:
+    """Exact version of :func:`lower_bound_shift` for the map actually applied: the shift is
+    subtracted per cell and clipped at 0, so the global fraction falls by less than c where
+    cells clip. Smallest grid c such that at most ``max_rate`` of renders satisfy
+    global(clip(p - c, 0, 1)) - true > margin."""
+    fc = face_cells(np.asarray(prob_maps).shape[-1])
+    p = np.asarray(prob_maps, np.float64)[:, fc]
+    t = np.asarray(true_global, np.float64)
+    for c in C_GRID:
+        g = np.clip(p - c, 0.0, 1.0).mean(axis=1)
+        if float(((g - t) > margin).mean()) <= max_rate:
+            return float(c)
+    return float(C_GRID[-1])
+
+
 def conservative_map(logits: NDArray[np.floating], temperature: float, shift: float) -> F64:
     p = _sigmoid(np.asarray(logits, np.float64) / temperature)
     return np.asarray(np.clip(p - shift, 0.0, 1.0), dtype=np.float64)
