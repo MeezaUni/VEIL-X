@@ -386,3 +386,17 @@ def test_comparison_requires_authorisation_and_discards_uploads(
     out = run_comparison(p, tmp_path, *paths, "F1_mask", True, -1, -1, False, True)
     assert any(lab in out[0] for lab in ("MATCH", "NON-MATCH", "ABSTAIN"))
     assert not any(Path(x).exists() for x in paths)
+
+
+def test_examples_survive_a_comparison(cfg: AppConfig, tmp_path: Path) -> None:
+    from veilx.app.ui import disposable_copies, run_comparison
+
+    ex = tmp_path / "examples"
+    ex.mkdir()
+    img = np.random.default_rng(6).integers(0, 255, (112, 112, 3), dtype=np.uint8)
+    srcs = (str(ex / "a.png"), str(ex / "b.png"))
+    for s in srcs:
+        Image.fromarray(img).save(s)
+    a, b = disposable_copies(srcs, tmp_path)
+    run_comparison(_pipeline(cfg, []), tmp_path, a, b, "F1_mask", True, -1, -1, False, True)
+    assert all(Path(s).exists() for s in srcs) and not Path(a).exists() and not Path(b).exists()

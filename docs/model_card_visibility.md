@@ -82,3 +82,17 @@ there) and shift c = 0.
 
 **Decisions.** VE-C is **not recommended for decisions** (D-050). It is useful as an explanation
 overlay. Face-like occluders remain undetectable.
+
+## 5. Use in the Phase 5 local application (D-051)
+
+- **What is loaded:** the VE-C fold model matching the selected frozen A3 system (default
+  F1_mask), with its temperature, lower-bound shift and Mahalanobis novelty threshold from the
+  Phase 4 freeze (`bba12900…`, SHA-verified).
+- **What is shown:** visibility maps, region fractions and novelty flags, computed **after** the
+  decision.
+- **Isolation:** tests show that removing or corrupting the diagnostics leaves the decision
+  unchanged.
+- **Wording in the app:**
+  - "explanatory only — not used in the decision";
+  - "a 'typical' novelty value does not mean the image is free of occlusion";
+  - face-like occluders and physical occluders are named as known blind spots.

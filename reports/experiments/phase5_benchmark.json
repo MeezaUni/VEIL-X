@@ -1,0 +1,229 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Phase 5 end-to-end application latency and memory (one pair per request; development images; RTX 4060 Laptop GPU)",
+ "results": {
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "cuda": {
+   "cold": {
+    "load_detector_ms": 140.65260003553703,
+    "load_adaface_ms": 1214.9300000164658,
+    "load_arcface_ms": 1002.3269000230357,
+    "load_rule_and_diagnostics_ms": 362.5635000062175,
+    "first_comparison_ms": 670.2327000093646
+   },
+   "first_comparison_stages_ms": {
+    "detect_align": 204.20599996577948,
+    "embed_adaface": 309.64219995075837,
+    "embed_arcface": 20.50109999254346,
+    "decide": 0.10280002607032657,
+    "diagnostics": 135.71249996311963,
+    "total": 670.2184999594465
+   },
+   "lfw_detector_path": {
+    "n_pairs": 40,
+    "face_statuses": {
+     "aligned": 65,
+     "multiple_faces": 14,
+     "fallback_fixed_crop": 1
+    },
+    "stages_ms": {
+     "detect_align": {
+      "median": 173.72579997754656,
+      "p95": 181.5128700225614,
+      "n": 40
+     },
+     "embed_adaface": {
+      "median": 24.182399967685342,
+      "p95": 50.134569988586,
+      "n": 27
+     },
+     "embed_arcface": {
+      "median": 21.27590001327917,
+      "p95": 52.204540034290396,
+      "n": 27
+     },
+     "decide": {
+      "median": 0.06780005060136318,
+      "p95": 0.08832997409626842,
+      "n": 27
+     },
+     "diagnostics": {
+      "median": 5.7339000049978495,
+      "p95": 8.627279999200255,
+      "n": 27
+     },
+     "total": {
+      "median": 226.1270000017248,
+      "p95": 284.79207001510076,
+      "n": 27
+     }
+    }
+   },
+   "digiface_pre_aligned_path": {
+    "n_pairs": 40,
+    "face_statuses": {
+     "pre_aligned": 80
+    },
+    "stages_ms": {
+     "detect_align": {
+      "median": 0.006099988240748644,
+      "p95": 0.007334997644647954,
+      "n": 40
+     },
+     "embed_adaface": {
+      "median": 19.36160001787357,
+      "p95": 24.579384984099303,
+      "n": 40
+     },
+     "embed_arcface": {
+      "median": 18.206349981483072,
+      "p95": 19.951005015172996,
+      "n": 40
+     },
+     "decide": {
+      "median": 0.06749999010935426,
+      "p95": 0.086335014202632,
+      "n": 40
+     },
+     "diagnostics": {
+      "median": 4.868350020842627,
+      "p95": 6.18454999057576,
+      "n": 40
+     },
+     "total": {
+      "median": 42.97715000575408,
+      "p95": 49.39183496462647,
+      "n": 40
+     }
+    }
+   },
+   "peak_gpu_mib": 550.29736328125,
+   "peak_process_rss_gib_so_far": 1.7261886596679688
+  },
+  "cpu": {
+   "cold": {
+    "load_detector_ms": 67.70830001914874,
+    "load_adaface_ms": 976.6071999911219,
+    "load_arcface_ms": 1024.5152999996208,
+    "load_rule_and_diagnostics_ms": 288.45669998554513,
+    "first_comparison_ms": 497.06569995032623
+   },
+   "first_comparison_stages_ms": {
+    "detect_align": 182.46480001835153,
+    "embed_adaface": 159.85080000245944,
+    "embed_arcface": 128.90579999657348,
+    "decide": 0.08180004078894854,
+    "diagnostics": 25.700600002892315,
+    "total": 497.05389997689053
+   },
+   "lfw_detector_path": {
+    "n_pairs": 10,
+    "face_statuses": {
+     "aligned": 16,
+     "multiple_faces": 4
+    },
+    "stages_ms": {
+     "detect_align": {
+      "median": 185.88025000644848,
+      "p95": 191.10596499522217,
+      "n": 10
+     },
+     "embed_adaface": {
+      "median": 165.30180000700057,
+      "p95": 182.0506599789951,
+      "n": 7
+     },
+     "embed_arcface": {
+      "median": 139.3093999940902,
+      "p95": 155.30450001824647,
+      "n": 7
+     },
+     "decide": {
+      "median": 0.08369999704882503,
+      "p95": 0.13100999640300867,
+      "n": 7
+     },
+     "diagnostics": {
+      "median": 18.067400029394776,
+      "p95": 19.661680003628135,
+      "n": 7
+     },
+     "total": {
+      "median": 509.3044000095688,
+      "p95": 524.0476899780333,
+      "n": 7
+     }
+    }
+   },
+   "digiface_pre_aligned_path": {
+    "n_pairs": 10,
+    "face_statuses": {
+     "pre_aligned": 20
+    },
+    "stages_ms": {
+     "detect_align": {
+      "median": 0.0074499985203146935,
+      "p95": 0.008810008876025677,
+      "n": 10
+     },
+     "embed_adaface": {
+      "median": 149.34324999921955,
+      "p95": 162.30443998647388,
+      "n": 10
+     },
+     "embed_arcface": {
+      "median": 135.5263000295963,
+      "p95": 144.63881000701804,
+      "n": 10
+     },
+     "decide": {
+      "median": 0.08170001092366874,
+      "p95": 0.09073999244719742,
+      "n": 10
+     },
+     "diagnostics": {
+      "median": 17.325499997241423,
+      "p95": 17.816900010802783,
+      "n": 10
+     },
+     "total": {
+      "median": 303.3297499641776,
+      "p95": 318.58264997717924,
+      "n": 10
+     }
+    }
+   }
+  },
+  "peak_process_rss_gib_total": 2.200054168701172
+ },
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-11-01T22:54:19.744531+00:00",
+  "git": {
+   "commit": "b53c5d5ac660d7a0d77faaaa4b2899455b7c45b7",
+   "dirty": false,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.12.3",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts\\phase5_benchmark.py",
+   "--n",
+   "40",
+   "--n-cpu",
+   "10"
+  ],
+  "extra": {}
+ }
+}

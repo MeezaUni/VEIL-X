@@ -6,6 +6,65 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-11-02 — Phase 5 complete: local research application (waiting for owner review)
+
+### What was built
+- `src/veilx/app/`: the frozen A3 pipeline as a local Gradio app (D-051).
+  - SCRFD alignment with the labelled fixed-crop fallback; multiple faces refused unless one is
+    selected.
+  - Frozen AdaFace for the decision, ArcFace as a diagnostic only.
+  - M1 fused score and the A3 three-way rule.
+  - Phase 4 VE-C visibility and novelty as diagnostics computed after the decision.
+- Every frozen file is SHA-256 checked at load.
+- Serving:
+  - FastAPI wrapper on 127.0.0.1 with a strict CSP; no share link, no analytics;
+  - uploads deleted after reading; per-session temp directory with stale cleanup;
+  - authorised-use confirmation for every comparison.
+- Code commit `b53c5d5`. Parity and benchmark were re-run at that clean commit.
+
+### Results (development data only)
+- **Parity, DigiFace p3_val, 1,000 pairs:** decisions 1000/1000 identical to the offline
+  `evaluate_phase3`; max |Δscore| 0.0025.
+- **Parity, LFW View 1 DevTrain, 300 images:**
+  - all 244 single-face crops are pixel-identical to the offline ones;
+  - 49 multi-face images are refused, and with the offline central face selected 48/48 are
+    identical;
+  - 7 use the fallback.
+- **CPU vs GPU, 100 pairs:** decisions 100 % agree; minimum embedding cosine 0.99991.
+- **Latency:** see `docs/phase5_results.md` §6. GPU photo path about 0.23 s per pair (detector on
+  the CPU dominates); pre-aligned about 45 ms; CPU-only about 0.3–0.5 s; peak GPU memory 550 MiB.
+
+### Issues found and fixed
+- **External CDN request.** Gradio requested an `iframeResizer` script from cdnjs. It is blocked
+  by the CSP; verified in a browser network log.
+- **Legacy decorator.** FastAPI's untyped decorator was replaced by direct middleware
+  registration (mypy strict).
+- **cv2 not needed for the fallback.** The fallback resize now uses PIL BOX, so the CPU
+  environment needs no cv2. LFW 250×250 is unchanged.
+- **Temp directories survived a killed process.** Fixed with owner-PID stale cleanup.
+- **Rule-bar text hidden** under the Gradio label overlay.
+- **`test_imports` heavy-dependency check was order-dependent.** It failed in the GPU env
+  whenever a torch test file had been collected, already at `4cc7a3a`. It now runs in a fresh
+  interpreter.
+- **Example files deleted by the upload discard.** Found in the live browser check: Gradio
+  passed the example files' own paths through, so the per-request discard deleted them.
+  Examples are now loaded as disposable copies (regression test).
+- **Lint slip in `b53c5d5`.** A docstring line in `src/veilx/app/__init__.py` exceeded the line
+  limit. It was edited after the quality gate ran and is fixed in the next commit; both commits
+  were pushed together.
+- **`.playwright-mcp/` snapshots** (UI checks) contain local paths. They are git-ignored.
+
+### Checks
+- Quality gate: PASS.
+- CPU suite: 397 passed, 3 skipped.
+- GPU suite: 410 passed.
+
+### Next steps
+Waiting for owner review. Phase 6 is **not** started (recommendations in `docs/phase5_results.md`
+§11).
+
+---
+
 ## 2026-11-02 — Phase 4 complete (waiting for owner review)
 
 ### 4A: audit and freeze

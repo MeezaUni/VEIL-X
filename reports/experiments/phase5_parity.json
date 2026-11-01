@@ -1,0 +1,72 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Phase 5 application parity with offline frozen evaluation (development data: p3_val, LFW View 1 DevTrain)",
+ "results": {
+  "fold": "F1_mask",
+  "digiface_pre_aligned_path": {
+   "n_pairs": 1000,
+   "n_occluded_pairs": 762,
+   "render_keys_found_offline": 1000,
+   "max_abs_cosine_diff": 0.00040669695571071696,
+   "max_abs_quality_diff": 0.008235931396484375,
+   "max_abs_fused_score_diff": 0.0025374273668961056,
+   "mean_abs_fused_score_diff": 7.404097393291823e-05,
+   "decision_agreement": 1.0,
+   "n_disagreements": 0,
+   "disagreement_distance_to_threshold_max": null,
+   "decision_counts_app": {
+    "MATCH": 473,
+    "NON-MATCH": 490,
+    "ABSTAIN": 37
+   },
+   "note": "offline embeddings were stored as float16; the app computes them fresh (fp16 autocast on GPU)"
+  },
+  "lfw_detector_path_devtrain": {
+   "n_images": 300,
+   "offline_ok": 299,
+   "app_aligned": 244,
+   "app_multiple_faces_refused": 49,
+   "app_fallback": 7,
+   "crop_identical": 244,
+   "crop_compared": 244,
+   "max_abs_pixel_diff": 0,
+   "selected_central_compared": 48,
+   "selected_central_identical": 48,
+   "note": "offline Phase 2 used the central face when several were found; the app refuses unless the user selects one (multiple_faces)"
+  },
+  "cpu_vs_gpu": {
+   "n_pairs": 100,
+   "min_embedding_cosine_fp16gpu_vs_fp32cpu": 0.999913478398752,
+   "decision_agreement": 1.0,
+   "max_abs_fused_score_diff": 0.009214006580723744
+  }
+ },
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-11-01T22:52:43.732950+00:00",
+  "git": {
+   "commit": "b53c5d5ac660d7a0d77faaaa4b2899455b7c45b7",
+   "dirty": false,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.12.3",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts\\phase5_parity.py",
+   "--n",
+   "1000"
+  ],
+  "extra": {}
+ }
+}

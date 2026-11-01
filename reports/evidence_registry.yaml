@@ -451,6 +451,36 @@ records:
       protocol_version: "0.6.0"
       final_run_log_entry: "db421cf1744d; d57db3ee8923"
     caveats: "Follow-up evidence (sets observed before); 300 LFW pairs; synthetic occluders."
+  - id: RES-022
+    type: real_measured_model_result
+    title: "Phase 5 application parity with the offline frozen evaluation"
+    statement: "The local application reproduces the frozen A3 decisions of the offline Phase 3 evaluation on 1000/1000 p3_val pairs (fold F1; max fused-score difference 0.0025); on 300 LFW View 1 DevTrain images all 244 single-face crops and all 48 explicitly selected central-face crops are pixel-identical to the offline aligned crops (49 multi-face images refused, 7 fallback); CPU fp32 vs GPU fp16 decisions agree on 100/100 pairs (min embedding cosine 0.99991)."
+    source: "scripts/phase5_parity.py --n 1000"
+    artefact: "reports/experiments/phase5_parity.json"
+    created: "2026-11-02"
+    provenance:
+      git_commit: "b53c5d5"
+      dataset_ids: ["digiface1m", "kaggle_jessicali9530_lfw"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m", "insightface_buffalo_l_det_10g"]
+      split: "p3_val; lfw_view1_devtrain"
+      protocol_version: "0.6.0"
+      final_run_log_entry: "none (development data; no test partition used)"
+    caveats: "Development data only. Parity of the pipeline, not evidence that the calibration transfers to other populations."
+  - id: RES-023
+    type: real_measured_model_result
+    title: "Phase 5 application latency and memory (RTX 4060 Laptop GPU)"
+    statement: "One pair per request, warm medians: total 226 ms on GPU for LFW photographs (SCRFD on CPU 174 ms), 43 ms for pre-aligned crops; CPU-only 509 ms and 303 ms. Model loading about 2.7 s; peak GPU memory 550 MiB; peak process RSS 2.2 GiB with both devices loaded."
+    source: "scripts/phase5_benchmark.py --n 40 --n-cpu 10"
+    artefact: "reports/experiments/phase5_benchmark.json"
+    created: "2026-11-02"
+    provenance:
+      git_commit: "b53c5d5"
+      dataset_ids: ["digiface1m", "kaggle_jessicali9530_lfw"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m", "veilx_vec_phase4_F1-F5", "insightface_buffalo_l_det_10g"]
+      split: "p3_val; lfw_view1_devtrain"
+      protocol_version: "0.6.0"
+      final_run_log_entry: "none (development data; no test partition used)"
+    caveats: "Single laptop; 40 GPU / 10 CPU pairs; totals over completed comparisons (multi-face refusals excluded)."
   # ------------------------------------------------------------------ hypotheses
   - id: HYP-001
     type: unverified_hypothesis

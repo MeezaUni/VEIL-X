@@ -1,69 +1,73 @@
 # VEIL-X
 
 Research code for **risk-controlled two-image (1:1) face verification under occlusion**.
-Non-commercial academic research only.
+Non-commercial academic research only. **Not an identity-verification product.**
 
-> **Status: Phase 2 complete, including the real-photo evaluation (LFW).** AdaFace IR-101 and
-> ArcFace IR-101 (WebFace4M) were evaluated frozen, with no training.
-> - **DigiFace-1M** (synthetic faces) with synthetic occlusions: `docs/baseline_evaluation.md`.
-> - **LFW** (Kaggle v4, used under user-reported academic authorisation): official View-2 protocol
->   plus derived synthetic occlusions on real photographs: `docs/real_world_benchmark.md` §7.
-> - Audit: `docs/statistical_audit.md`.
+> **Status: Phase 5 complete (local research application). Waiting for owner review.**
+> - Frozen AdaFace IR-101 and ArcFace IR-101 (WebFace4M); no recognition training.
+> - Phase 3 (`docs/phase3_results.md`): learned-visibility calibration did **not** beat
+>   quality-stratified calibration on unseen occluders.
+> - Phase 4 (`docs/phase4_results.md`): conservative visibility fixed the overestimation, but no
+>   visibility-based rule beat **A3 quality-stratified calibration**, which is recommended (D-050).
+> - On an untouched DigiFace population, **every rule exceeded the 5 % selective-error target**
+>   (population shift). The guarantees are calibration-population-specific.
+> - Phase 5 (`docs/phase5_results.md`): a local Gradio demonstration of the frozen pipeline with
+>   explanatory diagnostics (`docs/app_user_guide.md`).
 >
-> Derived occlusions are synthetic overlays, **not physical occlusions**. Clean LFW accuracy is
-> likely optimistic because of probable identity overlap with the backbones' training data.
->
-> Dataset images, manifests, embeddings and weights are never in this repository: they live in
-> a private data root (`VEILX_DATA_ROOT`). Every number in `docs/` and `reports/` is typed in
-> `reports/evidence_registry.yaml`:
-> - cited work;
-> - exact calculations;
-> - **SIMULATED** results;
-> - real-data statistics;
-> - **MEASURED** model results, each with run provenance.
+> All occluders are **synthetic**; physical occlusions are unvalidated. There is no formal
+> out-of-distribution risk guarantee. LFW and DigiFace results do not establish deployment
+> readiness.
 
-## Research questions (approved)
+## Research questions
 
-- **Primary (C3):** Do risk-controlled decisions (Learn-then-Test on calibration data) keep
-  their target error rate on **held-out challenge families**? Does **visibility-stratified**
-  calibration reduce violations? The guarantees assume exchangeable calibration/test data and
-  are **not** claimed under held-out shifts. Measuring the gap is the point.
-- **Secondary (C1):** Does pair-level **co-visibility** predict errors beyond image-quality
-  measures? It is compared with quality-only, co-visibility-only and quality + co-visibility.
+- **C3 (primary):** do risk-controlled decisions (Learn-then-Test) keep their target error on
+  **held-out occlusion families**, and does visibility-aware calibration help? **Answer so far:
+  no.** Quality stratification is more reliable, and guarantees do not transfer under population
+  shift.
+- **C1 (secondary):** does pair-level co-visibility add information beyond quality? Only for some
+  seen families; it is harmful on never-seen occluders, so it is excluded from the recommended
+  system.
 
-Frozen pretrained backbones: AdaFace IR101 (primary) and ArcFace (secondary). Challenge
-families: masks, sunglasses, hands/objects, random patches, extreme lighting. Lighting is
-interpreted separately.
+## The local research application (Phase 5)
 
-## What exists (Phases 1a + 1b)
+```powershell
+uv pip install --python .venv-gpu\Scripts\python.exe -e ".[gpu,app]"      # torch: CUDA wheel index, see pyproject
+$env:VEILX_DATA_ROOT = "C:\path\to\veilx_data"                              # private models + frozen configs
+.venv-gpu\Scripts\python.exe scripts\run_app.py                             # http://127.0.0.1:7860 (local only)
+```
 
-| Area | Module | Notes |
-|---|---|---|
-| Dataset adapter | `veilx.data.digiface` | DigiFace-1M layout, integrity and anomaly report. Run on the approved real subset: 310,665 images, 0 anomalies |
-| Real-data pipeline | `scripts/prepare_digiface.py`, `veilx.data.{download,archive,images,dedup,integrity}` | Verified download, safe extraction, fingerprints, validated dedup, pair sets, occlusion plans (`docs/data_integrity_report.md`) |
-| Occlusion engine | `veilx.occlusion` | Masks, sunglasses, hands/objects, random patches, extreme lighting (non-physical); stress combinations; leave-one-family-out plans with isolation checks |
-| Pairs | `veilx.pairs` | Identity-disjoint (independent) or clustered pairs. Explicit infeasibility; independence accounting |
-| Metrics | `veilx.metrics` | ROC-AUC, EER, TAR@FAR (benchmark and deployment), selective metrics, AUGRC/AURC, ECE/Brier/reliability. See `docs/metrics.md` |
-| Uncertainty | `veilx.stats.jackknife`, `veilx.stats.bootstrap` | Delete-one-identity jackknife (selected by SIM-010); identity bootstrap kept for comparison |
-| Risk control | `veilx.selective` | Audited Learn-then-Test (`docs/ltt_audit.md`), empirical-only calibrator, stratified LTT |
-| Simulations | `veilx.sim`, `reports/simulations/` | 10 deterministic synthetic experiments (`docs/simulation_findings.md`) |
-| Training infrastructure | `veilx.training`, `configs/experiments/` | Run configs, checkpoints, mixed precision; **training not authorised** (double guard) |
-| Integrity | `veilx.evidence`, `reports/evidence_registry.yaml` | Keeps published, calculated, simulated, measured and hypothesised results separate |
+**Pipeline:**
+- SCRFD detection + 5-point alignment, with the registered fixed-crop **fallback**. It is always
+  labelled, and multiple faces are refused unless the user selects one.
+- Frozen AdaFace (decision) and ArcFace (diagnostic).
+- Fused score M1 = logistic(cosine, min feature norm, product).
+- **A3 quality-stratified MATCH / NON-MATCH / ABSTAIN** rule (frozen Phase 3 system; D-051).
+
+Visibility maps and novelty flags (Phase 4 VE-C) are shown as **explanations only** and never
+enter the decision.
+
+**Privacy:**
+- loopback only; no share link, no analytics, no third-party requests (strict CSP);
+- uploads deleted after reading; no embedding storage; no identity search.
+
+The app verifies SHA-256 of every frozen file. Parity with the offline evaluation and measured
+latency are in `docs/phase5_results.md`.
 
 ## Repository layout
 
 ```
-configs/   research_protocol.yaml (protocol v0.3.0), datasets.yaml, experiments/ (templates)
-docs/      research, protocol (+ changelog), audit, metrics, data-integrity and decision docs
-reports/   simulations/*.json (SIMULATED), data/*.json (aggregated real-data statistics),
-           evidence_registry.yaml
-scripts/   quality_gate, validate_config, feasibility_report, run_simulations, scan_sensitive,
-           fetch_digiface, prepare_digiface, parts_benefit
-src/veilx/ config, data (manifest, splits, png, images, archive, download, paths, digiface,
-           dedup, integrity), pairs, occlusion, metrics, stats, selective, sim, training,
-           evidence, interfaces, provenance, logging, seeding, guards, errors
-tests/     unit, property, integrity, simulation and pipeline-integration tests (synthetic
-           fixtures only; no real images, no models)
+configs/   research_protocol.yaml (v0.6.0), datasets.yaml, experiments/, app/veilx_app.yaml
+docs/      protocols (phase3/phase4), results (phase3/phase4/phase5), audit, model cards,
+           app_user_guide, decision log, development log
+reports/   experiments/*.json (MEASURED, with provenance), simulations/ (SIMULATED),
+           data/ (aggregated statistics), figures/, evidence_registry.yaml
+scripts/   data preparation, extraction, training, evaluation (phase2-4), app (run_app,
+           phase5_parity, phase5_benchmark), quality_gate, scan_sensitive
+src/veilx/ data, occlusion, detect, models, embeddings, vis, fusion, selective, stats,
+           metrics, sim, training, evidence, app (config, inputs, face, decision, pipeline,
+           diagnostics, report, server, tempfiles, ui)
+tests/     unit, property, integrity and pipeline tests (synthetic fixtures; model tests skip
+           without the private data root)
 ```
 
 ## Setup and checks (Windows PowerShell, uv)
@@ -72,37 +76,34 @@ tests/     unit, property, integrity, simulation and pipeline-integration tests 
 uv venv --python 3.12 .venv
 uv pip install --python .venv\Scripts\python.exe -e . pytest ruff mypy types-PyYAML
 .venv\Scripts\python.exe scripts\quality_gate.py          # ruff, format, mypy, pytest, config, privacy scan
-.venv\Scripts\python.exe scripts\run_simulations.py       # regenerate reports/simulations (about 2 min)
-.venv\Scripts\python.exe scripts\feasibility_report.py    # exact sample-size calculations
+.venv-gpu\Scripts\python.exe -m pytest tests\test_app_models.py tests\test_models_torch.py   # GPU / model tests
 ```
 
-Run `scripts\scan_sensitive.py` before every commit. It refuses images, arrays, manifests
-(`.jsonl`), archives, weights, documents, secrets, large files and absolute user paths.
+Run `scripts\scan_sensitive.py` before every commit. It refuses images, arrays, manifests,
+archives, weights, documents, secrets, large files and absolute user paths.
 
-### Real-data preparation (approved DigiFace subset; private data root)
-
-```powershell
-$env:VEILX_DATA_ROOT = "<folder outside any git repository>"
-.venv\Scripts\python.exe scripts\fetch_digiface.py         # approved parts only, ~5.9 GiB
-.venv\Scripts\python.exe scripts\prepare_digiface.py extract scan fingerprint dedup pairs occlusion summary
-```
-
-Only aggregated, non-identifying statistics are written inside the repository
-(`reports/data/`). Everything listing images, identities or pairs stays in the data root.
+**Reproducibility.**
+- Every measured number traces to a script, a frozen configuration (SHA-256), a seed and, for test
+  data, a logged run in `results/test_runs.jsonl`. See `reports/experiments/registry.json` and the
+  per-phase result documents.
+- Data preparation: `scripts/fetch_digiface.py`, `prepare_digiface.py`, `prepare_phase3.py`,
+  `prepare_phase4.py`, `prepare_lfw.py`.
+- Evaluation: `scripts/evaluate_phase3.py`, `evaluate_phase4.py`.
 
 ## Privacy and licensing
 
 - **No biometric data in git:** no images, embeddings, real-data manifests, weights or
   credentials.
-- Scope is **1:1 verification of two images only**. There is no 1:N search, gallery,
-  scraping or surveillance functionality.
-- Pretrained weights (InsightFace, AdaFace/WebFace) and datasets (e.g. DigiFace-1M under
-  R-UDA) are **non-commercial research only**. See `docs/dataset_feasibility.md`.
+- Scope is **1:1 verification of two images only**. There is no 1:N search, gallery, scraping
+  or surveillance functionality.
+- Pretrained weights (InsightFace, AdaFace/ArcFace on WebFace) and datasets (DigiFace-1M under
+  R-UDA; LFW under user-reported academic authorisation) are **non-commercial research only**.
 
 ## Key documents
 
-`docs/protocol_design.md`, `docs/ltt_audit.md`, `docs/metrics.md`,
-`docs/simulation_findings.md`, `docs/evidence_registry.md`, `docs/dataset_feasibility.md`,
-`docs/interfaces.md`, `docs/decision_log.md`, `docs/DEVELOPMENT_LOG.md`, plus the Phase 0
-research documents (`research_landscape`, `novelty_audit`, `dataset_strategy`,
-`proposed_architecture`, `evaluation_protocol`, `implementation_roadmap`).
+- **Results:** `docs/phase3_results.md`, `docs/phase4_results.md`, `docs/phase5_results.md`.
+- **Protocols:** `docs/phase3_protocol.md`, `docs/phase4_protocol.md`.
+- **Using the app:** `docs/app_user_guide.md`.
+- **Model cards:** `docs/model_card_backbones.md`, `docs/model_card_visibility.md`.
+- **Audit and records:** `docs/statistical_audit.md`, `docs/decision_log.md`,
+  `docs/DEVELOPMENT_LOG.md`, `docs/implementation_roadmap.md`.

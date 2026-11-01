@@ -77,10 +77,11 @@ Everything else (visibility segmenter, region similarities, stratified calibrati
 - [ ] Write-up separating [V] prior work, [H] hypotheses, [D] design and [M] measured results.
 
 ### Phase 5 — Local demo · size: S–M
-- [ ] Gradio app per `proposed_architecture.md` §7, bound to localhost, no persistence.
-- [ ] Scripted scenarios using DigiFace synthetic identities only.
-- [ ] Rationale templates are tested so that every abstention reason maps to the triggering
-      quantity.
+- [x] Gradio app bound to localhost, no persistence (as built: §7 of `proposed_architecture.md`,
+      updated; D-051).
+- [x] Scripted scenarios using DigiFace synthetic identities only (generated locally at launch).
+- [x] Abstention reasons are tested: each names the stratum band or the face-preparation failure
+      that triggered it.
 
 ### Optional extensions (only after Phase 4, each with its own ablation)
 | Extension | Ablation | Note |
@@ -183,6 +184,27 @@ Not done:
 - Physical-occlusion benchmarks (ROF not approved; RMFRD, MLFW and others unresolved).
 - Detector runs on occluded photographs.
 - Train-role occlusion plans (deferred to Phase 3).
+
+## 4i. Phase 5 status (2026-11-02): complete; waiting for owner review
+
+Local research application (D-051). Results: `docs/phase5_results.md`; user guide:
+`docs/app_user_guide.md`.
+
+**What the app runs:** the frozen A3 system with SCRFD and the labelled fallback.
+**Diagnostics:** VE-C visibility and novelty are explanatory only.
+**Privacy:** loopback only, with a strict CSP; no persistence.
+
+**Parity on development data:**
+- 1000/1000 A3 decisions match the offline evaluation;
+- LFW crops are pixel-identical;
+- CPU and GPU decisions match.
+
+**Latency:**
+- GPU photo path about 0.23 s per pair (the detector on the CPU dominates);
+- pre-aligned about 45 ms;
+- CPU-only about 0.3–0.5 s.
+
+**Phase 6** is not started. Recommendations are in `docs/phase5_results.md` §11.
 
 ## 4h. Phase 4 status (2026-11-02): complete; waiting for owner review
 

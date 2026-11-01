@@ -11,6 +11,8 @@ Privacy behaviour:
 from __future__ import annotations
 
 import os
+import shutil
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -60,6 +62,20 @@ def read_and_discard(path: str | None, temp_root: Path | None) -> bytes | None:
         except OSError:
             pass
     return data
+
+
+def disposable_copies(paths: tuple[str, str], temp_root: Path | None) -> tuple[str, str]:
+    """Copies of example files for one comparison (the comparison deletes its inputs after reading)."""
+    if temp_root is None:
+        return paths
+    out = temp_root / "uploads"
+    out.mkdir(exist_ok=True)
+    copies = []
+    for src in paths:
+        dst = out / f"{uuid.uuid4().hex}{Path(src).suffix}"
+        shutil.copyfile(src, dst)
+        copies.append(str(dst))
+    return copies[0], copies[1]
 
 
 def model_info_md(cfg: AppConfig) -> str:
@@ -368,7 +384,7 @@ def build_app(
 
                 def load_example(name: str) -> tuple[str, str]:
                     i = int(name.split()[-1]) - 1
-                    return example_pairs[i]
+                    return disposable_copies(example_pairs[i], temp_root)
 
                 load.click(load_example, [ex_btn], [in_a, in_b])
             else:

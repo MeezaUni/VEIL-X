@@ -155,6 +155,16 @@ the GPU clock state.
 
 ## 7. Local demo design
 
+> **As built in Phase 5 (D-051; `docs/phase5_results.md`).** The original design below predates
+> the Phase 3/4 results. The implemented app differs as follows:
+> - the decision is the frozen **A3 quality-stratified** rule;
+> - co-visibility, visibility-weighted similarity and the local-similarity heatmap are **not**
+>   decision inputs. Visibility maps and novelty are shown as explanations only;
+> - there is no calibrated "p(match)": the fused score is labelled *not a probability of identity*;
+> - synthetic occluder toggles were not added. The synthetic examples include an occluded pair;
+> - the authorised-use confirmation, localhost binding and no-persistence rules were implemented
+>   as specified, plus a strict CSP and deletion of uploads after reading.
+
 **Purpose:** show *why* the system decided, and show it **declining** when evidence is
 inadequate. Do not show off accuracy.
 

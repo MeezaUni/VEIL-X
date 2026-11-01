@@ -61,3 +61,16 @@ never does this: any missing, unexpected or mis-shaped tensor raises `ModelLoadE
 identical validation AUC, and is faster than fp32. Calibration and test embeddings use the
 same precision, so the frozen system (weights + preprocessing + fp16) is identical
 across splits.
+
+## 3. Use in the Phase 5 local application (D-051)
+
+- **AdaFace IR-101:** the only recognition input to the decision (cosine s and pre-normalisation
+  feature norm q → M1 → A3).
+- **ArcFace IR-101:** shown only as a diagnostic similarity and an AdaFace–ArcFace disagreement.
+- **Precision:**
+  - GPU: fp16 autocast, as in extraction;
+  - CPU: fp32. Over 100 development pairs, the minimum embedding cosine between CPU and GPU was
+    0.99991, and every A3 decision was identical (`reports/experiments/phase5_parity.json`).
+- **Weights:** loaded from the private data root with SHA-256 verification and never
+  redistributed.
+- **Use restrictions:** the non-commercial research terms of the checkpoints apply to the app.

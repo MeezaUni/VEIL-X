@@ -38,6 +38,8 @@
 |---|---|
 | Network | Binds to `127.0.0.1` only. No Gradio share link, no analytics, Hugging Face hub offline. A Content-Security-Policy confines the page to the local origin: the browser makes no third-party request (Gradio's default CDN script is blocked) |
 | Uploads | Gradio stores each upload in a **private per-session temp directory** (`%TEMP%\veilx_app_*`). The app reads the bytes, validates and decodes them in memory, and **deletes the upload file immediately** |
+| Displayed images | To show detections, crops and visibility overlays, Gradio writes these images into the **same private session directory**. Files older than 15 minutes are removed every 10 minutes, and the whole directory is removed at exit |
+| Examples | Synthetic examples are generated into the session directory at launch. Each load hands the comparison a disposable copy |
 | Session end | The session directory is removed on normal exit. A directory left by a killed process is removed at the next start (owner-PID check) |
 | Embeddings | Computed in memory for the current comparison only; **never written to disk**, never compared against any stored gallery. There is no identity lookup or search function |
 | Logging | No image, embedding or result logging (server access log disabled) |
