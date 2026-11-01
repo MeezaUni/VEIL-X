@@ -1,0 +1,122 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Phase 4 feature extraction, set p4 (throughput only; no scores)",
+ "pilot": false,
+ "groups": {
+  "p4_clean": {
+   "n": 81915,
+   "parts": 5,
+   "computed": 81915,
+   "seconds": 1073.4,
+   "items_per_s": 76.3
+  },
+  "e1": {
+   "n": 48000,
+   "parts": 3,
+   "computed": 48000,
+   "seconds": 467.2,
+   "items_per_s": 102.7
+  },
+  "F1_mask__test_id__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 307.4,
+   "items_per_s": 195.2
+  },
+  "F2_sunglasses__test_id__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 310.0,
+   "items_per_s": 193.6
+  },
+  "F3_hand_object__test_id__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 311.5,
+   "items_per_s": 192.6
+  },
+  "F4_random_patch__test_id__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 310.4,
+   "items_per_s": 193.3
+  },
+  "F5_extreme_lighting__test_id__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 311.2,
+   "items_per_s": 192.8
+  },
+  "F1_mask__test_ood__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 307.6,
+   "items_per_s": 195.1
+  },
+  "F2_sunglasses__test_ood__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 307.3,
+   "items_per_s": 195.2
+  },
+  "F3_hand_object__test_ood__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 314.6,
+   "items_per_s": 190.7
+  },
+  "F4_random_patch__test_ood__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 312.5,
+   "items_per_s": 192.0
+  },
+  "F5_extreme_lighting__test_ood__p4_test_pairs": {
+   "n": 60000,
+   "parts": 4,
+   "computed": 60000,
+   "seconds": 309.3,
+   "items_per_s": 194.0
+  }
+ },
+ "wall_seconds": 4642.4,
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-11-01T19:14:19.204345+00:00",
+  "git": {
+   "commit": "5571872952b78ae05d1078c451519d2e2ef82045",
+   "dirty": false,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.14.1",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts\\extract_phase4.py",
+   "--set",
+   "p4",
+   "--workers",
+   "6"
+  ],
+  "extra": {}
+ }
+}
