@@ -163,3 +163,41 @@ def test_strata_labels_cover_all_pairs(ev: Any) -> None:
         "qH_vH",
         "qH_vH",
     ]
+
+
+def test_build_table_when_occluded_store_is_larger_than_clean(ev: Any) -> None:
+    """Regression: each side must be looked up only in its own store (LFW: 8k clean, 62k occ)."""
+    rng = np.random.default_rng(1)
+    imgs = ["lfw:a:0", "lfw:a:1", "lfw:b:0"]
+    ident = {"lfw:a:0": "a", "lfw:a:1": "a", "lfw:b:0": "b"}
+    pairs = [
+        PairRecord.model_construct(pair_id="q0", image_a=imgs[0], image_b=imgs[1], label="genuine"),
+        PairRecord.model_construct(
+            pair_id="q1", image_a=imgs[0], image_b=imgs[2], label="impostor"
+        ),
+    ]
+    spec = {"family": "F1_mask", "severity_level": "high", "visibility_ratio": 0.5}
+    rows = {
+        "q0": {"stratum": "one", "a": None, "b": spec | {"seed": 7}},
+        "q1": {"stratum": "one", "a": None, "b": spec | {"seed": 8}},
+    }
+    pad = [f"pad{i}" for i in range(50)]  # occluded rows land at indices far above len(clean)
+    occ_keys = [
+        *pad,
+        occluded_key(imgs[1], "F1_mask", "high", 7),
+        occluded_key(imgs[2], "F1_mask", "high", 8),
+    ]
+    clean, occ = _store(ev, imgs, rng, False), _store(ev, occ_keys, rng, True)
+    link = LogisticModel(("anomaly",), 1e6).fit(
+        rng.uniform(0, 4, (200, 1)), (rng.random(200) < 0.5).astype(np.int64)
+    )
+    t = ev.build_table(pairs, rows, clean, occ, "F1_mask", link, ident)
+
+    def unit(x: np.ndarray) -> np.ndarray:
+        x = x.astype(np.float32)
+        return x / np.linalg.norm(x)
+
+    for k, (img_a, key_b) in enumerate(((imgs[0], occ_keys[-2]), (imgs[0], occ_keys[-1]))):
+        ea = unit(clean.arr["emb_ada"][clean.index[img_a]])
+        eb = unit(occ.arr["emb_ada"][occ.index[key_b]])
+        assert t["s"][k] == pytest.approx(float(ea @ eb), abs=1e-5)

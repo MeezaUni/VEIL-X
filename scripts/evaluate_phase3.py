@@ -147,9 +147,11 @@ def build_table(
 
     def gather(col_clean: str, col_occ: str, j: int, idx: slice) -> np.ndarray:
         st, rw = side_store[j, idx], side_row[j, idx]
-        src = clean.arr[col_clean][rw]
-        if occ is not None and (st == 1).any():
-            src = src.copy()
+        # rows index two different stores: look each side up only in its own store
+        src = np.empty((len(rw), *clean.arr[col_clean].shape[1:]), clean.arr[col_clean].dtype)
+        src[st == 0] = clean.arr[col_clean][rw[st == 0]]
+        if (st == 1).any():
+            assert occ is not None
             src[st == 1] = occ.arr[col_occ][rw[st == 1]]
         return src
 
