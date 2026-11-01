@@ -223,10 +223,11 @@ def main() -> int:
             for p in read_jsonl(p4 / "p4_test_pairs.jsonl", PairRecord)
         }
         used = sorted({i for ab in pairs4.values() for i in ab})
+        used_set = set(used)  # built once (membership test per manifest record)
         recs = {
             r.image_id: (r.relpath, r.pixel_sha256 or r.sha256)
             for r in read_jsonl(p4 / "images.jsonl", ImageRecord)
-            if r.image_id in set(used)
+            if r.image_id in used_set
         }
         root = lay.extracted / "phase4"
         groups.append(("p4_clean", [(i, i, None, None, 0) for i in used], FAMILIES))
