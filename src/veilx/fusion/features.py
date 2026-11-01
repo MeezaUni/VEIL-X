@@ -19,6 +19,7 @@ from veilx.vis.covis import pair_features
 
 F64 = NDArray[np.float64]
 SOURCES = ("ve", "heur", "gt")
+P4_SOURCES = ("vc",)  # Phase 4 conservative VE-C maps
 
 # model -> (feature names; the visibility source used for vis/cv features or None)
 LADDER: dict[str, tuple[tuple[str, ...], str | None]] = {
@@ -34,6 +35,15 @@ LADDER: dict[str, tuple[tuple[str, ...], str | None]] = {
     ),
     "M4_heur": (("s", "q", "s*q", "cv", "asym", "s*cv"), "heur"),
     "M4_oracle": (("s", "q", "s*q", "cv", "asym", "s*cv"), "gt"),
+}
+
+# Phase 4 ladder (docs/phase4_protocol.md 4.4-4.5); kept separate so Phase 3 stays frozen.
+_M5 = ("s", "q", "s*q", "cv", "asym", "s*cv", "s_arc", "q_arc", "s_arc*q_arc", "disagree")
+LADDER_P4: dict[str, tuple[tuple[str, ...], str | None]] = {
+    "M1": (("s", "q", "s*q"), None),
+    "M4c": (("s", "q", "s*q", "cv", "asym", "s*cv"), "vc"),
+    "M5c": (_M5, "vc"),
+    "M5_noCV": (("s", "q", "s*q", "s_arc", "q_arc", "s_arc*q_arc", "disagree"), None),
 }
 
 
@@ -52,9 +62,14 @@ def covis_columns(
     return {k: np.concatenate(v) for k, v in parts.items()}
 
 
-def design(table: dict[str, NDArray[Any]], model: str, cv_def: str) -> tuple[F64, tuple[str, ...]]:
+def design(
+    table: dict[str, NDArray[Any]],
+    model: str,
+    cv_def: str,
+    ladder: dict[str, tuple[tuple[str, ...], str | None]] | None = None,
+) -> tuple[F64, tuple[str, ...]]:
     """Design matrix of ``model`` with the registered co-visibility definition ``cv_def``."""
-    names, src = LADDER[model]
+    names, src = (LADDER if ladder is None else ladder)[model]
     get: dict[str, Callable[[], F64]] = {
         "s": lambda: table["s"],
         "s_arc": lambda: table["s_arc"],

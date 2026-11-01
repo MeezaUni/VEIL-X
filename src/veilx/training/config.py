@@ -42,10 +42,18 @@ class PrecisionPolicy(_Strict):
     deterministic: bool = True
 
 
+class VisibilityTrainingOptions(_Strict):
+    """Phase 4 conservative visibility estimator (docs/phase4_protocol.md section 4.2)."""
+
+    occluded_weight: float = Field(ge=1.0, default=1.0)  # BCE weight on occluded-target cells
+    hard_negative_fraction: float = Field(ge=0.0, lt=1.0, default=0.0)
+    lighting_as_corruption: bool = False
+
+
 class TrainingRunConfig(_Strict):
     schema_version: Literal[1] = 1
     run_id: str = Field(pattern=r"^[a-z0-9][a-z0-9_\-]{2,63}$")
-    phase: Literal["phase2", "phase3"]
+    phase: Literal["phase2", "phase3", "phase4"]
     authorized: bool = False
     purpose: str = Field(min_length=10)
     seed: int = Field(ge=0)
@@ -61,6 +69,7 @@ class TrainingRunConfig(_Strict):
     learning_rate: float = Field(gt=0)
     precision: PrecisionPolicy = PrecisionPolicy()
     checkpoint: CheckpointPolicy
+    visibility: VisibilityTrainingOptions | None = None
 
     @model_validator(mode="after")
     def _no_test_data(self) -> TrainingRunConfig:

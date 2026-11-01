@@ -51,6 +51,19 @@ class VisNet(nn.Module):
         logits: torch.Tensor = self.head(y)[:, 0]
         return logits
 
+    def forward_with_features(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        """(logits, bottleneck feature): the 7x7 encoder output, global-average-pooled to
+        (N, 8w). The feature is the input to the Phase 4 Mahalanobis novelty score."""
+        x1 = self.e1(x)
+        x2 = self.e2(self.pool(x1))
+        x3 = self.e3(self.pool(x2))
+        x4 = self.e4(self.pool(x3))
+        x5 = self.e5(self.pool(x4))
+        y = self.d4(torch.cat([self.up5(x5), x4], 1))
+        y = self.d3(torch.cat([self.up4(y), x3], 1))
+        logits: torch.Tensor = self.head(y)[:, 0]
+        return logits, x5.mean(dim=(2, 3))
+
 
 def to_input(images: NDArray[np.uint8]) -> NDArray[np.float32]:
     if images.dtype != np.uint8 or images.ndim != 4 or images.shape[1:] != (112, 112, 3):

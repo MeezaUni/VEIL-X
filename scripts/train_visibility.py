@@ -1,4 +1,8 @@
-"""Train the Phase 3 visibility estimator for one held-out family (docs/phase3_protocol.md §3).
+"""Train the visibility estimator for one held-out family (Phase 3 §3; Phase 4 VE-C §4.2).
+
+Phase 4 configs (``phase: phase4`` + ``visibility:``) add the conservative options: asymmetric
+BCE (weight on occluded-target cells), natural-texture hard negatives, and lighting targets that
+mark only information-free pixels. Without ``visibility:`` behaviour is exactly Phase 3.
 
 Training images: p3_train only; every sample is clean (25 %) or occluded with one SEEN family
 (the fold's held-out family is excluded and checked). Validation: a fixed set of 10,000
@@ -35,7 +39,13 @@ from veilx.data.paths import resolve_data_root
 from veilx.seeding import derive_seed
 from veilx.training.config import assert_training_authorized, load_training_config
 from veilx.vis.regions import GRID, face_cells
-from veilx.vis.samples import check_isolation, draw_condition, make_sample
+from veilx.vis.samples import (
+    HARD_NEGATIVE,
+    check_isolation,
+    draw_condition,
+    make_hard_negative,
+    make_sample,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 PROTO = load_protocol(ROOT / "configs" / "research_protocol.yaml")
@@ -48,28 +58,47 @@ VAL_SAMPLES = 10_000
 _W: dict[str, Any] = {}
 
 
-def _init(root: str, recs: list[tuple[str, str]]) -> None:
-    _W["root"], _W["recs"] = Path(root), recs
+Job = tuple[int, str | None, str | None, int, int]  # image, family, level, seed, donor (-1)
 
 
-def _render(jobs: list[tuple[int, str | None, str | None, int]]) -> tuple[np.ndarray, np.ndarray]:
+def _init(root: str, recs: list[tuple[str, str]], lighting_as_corruption: bool = False) -> None:
+    _W["root"], _W["recs"], _W["lac"] = Path(root), recs, lighting_as_corruption
+
+
+def _render(jobs: list[Job]) -> tuple[np.ndarray, np.ndarray]:
     imgs = np.empty((len(jobs), 112, 112, 3), np.uint8)
     tgts = np.empty((len(jobs), GRID, GRID), np.float32)
-    for k, (idx, fam, lvl, seed) in enumerate(jobs):
+    for k, (idx, fam, lvl, seed, donor) in enumerate(jobs):
         relpath, psha = _W["recs"][idx]
-        img, tgt, _ = make_sample(load_rgb(_W["root"] / relpath), fam, lvl, seed, psha)
+        src = load_rgb(_W["root"] / relpath)
+        if fam == HARD_NEGATIVE:
+            img, tgt, _ = make_hard_negative(src, load_rgb(_W["root"] / _W["recs"][donor][0]), seed)
+        else:
+            img, tgt, _ = make_sample(
+                src, fam, lvl, seed, psha, lighting_as_corruption=_W.get("lac", False)
+            )
         imgs[k], tgts[k] = img, tgt
     return imgs, tgts
 
 
 def _jobs(
-    n_images: int, n: int, allowed: tuple[str, ...], seed: int, tag: str
-) -> list[tuple[int, str | None, str | None, int]]:
-    out = []
+    n_images: int,
+    n: int,
+    allowed: tuple[str, ...],
+    seed: int,
+    tag: str,
+    hard_negative_fraction: float = 0.0,
+) -> list[Job]:
+    out: list[Job] = []
     for i in range(n):
         rng = np.random.default_rng(derive_seed(seed, tag, i))
+        if hard_negative_fraction > 0 and rng.random() < hard_negative_fraction:
+            idx = int(rng.integers(n_images))
+            donor = int(rng.integers(n_images))
+            out.append((idx, HARD_NEGATIVE, None, derive_seed(seed, tag, "hn", i), donor))
+            continue
         fam, lvl = draw_condition(rng, allowed)
-        out.append((int(rng.integers(n_images)), fam, lvl, derive_seed(seed, tag, "occl", i)))
+        out.append((int(rng.integers(n_images)), fam, lvl, derive_seed(seed, tag, "occl", i), -1))
     return out
 
 
@@ -103,6 +132,10 @@ def main() -> int:
     args = ap.parse_args()
     cfg = load_training_config(args.config)
     assert_training_authorized(cfg)
+    vopt = cfg.visibility
+    occ_w = vopt.occluded_weight if vopt else 1.0
+    hn_frac = vopt.hard_negative_fraction if vopt else 0.0
+    lac = vopt.lighting_as_corruption if vopt else False
     heldout = cfg.heldout_family
     allowed = tuple(f for f in FAMILIES if f != heldout)
     check_isolation(allowed, heldout)
@@ -141,6 +174,11 @@ def main() -> int:
     scaler = torch.amp.GradScaler("cuda", enabled=amp and amp_dtype == torch.float16)
     w_face = torch.from_numpy(np.where(face_cells(), 1.0, 0.25).astype(np.float32)).to(dev)
     bce = nn.BCEWithLogitsLoss(reduction="none")
+
+    def weight(t: Any) -> Any:
+        """Face-cell weighting (Phase 3); Phase 4 adds occ_w on occluded-target cells."""
+        return w_face * (1.0 + (occ_w - 1.0) * (t < 0.5).float())
+
     hist: list[dict[str, Any]] = []
     start_epoch, best_loss, bad = 0, float("inf"), 0
     latest = ckpt.latest()
@@ -157,12 +195,13 @@ def main() -> int:
         )
         hist = json.loads((out_dir / "history.json").read_text("utf-8"))
         print(f"resumed after epoch {start_epoch - 1}", flush=True)
-    val_jobs = [
-        (n_tr + j[0] % len(va_ids), *j[1:]) for j in _jobs(len(va_ids), n_val, allowed, seed, "val")
+    val_jobs: list[Job] = [
+        (n_tr + j[0], j[1], j[2], j[3], n_tr + j[4] if j[4] >= 0 else -1)
+        for j in _jobs(len(va_ids), n_val, allowed, seed, "val", hn_frac)
     ]
     t_all = time.perf_counter()
     with ProcessPoolExecutor(
-        args.workers, initializer=_init, initargs=(str(layout.extracted), recs)
+        args.workers, initializer=_init, initargs=(str(layout.extracted), recs, lac)
     ) as pool:
         vx, vt = [], []
         for imgs, tg in _batches(pool, val_jobs, 256, 2 * args.workers):
@@ -179,21 +218,21 @@ def main() -> int:
                     t = torch.from_numpy(val_t[i : i + 256]).to(dev)
                     with torch.autocast(dev.type, dtype=amp_dtype, enabled=dtype_amp):
                         lg = model(x).float()
-                    losses.append(float((bce(lg, t) * w_face).mean()) * len(x))
+                    losses.append(float((bce(lg, t) * weight(t)).mean()) * len(x))
                     probs.append(torch.sigmoid(lg).cpu().numpy())
             return sum(losses) / len(val_x), np.concatenate(probs)
 
         for epoch in range(start_epoch, max_epochs):
             model.train()
             t0 = time.perf_counter()
-            jobs = _jobs(n_tr, per_epoch, allowed, seed, f"train-e{epoch}")
+            jobs = _jobs(n_tr, per_epoch, allowed, seed, f"train-e{epoch}", hn_frac)
             tot, n = 0.0, 0
             for imgs, tg in _batches(pool, jobs, cfg.batch_size, 2 * args.workers):
                 x = torch.from_numpy(to_input(imgs)).to(dev, non_blocking=True)
                 t = torch.from_numpy(tg).to(dev, non_blocking=True)
                 opt.zero_grad(set_to_none=True)
                 with torch.autocast(dev.type, dtype=amp_dtype, enabled=amp):
-                    loss = (bce(model(x).float(), t) * w_face).mean()
+                    loss = (bce(model(x).float(), t) * weight(t)).mean()
                 if not torch.isfinite(loss):
                     raise FloatingPointError(f"non-finite loss at epoch {epoch}")
                 scaler.scale(loss).backward()
@@ -255,7 +294,9 @@ def main() -> int:
     l16, p16 = evaluate(True)
     summary = {
         "evidence_type": "real_measured_model_result",
-        "scope": "visibility-estimator training on DigiFace p3_train (synthetic occlusions)",
+        "scope": "visibility-estimator training on DigiFace p3_train (synthetic occlusions)"
+        + (" - Phase 4 conservative VE-C" if cfg.phase == "phase4" else ""),
+        "visibility_options": vopt.model_dump() if vopt else None,
         "fold_heldout_family": heldout,
         "seen_families": list(allowed),
         "pilot": args.pilot,
@@ -281,7 +322,8 @@ def main() -> int:
         json.dumps(summary, indent=1, default=str), encoding="utf-8"
     )
     if not args.pilot:
-        pub = ROOT / "reports" / "experiments" / f"phase3_ve_training_{heldout}.json"
+        stem = "phase4_vec_training" if cfg.phase == "phase4" else "phase3_ve_training"
+        pub = ROOT / "reports" / "experiments" / f"{stem}_{heldout}.json"
         with pub.open("w", encoding="utf-8", newline="\n") as fh:
             json.dump(summary, fh, indent=1, default=str)
     print(

@@ -84,3 +84,12 @@ def align_to_template(
     """Crop aligned to the ArcFace template; returns (crop, 2x3 matrix)."""
     m = umeyama(np.asarray(landmarks, dtype=np.float64), TEMPLATE * (size / 112.0))
     return warp(image, m, size), m
+
+
+def alignment_residual(landmarks: F64, size: int = 112) -> float:
+    """RMS distance (template pixels) between the template and the similarity-aligned landmarks:
+    a cheap alignment-quality signal (large when the five points are not face-shaped)."""
+    lm = np.asarray(landmarks, dtype=np.float64)
+    dst = TEMPLATE * (size / 112.0)
+    m = umeyama(lm, dst)
+    return float(np.sqrt(((transform_points(m, lm) - dst) ** 2).sum(axis=1).mean()))
