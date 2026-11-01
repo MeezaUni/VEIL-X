@@ -48,6 +48,11 @@ APPROVED_FAMILY_IDS: tuple[str, ...] = (
     "F5_extreme_lighting",
 )
 
+# Evaluation-only families (Phase 4): never part of the LOFO fold structure, never used for any
+# training, selection or calibration. They exist only to test generalisation to an occluder
+# that no Phase 4 design decision has seen.
+EVAL_ONLY_FAMILY_IDS: tuple[str, ...] = ("E1_hair_strands",)
+
 REQUIRED_ISOLATION_STAGES: frozenset[str] = frozenset(
     {
         "feature_selection",
@@ -375,6 +380,42 @@ class Phase3Section(_Strict):
         return v
 
 
+class Phase4Section(_Strict):
+    """Prospective Phase 4 protocol (docs/phase4_protocol.md), frozen before any Phase 4 method
+    is trained or any Phase 4 confirmatory image is scored."""
+
+    protocol_doc: str
+    seed: int = Field(ge=0)
+    confirmatory_set: str
+    confirmatory_parts: tuple[str, ...]
+    eval_only_families: tuple[str, ...]
+    design_informed_families: tuple[str, ...]
+    reference_arm: Literal["A3_quality"]
+    candidate_arms: tuple[str, ...]
+    followup_sets: tuple[str, ...]
+    ve_max_epochs: int = Field(ge=1)
+    ve_patience: int = Field(ge=1)
+    overestimation_weight: float = Field(gt=1.0)
+    hard_negative_fraction: float = Field(gt=0.0, lt=1.0)
+    novelty_id_fpr: float = Field(gt=0.0, lt=0.5)
+    clean_margin_pp: float = Field(gt=0.0)
+
+    @field_validator("eval_only_families")
+    @classmethod
+    def _eval_only_known(cls, v: tuple[str, ...]) -> tuple[str, ...]:
+        unknown = [f for f in v if f not in EVAL_ONLY_FAMILY_IDS]
+        if unknown or any(f in APPROVED_FAMILY_IDS for f in v):
+            raise ValueError(f"eval-only families must be in EVAL_ONLY_FAMILY_IDS: {unknown}")
+        return v
+
+    @field_validator("candidate_arms")
+    @classmethod
+    def _no_reference_in_candidates(cls, v: tuple[str, ...]) -> tuple[str, ...]:
+        if "A3_quality" in v:
+            raise ValueError("the reference arm cannot also be a candidate")
+        return v
+
+
 # --------------------------------------------------------------------------- root
 
 
@@ -401,6 +442,7 @@ class ResearchProtocol(_Strict):
     occlusion: OcclusionSection | None = None
     calibration_plan: CalibrationPlanSection | None = None
     phase3: Phase3Section | None = None
+    phase4: Phase4Section | None = None
 
     @field_validator("challenge_families")
     @classmethod

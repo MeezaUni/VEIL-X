@@ -283,12 +283,60 @@ def extreme_lighting(
     return out_u8, crushed | clipped | darkened, params
 
 
+# --------------------------------------------------------------------------- E1 hair (eval only)
+
+_HAIR_COLOURS = np.array(
+    [[25, 20, 18], [60, 40, 25], [110, 75, 40], [190, 160, 110], [130, 50, 30]], dtype=np.float64
+)
+_HAIR_COVER = {"low": (0.06, 0.14), "medium": (0.16, 0.28), "high": (0.30, 0.45)}
+
+
+def hair_strands(
+    img: U8, lm: Landmarks, level: Level, rng: np.random.Generator
+) -> tuple[U8, BoolMask, dict[str, float]]:
+    """EVALUATION-ONLY (Phase 4): locks of hair falling over the forehead and eyes. Curved
+    quadratic-Bezier strands drawn as discs, starting above the brows. Novel location (upper
+    face, not the eye band alone), thin texture, natural hair colours; unlike every training
+    family. Mask = strand pixels."""
+    h, w = img.shape[:2]
+    face = face_region(lm, h, w)
+    d = lm.eye_distance
+    lo, hi = _HAIR_COVER[level]
+    target = rng.uniform(lo, hi)
+    colour = _HAIR_COLOURS[int(rng.integers(len(_HAIR_COLOURS)))] * rng.uniform(0.85, 1.15)
+    side = rng.choice([-1.0, 1.0])  # parting side
+    top = float(lm.eye_center[1]) - 1.1 * d
+    mask = np.zeros((h, w), dtype=bool)
+    yy, xx = np.mgrid[0:h, 0:w]
+    n = 0
+    while mask[face].mean() < target and n < 400:
+        x0 = float(lm.eye_center[0]) + rng.uniform(-1.0, 1.0) * d
+        p0 = np.array([x0, top + rng.uniform(-0.2, 0.2) * d])
+        length = rng.uniform(0.8, 1.9) * d
+        p2 = p0 + np.array([side * rng.uniform(0.0, 0.7) * d, length])
+        p1 = (p0 + p2) / 2 + np.array([side * rng.uniform(0.1, 0.6) * d, 0.0])
+        r = rng.uniform(0.9, 2.2)
+        for t in np.linspace(0.0, 1.0, 24):
+            pt = (1 - t) ** 2 * p0 + 2 * (1 - t) * t * p1 + t**2 * p2
+            y0, y1 = max(int(pt[1] - r - 1), 0), min(int(pt[1] + r + 2), h)
+            x0i, x1i = max(int(pt[0] - r - 1), 0), min(int(pt[0] + r + 2), w)
+            if y0 >= y1 or x0i >= x1i:
+                continue
+            win = (xx[y0:y1, x0i:x1i] + 0.5 - pt[0]) ** 2 + (yy[y0:y1, x0i:x1i] + 0.5 - pt[1]) ** 2
+            mask[y0:y1, x0i:x1i] |= win <= r * r
+        n += 1
+    shade = 0.75 + 0.5 * rng.random((h, w))
+    out = _composite(img, mask, colour, rng, texture=8.0, shade=shade)
+    return out, mask, {"target_cover": float(target), "n_strands": float(n), "side": float(side)}
+
+
 GENERATORS: dict[str, Generator] = {
     "F1_mask": surgical_mask,
     "F2_sunglasses": sunglasses,
     "F3_hand_object": hand_or_object,
     "F4_random_patch": random_patches,
     "F5_extreme_lighting": extreme_lighting,
+    "E1_hair_strands": hair_strands,  # evaluation only (Phase 4); not a LOFO family
 }
 PHYSICAL = {
     "F1_mask": True,
@@ -296,4 +344,5 @@ PHYSICAL = {
     "F3_hand_object": True,
     "F4_random_patch": True,
     "F5_extreme_lighting": False,
+    "E1_hair_strands": True,
 }

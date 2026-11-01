@@ -44,7 +44,7 @@ def test_registered_constants_match_approved_values() -> None:
 
 def test_v040_real_data_sections_and_frozen_constants() -> None:
     proto = load_protocol(PROTOCOL)
-    assert proto.protocol_version == "0.5.0"
+    assert proto.protocol_version == "0.6.0"
     dp = proto.data_preparation
     assert dp is not None and dp.images_final == 643_995 and dp.identities_final == 101_999
     assert len(dp.parts) == 4 and set(dp.archive_sha256) == set(dp.archive_bytes)
@@ -262,4 +262,24 @@ def test_v050_phase3_protocol_section() -> None:
 def test_phase3_bands_must_partition(mutable_protocol: dict[str, Any]) -> None:
     mutable_protocol["phase3"]["subsplit_bands"]["p3_test"] = [80, 100]
     with pytest.raises(ValueError, match="contiguous"):
+        _validate(mutable_protocol)
+
+
+def test_v060_phase4_protocol_section() -> None:
+    p4 = load_protocol(PROTOCOL).phase4
+    assert p4 is not None and p4.reference_arm == "A3_quality"
+    assert p4.eval_only_families == ("E1_hair_strands",)
+    assert "A3_quality" not in p4.candidate_arms
+    assert p4.confirmatory_set == "p4_test" and p4.clean_margin_pp == 0.5
+
+
+def test_phase4_rejects_lofo_family_as_eval_only(mutable_protocol: dict[str, Any]) -> None:
+    mutable_protocol["phase4"]["eval_only_families"] = ["F4_random_patch"]
+    with pytest.raises(ValueError, match="eval-only"):
+        _validate(mutable_protocol)
+
+
+def test_phase4_reference_cannot_be_candidate(mutable_protocol: dict[str, Any]) -> None:
+    mutable_protocol["phase4"]["candidate_arms"] = ["A3_quality", "C4_conservative"]
+    with pytest.raises(ValueError, match="reference"):
         _validate(mutable_protocol)

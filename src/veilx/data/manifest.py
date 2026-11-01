@@ -22,7 +22,7 @@ from typing import Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
-from veilx.config.schema import APPROVED_FAMILY_IDS, SplitName
+from veilx.config.schema import APPROVED_FAMILY_IDS, EVAL_ONLY_FAMILY_IDS, SplitName
 from veilx.errors import LeakageError, ManifestError
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
@@ -50,7 +50,7 @@ class OcclusionSpec(_Record):
     @field_validator("family")
     @classmethod
     def _approved(cls, v: str) -> str:
-        if v not in APPROVED_FAMILY_IDS:
+        if v not in APPROVED_FAMILY_IDS and v not in EVAL_ONLY_FAMILY_IDS:
             raise ValueError(f"unknown challenge family {v!r}")
         return v
 

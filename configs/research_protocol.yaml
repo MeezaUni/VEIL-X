@@ -9,7 +9,7 @@
 # =============================================================================
 schema_version: 1
 protocol_id: veilx-c3c1
-protocol_version: 0.5.0   # changes: docs/protocol_changelog.md
+protocol_version: 0.6.0   # changes: docs/protocol_changelog.md
 status: provisional
 
 project:
@@ -301,3 +301,20 @@ phase3:
   ve_grid: 28
   ve_max_epochs: 30
   ve_patience: 4
+
+phase4:
+  protocol_doc: docs/phase4_protocol.md
+  seed: 20261101
+  confirmatory_set: p4_test            # DigiFace identities never downloaded before Phase 4
+  confirmatory_parts: [subjects_2000-3999_72_imgs, subjects_4000-5999_72_imgs]
+  eval_only_families: [E1_hair_strands]          # never rendered during development
+  design_informed_families: [F4_random_patch, F5_extreme_lighting]  # Phase 4 design saw their failure
+  reference_arm: A3_quality
+  candidate_arms: [C4_conservative, N4_novelty_aware, H4_quality_first_hybrid]
+  followup_sets: [p3_test, phase2_digiface_test, lfw_view2]
+  ve_max_epochs: 30
+  ve_patience: 4
+  overestimation_weight: 4.0
+  hard_negative_fraction: 0.2
+  novelty_id_fpr: 0.05
+  clean_margin_pp: 0.5

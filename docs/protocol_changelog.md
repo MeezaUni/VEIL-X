@@ -3,6 +3,15 @@
 Every revision of `configs/research_protocol.yaml` is listed here with its reason. Decision IDs
 refer to `docs/decision_log.md`. Constants change status only through an entry here.
 
+## v0.6.0 — 2026-11-01 (Phase 4 prospective protocol)
+
+| Area | Change | Reason |
+|---|---|---|
+| `phase4` (new) | Confirmatory set p4_test from DigiFace 72-image parts 2000-5999 (never downloaded before), seed 20261101, eval-only family `E1_hair_strands`, design-informed families F4/F5, reference arm A3, candidates C4/N4/H4, VE-C budget (30 epochs, patience 4), overestimation weight 4.0, hard-negative fraction 0.2, novelty ID FPR 0.05, clean margin 0.5 pp | Pre-registration before any Phase 4 training or p4_test scoring (D-048) |
+| Families | `EVAL_ONLY_FAMILY_IDS = (E1_hair_strands,)` accepted by the engine and specs, outside the LOFO fold structure; approved F1-F5 and the generator version are unchanged | A clean never-seen occluder after Phase 4 design saw the F4/F5 failures |
+
+The full design is in `docs/phase4_protocol.md`. All Phase 2-3 constants are unchanged.
+
 ## v0.5.0 — 2026-10-27 (Phase 3 prospective protocol)
 
 | Area | Change | Reason |
