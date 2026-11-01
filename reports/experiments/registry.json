@@ -333,6 +333,212 @@
       "dataset_ids": [
         "digiface1m"
       ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P3-EXP-001",
+      "purpose": "Visibility estimator training, 5 LOFO folds (p3_train / p3_val only)",
+      "script": "scripts/train_visibility.py --config configs/experiments/phase3/ve_<fold>.yaml",
+      "artefact": "reports/experiments/phase3_ve_training_F1_mask.json",
+      "splits": [
+        "p3_train",
+        "p3_val"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": null,
+      "git_dirty": null,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "bd3e1f1ea88aec4a80b5757495ab080ac60c87e538aceab7d70b584e28373bca",
+      "created_utc": null
+    },
+    {
+      "dataset_ids": [
+        "digiface1m",
+        "kaggle_jessicali9530_lfw"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P3-EXP-002",
+      "purpose": "Phase 3 feature extraction (embeddings, learned/heuristic/oracle maps)",
+      "script": "scripts/extract_phase3.py --set p3|p2test|lfw",
+      "artefact": "reports/experiments/phase3_extraction.json",
+      "splits": [
+        "p3_*",
+        "test (Phase 2)",
+        "lfw (images only; no scores)"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "8bbab7d43f6cef46cd6ef7a81c2ead7183e2ce20",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "9767cd8bb6b8ea9f3ac7db301202284dba0779c83af108557988ca721843d411",
+      "created_utc": "2026-10-27T11:49:25.281461+00:00"
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P3-EXP-003",
+      "purpose": "Develop + freeze (cv selection, fusion ladder, strata, LTT arms; no test)",
+      "script": "scripts/evaluate_phase3.py develop",
+      "artefact": "reports/experiments/phase3_develop.json",
+      "splits": [
+        "p3_train",
+        "p3_val",
+        "p3_cal"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "8bbab7d43f6cef46cd6ef7a81c2ead7183e2ce20",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "7f14cbc878910f3ee2a422706e6c6f2d874b994000e628dcba20ffa21c04b890",
+      "created_utc": "2026-10-27T12:07:41.418571+00:00"
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P3-EXP-004",
+      "purpose": "CONFIRMATORY single logged p3_test run: C3, C1, H4, all arms, orderings",
+      "script": "scripts/evaluate_phase3.py final --final",
+      "artefact": "reports/experiments/phase3_final.json",
+      "splits": [
+        "p3_test"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "1b81d53bf4e7caf30884cc81f3fddb85c6e49d74",
+      "git_dirty": false,
+      "run_id": "bb5d9244bb3c",
+      "frozen_config_sha256": null,
+      "artefact_sha256": "a390a1d6501784c3ffc5a5d4e946fc7794bb9bfe396d50dbb7bdcb1e26e2cd17",
+      "created_utc": "2026-10-27T12:10:43.848527+00:00"
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P3-EXP-005",
+      "purpose": "Gate 3B visibility-map accuracy (learned vs heuristic vs oracle; ID vs OOD)",
+      "script": "scripts/evaluate_visibility.py",
+      "artefact": "reports/experiments/phase3_visibility_eval.json",
+      "splits": [
+        "p3_test (renders; map accuracy only)"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "8e317fb7c2aae316d6512c9c2c103018f1a5e712",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "75e3e1ced6f8b1b8dfda41417fc9938835d2878ee66641239c25b2972c531d23",
+      "created_utc": "2026-11-01T10:43:11.595227+00:00"
+    },
+    {
+      "dataset_ids": [
+        "digiface1m",
+        "kaggle_jessicali9530_lfw"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P3-EXP-006",
+      "purpose": "FOLLOW-UP with frozen rules: Phase 2 DigiFace test + LFW derived occlusions",
+      "script": "scripts/evaluate_phase3.py followup --final",
+      "artefact": "reports/experiments/phase3_followup.json",
+      "splits": [
+        "test (Phase 2)",
+        "lfw_view2"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "8e317fb7c2aae316d6512c9c2c103018f1a5e712",
+      "git_dirty": true,
+      "run_id": "9b660f16061a",
+      "frozen_config_sha256": null,
+      "artefact_sha256": "150a3de7e3ca7559c75b81dc08f17b9b9a8ab2f8a6bfd5923c58f7cf30aed8e8",
+      "created_utc": "2026-11-01T10:39:39.993920+00:00"
+    },
+    {
+      "dataset_ids": [
+        "kaggle_jessicali9530_lfw"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P3-EXP-007",
+      "purpose": "EXPLORATORY detector-inclusive LFW (300 pairs, occluders composited)",
+      "script": "scripts/lfw_detector_inclusive.py --final",
+      "artefact": "reports/experiments/phase3_lfw_detector_inclusive.json",
+      "splits": [
+        "lfw_view2"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "8e317fb7c2aae316d6512c9c2c103018f1a5e712",
+      "git_dirty": true,
+      "run_id": "6a3c151e18a5",
+      "frozen_config_sha256": null,
+      "artefact_sha256": "3d8873c80ecba1df4c327048d8e063316c20d11fd5d15763975183708e7f6049",
+      "created_utc": "2026-11-01T10:45:12.292089+00:00"
+    },
+    {
+      "dataset_ids": [],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P3-SIM-013",
+      "purpose": "Stratified LTT validity with predicted (noisy/biased) visibility strata",
+      "script": "scripts/run_simulations.py --only noisy_strata_validity",
+      "artefact": "reports/simulations/noisy_strata_validity.json",
+      "splits": [
+        "(synthetic)"
+      ],
+      "status": "complete",
+      "evidence_type": "synthetic_simulation",
+      "protocol_version": null,
+      "git_commit": null,
+      "git_dirty": null,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "ec84ad36d1e6709b02a68578c36d64765b1b903eca450dda244251e921296918",
+      "created_utc": null
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
       "model_ids": [],
       "id": "P2-CALC-001",
       "purpose": "Calibration capacity (exact binomial) at protocol v0.4.0",

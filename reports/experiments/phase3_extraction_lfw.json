@@ -1,0 +1,80 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Phase 3 feature extraction, set lfw (throughput only; no accuracy)",
+ "pilot": false,
+ "groups": {
+  "lfw_clean": {
+   "n": 8076,
+   "parts": 1,
+   "computed": 8076,
+   "seconds": 53.4,
+   "items_per_s": 151.2
+  },
+  "lfw__F1_mask": {
+   "n": 62559,
+   "parts": 4,
+   "computed": 62559,
+   "seconds": 281.4,
+   "items_per_s": 222.3
+  },
+  "lfw__F2_sunglasses": {
+   "n": 62559,
+   "parts": 4,
+   "computed": 62559,
+   "seconds": 282.9,
+   "items_per_s": 221.1
+  },
+  "lfw__F3_hand_object": {
+   "n": 62559,
+   "parts": 4,
+   "computed": 62559,
+   "seconds": 291.8,
+   "items_per_s": 214.4
+  },
+  "lfw__F4_random_patch": {
+   "n": 62559,
+   "parts": 4,
+   "computed": 62559,
+   "seconds": 296.9,
+   "items_per_s": 210.7
+  },
+  "lfw__F5_extreme_lighting": {
+   "n": 62559,
+   "parts": 4,
+   "computed": 62559,
+   "seconds": 283.8,
+   "items_per_s": 220.4
+  }
+ },
+ "wall_seconds": 1490.8,
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-11-01T10:36:53.040747+00:00",
+  "git": {
+   "commit": "f001b54179b67c39b0c7bd9ea72f7355031367e6",
+   "dirty": true,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.14.1",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts\\extract_phase3.py",
+   "--set",
+   "lfw",
+   "--workers",
+   "4"
+  ],
+  "extra": {}
+ }
+}

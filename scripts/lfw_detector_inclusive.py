@@ -201,7 +201,7 @@ def main() -> int:
                     }
                 )
     if args.pilot:
-        jobs = jobs[: args.pilot]
+        jobs = jobs[: args.pilot // 2] + jobs[-(args.pilot // 2) :]  # both classes
     run_id = uuid.uuid4().hex[:12]
     prov = collect_provenance(ROOT, argv=sys.argv)
     if args.final:

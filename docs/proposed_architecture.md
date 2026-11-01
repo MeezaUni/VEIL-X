@@ -94,6 +94,17 @@ typed as `INSUFFICIENT_COVISIBILITY`, `LOW_QUALITY`, `AMBIGUOUS_SCORE` or `ALIGN
 
 ## 4. Module boundaries (Python package `veilx/`)
 
+> Phase 3 status (2026-11-01): implemented as follows.
+> - `veilx.vis` (in place of `veilx.visibility`): `regions`, `model` (VisNet U-Net-lite, 28×28),
+>   `samples`, `heuristic`, `metrics`, `covis`.
+> - `veilx.fusion` (in place of `veilx.scoring`): `logreg` (IRLS L2 logistic), `features`
+>   (registered ladder M0–M5).
+> - `veilx.stats.paired`: paired identity jackknife and Holm.
+> - Feature storage: `veilx.embeddings.store.write_array_shard` / `read_array_shard`.
+> - Quality is the backbone feature norm; no separate `veilx.quality` module.
+>
+> The demo is not built (Phase 5).
+
 > Phase 0 status: implemented = `config`, `data.manifest`, `data.splits`, `guards`,
 > `provenance`, `logging_utils`, `seeding`, `errors`, `stats.feasibility`, and `interfaces`
 > (contracts only). Not implemented = everything that touches images or models. Manifests

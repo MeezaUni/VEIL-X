@@ -38,9 +38,15 @@ the learned visibility estimate is the weak link.
 | detector-inclusive | `lfw_detector_inclusive.py --final` | 300 LFW View 2 pairs | **exploratory** (§9) |
 | SIM-013 | `run_simulations.py --only noisy_strata_validity` | synthetic | simulation |
 
-Test accesses are logged in `results/test_runs.jsonl`. The first gate-3B attempt was stopped by
-our own memory monitor after loading data, before any metric was written. It was rerun with a
-lower-memory loader, and both accesses are logged.
+Test accesses are logged in `results/test_runs.jsonl`. Gate 3B (map accuracy only) touched
+p3_test renders three times:
+1. stopped by our own memory monitor before any metric was written;
+2. a complete run with a lower-memory loader;
+3. an identical rerun on the same seeded sample to add the signed visibility bias. Every other
+   number was unchanged.
+
+The detector-inclusive study also has one logged 12-pair diagnostic (`diag-detinc-1`, visibility
+aggregates only).
 
 ## 2. Visibility estimator (gate 3B)
 
@@ -58,6 +64,16 @@ F4 and F5 hit the 30-epoch cap still improving.
 | random patch | 0.946 / **0.130** | 0.005 / **0.344** | 0.143 / 0.274 |
 | extreme lighting | 0.973 / **0.005** | 0.001 / **0.492** | 0.183 / 0.118 |
 
+- **Direction of the held-out errors** (signed global bias, predicted − true):
+
+  | Held-out family | Bias | Bias as a share of MAE |
+  |---|---|---|
+  | random patch | **+0.344** | 100 % |
+  | lighting | **+0.491** | 100 % |
+  | mask | +0.053 | — |
+
+  The estimator **overestimates** visibility on unseen occluders. That is the harmful direction
+  identified by SIM-013.
 - **Clean test images:** learned global MAE ≤ 0.010, false-occlusion cell rate ≤ 0.6 %.
   Heuristic: MAE 0.15–0.22, false-occlusion rate 2.7–5.0 %.
 - **Calibration** (seen families): Brier 0.009–0.018, ECE 0.014–0.021.
@@ -171,12 +187,79 @@ The fused model is **better** on clean pairs, so the 0.5 pp margin is met with r
 
 ## 8. Follow-up sets (gate 3G)
 
-*Pending: Phase 2 DigiFace test held-out-family plans and LFW View 2 derived occlusions with the
-frozen Phase 3 rules.*
+Run `9b660f16061a` (logged) used the frozen Phase 3 models and rules with no fitting of any kind.
+Both sets were observed in Phase 2, so this is **follow-up** evidence. LFW View 2 is being used
+for the third time.
+
+**Phase 2 DigiFace test** (held-out-family plans; 122,244 pairs per fold; identities disjoint
+from every Phase 3 sub-split). The confirmatory picture replicates almost exactly:
+
+| Arm | random patch: cov / sFNMR / sFMR, % |
+|---|---|
+| A4 | 98.5 / **8.90 ✗** / 2.07 |
+| A3 | 88.4 / 2.18 / 1.88 |
+| A5 | 90.2 / 2.77 / 1.85 |
+
+- C3 Δ (A4 − A3) is −0.14 / −0.58 pp on mask / sunglasses and +0.77 / +6.72 / +1.25 pp on
+  hand / patch / lighting.
+- C1 has the same signs as on p3_test.
+- Clean FNMR: M0 1.31 % → M4 0.76–0.87 %.
+
+**LFW View 2 derived occlusions** (real photographs with synthetic overlays; DigiFace-trained
+models and DigiFace-calibrated rules applied without adaptation):
+
+| Arm | random patch: cov / sFNMR / sFMR, % |
+|---|---|
+| A4 | 99.9 / **8.30 ✗** / 0.16 |
+| A3 | 94.6 / 2.26 / 0.10 |
+| A5 | 95.0 / 2.20 / 0.13 |
+
+- The other four families are well within target for every occlusion-aware arm. The DigiFace
+  rules are conservative on LFW, as in Phase 2, with sFMR ≤ 0.2 %.
+- **Co-visibility gives no log-loss benefit on LFW**: M1 − M4 < 0 in all 5 families, from
+  −0.0006 to −0.048. The synthetic-to-real transfer of the visibility *features* is therefore
+  negative, while the stratification failure on random patch transfers unchanged.
+- Clean View-2 FNMR at the frozen thresholds is 0.44 % for both M0 and M4. These clean
+  thresholds are far from the LFW impostor distribution, so H4 is uninformative there.
 
 ## 9. Detector-inclusive LFW (exploratory)
 
-*Pending.*
+Run `6a3c151e18a5` (logged; 300 View-2 pairs, 150 genuine / 150 impostor, × 5 families × 3
+levels). The setup:
+- the same occluder as the crop-level study is inverse-warped into the original photograph;
+- SCRFD then re-detects the face and it is re-aligned;
+- the frozen fold rules are applied, with side b occluded.
+
+| Family | Detection failures, low / med / high | Mean landmark shift (px of 112) | A4 cov / sFNMR / sFMR, % | A3 cov / sFNMR / sFMR, % |
+|---|---|---|---|---|
+| mask | 0 / 0.3 / 1.0 % | 3.2 | 99.8 / 1.12 / 0.00 | 99.4 / 0.22 / 0.00 |
+| sunglasses | 0 / 0 / 0 % | 0.9 | 99.9 / 0.89 / 0.00 | 100 / 0.67 / 0.00 |
+| hand/object | 0 / 0 / 3.7 % | 2.0 | 100 / 1.13 / 0.00 | 99.6 / 0.23 / 0.00 |
+| random patch | 0 / 1.3 / **17.3 %** | 4.3 | 100 / **8.49 ✗** / 0.00 | 96.3 / 3.53 / 0.00 |
+| lighting | 0 / 2.0 / 7.7 % | 1.6 | 100 / 1.38 / 0.00 | 99.5 / 0.46 / 0.00 |
+
+- **Detection is itself a failure mode.** At high severity the detector loses up to 17 % of
+  random-patch faces.
+- **Handling detection failures:**
+  - Treated as abstentions, they cost genuine coverage. For A4 on random patch: 94.2 % coverage,
+    sFNMR 8.5 %.
+  - Treated as forced non-matches, they raise sFNMR: A4 random patch 13.8 %, hand/object 2.9 %,
+    lighting 4.7 %.
+  - The policy for detection failures therefore matters as much as calibration.
+- **The visibility estimator degrades after re-alignment.** A diagnostic on 12 pairs (logged
+  `diag-detinc-1`, aggregates only) checked two things:
+  - The ground-truth warp is correct: re-aligned vs crop-level visible fraction differ by
+    0.035 (mask) and 0.005 (sunglasses).
+  - The learned estimator's global error rises from 0.066 to 0.204 (mask) and from 0.003 to
+    0.101 (sunglasses), always as **overestimation**.
+
+  The occluder is resampled twice: into the photograph, then by re-alignment. That softening is
+  enough to move the estimator toward "visible". Over the full study, the learned-vs-re-aligned
+  GT error is 0.10–0.53 across families.
+- The **F5 lighting composite** re-lights only the crop footprint, so its edge is visible in the
+  photograph. It is a weaker stand-in for real illumination change.
+- Exploratory only: 300 pairs, one detector, synthetic occluders. sFMR stays 0 because the
+  DigiFace rules are conservative on LFW.
 
 ## 10. Validity and limitations
 
@@ -190,8 +273,8 @@ frozen Phase 3 rules.*
   Generalisation to an arbitrary new occluder cannot be inferred from 5 folds.
 - **No formal OOD guarantee.** LTT certificates hold for the calibration distribution only. All
   OOD rates here are empirical, with identity-level jackknife intervals.
-- **One confirmatory look.** p3_test was used once for decisions (`bb5d9244bb3c`) and once for
-  map accuracy. Phase 2 test and LFW View 2 are re-used (follow-up), never for fitting.
+- **One confirmatory look.** p3_test was used once for decisions (`bb5d9244bb3c`); map-accuracy
+  passes (§1) never touch verification scores or rules. Phase 2 test and LFW View 2 are re-used (follow-up), never for fitting.
 - **Estimator budget.** The 30-epoch cap was reached by F4/F5 (still improving), and validation
   loss was noisy. A longer or more diverse training budget might change the held-out picture.
   It was fixed in advance and not tuned on held-out results.

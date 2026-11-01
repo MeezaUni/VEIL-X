@@ -184,6 +184,43 @@ Not done:
 - Detector runs on occluded photographs.
 - Train-role occlusion plans (deferred to Phase 3).
 
+## 4g. Phase 3 status (2026-11-01): complete; waiting for owner review
+
+Authorised by D-046; protocol v0.5.0; development freeze D-047. Results:
+`docs/phase3_results.md`.
+
+**Done.**
+- **Gates 3A–3F and 3I:**
+  - 5 LOFO visibility-estimator folds trained;
+  - heuristic and oracle comparators;
+  - 4 co-visibility definitions, with the selection rule applied on p3_val;
+  - fusion ladder M0–M5 plus heuristic and oracle variants;
+  - calibration arms A1–A6 × {primary, far1} × {v2, v1};
+  - one logged confirmatory p3_test run (`bb5d9244bb3c`);
+  - paired identity-jackknife endpoints with Holm.
+- **Gate 3G:** follow-up on the Phase 2 DigiFace test and LFW derived occlusions (`9b660f16061a`);
+  the exploratory detector-inclusive LFW study.
+- **Gate 3H:** physical-occlusion readiness, documentation only.
+- **Simulation:** SIM-013.
+
+**Outcome against the §4f table.**
+- Row 1 (learned visibility replacing oracle strata): **failed** on held-out random patch
+  (A4 sFNMR 8.5 % vs 5 %). The estimator overestimates visibility on unseen occluders. The oracle
+  arm still controls risk, so the method works only with accurate visibility.
+- Row 2: clean-only calibration violates again on every family; occlusion-aware calibration is
+  required.
+- Row 3: v2 ordering is feasible everywhere, at about +40 pp coverage over v1, but with more
+  held-out violations.
+- Row 4: C1 is not supported. Quality carries most of the value; co-visibility helps only where
+  the estimator generalises.
+- Row 7: H4 met.
+
+**Phase 4 candidates** (`docs/phase3_results.md` §11):
+- an OOD-robust or conservative visibility estimator;
+- quality-stratified calibration as the deployable default;
+- dual-backbone and MLP fusion, evaluated prospectively;
+- physical occlusions and in-domain real-photo calibration, after authorisation.
+
 ## 4f. Recommended Phase 3, tied to the measured Phase 2 failures (needs authorisation)
 
 | # | Measured failure (Phase 2) | Recommended Phase 3 work | Success test (pre-register) |

@@ -184,6 +184,48 @@ Explicit non-claims:
 | SIMULATED | Interval-method coverage (SIM-010); p-value-ordering validity/power test (`tests/test_ltt.py`) |
 | ESTIMATED | Margin testability (§3.4); C1 within-decile AUROC as evidence for H1 |
 
+## 3.7 Phase 3 audit (confirmatory run `bb5d9244bb3c`, freeze `34409779…`, protocol v0.5.0)
+
+- **Confirmatory set.** p3_test is drawn from DigiFace train-split identities verified unscored in
+  Phases 1–2. It is used once for decisions and twice for map accuracy (the first map-accuracy
+  attempt was aborted by our memory monitor before writing any metric). All three accesses are
+  logged.
+- **Units of dependence.**
+  - All intervals are delete-one-identity jackknife intervals: logit scale for rates, linear
+    scale for differences.
+  - Paired differences (C3: A4 − A3 sFNMR / sFMR / coverage) delete each identity from both
+    systems in the same replicate (`veilx.stats.paired`). SIM-011 validates coverage at
+    0.942–0.946.
+- **Multiplicity.**
+  - C3: Holm over 5 folds.
+  - C1: Holm over 10 cells (5 folds × ID/OOD).
+  - All other arm, target, ordering and severity tables are secondary or descriptive and are
+    not multiplicity-adjusted.
+- **Verdict rules** were applied exactly as registered:
+  - C3 failed on part (a): 1 vs 0 violations.
+  - C3 also failed on part (b): 3 folds significantly worse.
+  - C1 failed on the random-patch cell: it was significant in the wrong direction.
+- **Validity scope.**
+  - LTT certificates (fixed-sequence, class-conditional binomial, δ = 0.05, Bonferroni over
+    strata) apply to the p3_cal distribution only.
+  - Test-ID rates (seen families) are within target for every occlusion-aware arm, consistent
+    with validity.
+  - Test-OOD rates are empirical OOD measurements, not guarantees.
+- **Predicted-strata validity** (SIM-013). Stratifying on a predicted quantity keeps validity
+  conditional on the predicted stratum. It breaks when the predictor's error distribution shifts
+  at test time, especially toward overestimated visibility. The measured estimator bias on
+  held-out random patch / lighting (+0.34 / +0.49) is that case.
+- **Development-stage choices** were made on p3_val before any test access:
+  - co-visibility definition: `cv_region`;
+  - L2 strength C;
+  - strata edges;
+  - candidate orders;
+  - the MLP diagnostic, which stays exploratory.
+
+  The 30-epoch estimator budget was fixed in advance and not changed.
+- **Clean margin.** The H4 upper CI is ≤ −0.30 pp in all folds, so M4 is non-inferior and in
+  fact better than M0. This needs the SIM-011 paired-interval validity, which holds.
+
 ## 4. Domain limitations (apply to every Phase 2 number)
 
 1. **Synthetic faces.** DigiFace renders are a different domain from real photographs. Clean

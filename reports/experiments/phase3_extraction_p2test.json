@@ -1,0 +1,80 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Phase 3 feature extraction, set p2test (throughput only; no accuracy)",
+ "pilot": false,
+ "groups": {
+  "p2_clean": {
+   "n": 99507,
+   "parts": 7,
+   "computed": 0,
+   "seconds": 0.0,
+   "items_per_s": null
+  },
+  "p2__F1_mask__test_ood": {
+   "n": 152805,
+   "parts": 10,
+   "computed": 0,
+   "seconds": 0.1,
+   "items_per_s": null
+  },
+  "p2__F2_sunglasses__test_ood": {
+   "n": 152805,
+   "parts": 10,
+   "computed": 0,
+   "seconds": 0.1,
+   "items_per_s": null
+  },
+  "p2__F3_hand_object__test_ood": {
+   "n": 152805,
+   "parts": 10,
+   "computed": 0,
+   "seconds": 0.1,
+   "items_per_s": null
+  },
+  "p2__F4_random_patch__test_ood": {
+   "n": 152805,
+   "parts": 10,
+   "computed": 87269,
+   "seconds": 431.7,
+   "items_per_s": 202.1
+  },
+  "p2__F5_extreme_lighting__test_ood": {
+   "n": 152805,
+   "parts": 10,
+   "computed": 152805,
+   "seconds": 725.8,
+   "items_per_s": 210.5
+  }
+ },
+ "wall_seconds": 1164.0,
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-11-01T10:11:51.834311+00:00",
+  "git": {
+   "commit": "f001b54179b67c39b0c7bd9ea72f7355031367e6",
+   "dirty": false,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.14.1",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts\\extract_phase3.py",
+   "--set",
+   "p2test",
+   "--workers",
+   "4"
+  ],
+  "extra": {}
+ }
+}

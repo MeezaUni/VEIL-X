@@ -289,3 +289,24 @@ Among derived-occluded pairs, errors at the DigiFace threshold are ranked as fol
    intervals are identity-clustered.
 5. **Licensing.** LFW was used under user-reported academic authorisation (D-043), not a dataset-owner
    licence.
+
+## 8. Phase 3 follow-up on LFW (MEASURED; runs `9b660f16061a`, `6a3c151e18a5`)
+
+This applies the frozen Phase 3 models and rules (trained and calibrated on DigiFace only). LFW
+View 2 is used for the third time, with no fitting on it. Details: `docs/phase3_results.md`
+§§8–9.
+
+- **Derived occlusions on aligned crops:**
+  - The learned-visibility arm A4 violates on random patch (sFNMR 8.30 %). Quality-stratified A3
+    (2.26 %) and the oracle A5 (2.20 %) do not.
+  - The other families are within target for all occlusion-aware arms.
+  - Co-visibility features give **no** log-loss benefit on any family.
+- **Detector-inclusive** (exploratory, 300 pairs):
+  - Occluders are composited into the original photographs and then re-detected.
+  - SCRFD fails on up to 17 % of high-severity random-patch faces.
+  - A4 still violates on random patch (8.5 %), A3 does not (3.5 %).
+  - Treating detection failures as forced non-matches raises A4's random-patch sFNMR to 13.8 %.
+  - After re-alignment the visibility estimator overestimates visibility even for masks and
+    sunglasses.
+- Limitation 3 above ("detector on occluded photographs ... not done") is now partly addressed
+  for synthetic occluders. Physical occluders remain untested.

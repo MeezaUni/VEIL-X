@@ -450,6 +450,86 @@ def fig_lfw_detection(det: dict[str, Any]) -> None:
     )
 
 
+P3_ARMS = (
+    ("A3_quality", "A3 quality strata"),
+    ("A4_predvis", "A4 learned-visibility strata"),
+    ("A5_oracle", "A5 GT-visibility oracle"),
+)
+
+
+def fig_p3_arms(p3: dict[str, Any]) -> None:
+    """Phase 3 confirmatory: realised sFNMR (jackknife CI) and coverage, held-out families."""
+    r = p3["results"]["folds"]
+    fig, axes = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+    x = np.arange(len(FAMS))
+    for k, (arm, label) in enumerate(P3_ARMS):
+        recs = [r[f]["test_ood"]["arms"][f"{arm}|primary|v2"] for f in FAMS]
+        xs = x + (k - 1) * 0.2
+        y = [_val(a["selective_fnmr"]) for a in recs]
+        e = np.array([_err(a["selective_fnmr"]) for a in recs]).T
+        axes[0].errorbar(
+            xs,
+            y,
+            yerr=e,
+            fmt="o",
+            ms=6,
+            color=SLOT[k],
+            mec=SURFACE,
+            elinewidth=1,
+            capsize=0,
+            label=label,
+        )
+        axes[1].plot(xs, [a["coverage"] for a in recs], "o", ms=6, color=SLOT[k], mec=SURFACE)
+    axes[0].axhline(0.05, color=INK2, lw=1, ls="--")
+    axes[0].text(len(FAMS) - 0.55, 0.05, " 5 % target", fontsize=7, color=INK2, va="bottom")
+    axes[0].set_ylabel("selective FNMR")
+    axes[1].set_ylabel("coverage")
+    axes[1].set_xticks(x, [SHORT[f] for f in FAMS], rotation=15, ha="right")
+    axes[0].legend(loc="upper left", fontsize=7)
+    axes[0].set_title(
+        f"Phase 3 confirmatory run {p3['run_id']}: held-out family (Test-OOD), "
+        "primary target, v2 ordering"
+    )
+    _save(
+        fig,
+        "phase3_ood_arms",
+        "DigiFace p3_test (synthetic faces, synthetic occlusions); "
+        "95 % delete-one-identity jackknife intervals",
+    )
+
+
+def fig_p3_ve(ve: dict[str, Any]) -> None:
+    """Gate 3B: learned VE IoU on seen vs held-out families, heuristic for reference."""
+    r = ve["results"]["folds"]
+    fig, ax = plt.subplots(figsize=(8, 3.6))
+    x = np.arange(len(FAMS))
+    series = (
+        ("id", "learned", "learned, seen families"),
+        ("ood", "learned", "learned, held-out family"),
+        ("ood", "heuristic", "heuristic, held-out family"),
+    )
+    for k, (cell, src, label) in enumerate(series):
+        ax.plot(
+            x + (k - 1) * 0.2,
+            [r[f][cell][src]["iou"] for f in FAMS],
+            "o",
+            ms=7,
+            color=SLOT[k],
+            mec=SURFACE,
+            label=label,
+        )
+    ax.set_ylim(-0.03, 1.03)
+    ax.set_ylabel("IoU of occluded face cells")
+    ax.set_xticks(x, [f"{SHORT[f]}\n(held out)" for f in FAMS])
+    ax.legend(loc="lower left", fontsize=7)
+    ax.set_title(
+        "Visibility estimator: each fold's model on its seen families vs its held-out family"
+    )
+    _save(
+        fig, "phase3_visibility_iou", "DigiFace p3_test renders (synthetic); 28x28 grid, face cells"
+    )
+
+
 def main() -> int:
     global OUT, FMT
     import argparse
@@ -482,6 +562,10 @@ def main() -> int:
     det_path = EXP / "lfw_detection.json"
     if det_path.exists():
         fig_lfw_detection(json.loads(det_path.read_text("utf-8")))
+    for name, fn in (("phase3_final", fig_p3_arms), ("phase3_visibility_eval", fig_p3_ve)):
+        p = EXP / f"{name}.json"
+        if p.exists():
+            fn(json.loads(p.read_text("utf-8")))
     return 0
 
 

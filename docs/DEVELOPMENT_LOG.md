@@ -6,6 +6,70 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-11-01 — Phase 3 complete (waiting for owner review)
+
+### Runs (all memory-monitored; test accesses in `results/test_runs.jsonl`)
+
+**Visibility estimator training, 5 folds.**
+- F1/F2 stopped early at epoch 8 and F3 at epoch 14.
+- **F4/F5 hit the 30-epoch cap still improving.**
+- Peak 3.55 GB.
+
+**Extraction** (`extract_phase3.py`).
+- p3 set: 1.37 M renders in 1.8 h at 167–226 items/s.
+- Then the Phase 2 test set and LFW.
+- **Claude Code stopped the follow-up extraction twice under system memory pressure while idle**
+  (other applications were using RAM). It was not auto-restarted. Each time it was resumed only
+  on the owner's instruction, from the saved part shards, with no recomputation.
+
+**Develop / freeze** (D-047, SHA `34409779…`).
+- `cv_region` selected.
+- MLP criterion met in 4/5 folds; MLP kept exploratory.
+- p3_val rehearsal of the confirmatory path passed.
+
+**CONFIRMATORY run `bb5d9244bb3c`** (p3_test, once).
+- **C3 not supported:** A4 sFNMR 8.52 % on held-out random patch; A4 significantly worse than A3
+  on 3/5 folds.
+- **C1 not supported.**
+- **H4 met 5/5.**
+
+**Gate 3B** (`evaluate_visibility.py`, map accuracy only).
+- The estimator transfers to held-out mask, sunglasses and hand (IoU 0.87–0.90).
+- It fails on random patch and lighting (IoU 0.13 / 0.005), with **bias = +MAE
+  (overestimation)**.
+- Three logged accesses: the first was stopped by our own memory monitor and rerun with a
+  per-part subsampling loader; the third added the signed bias.
+
+**Follow-up `9b660f16061a`** (Phase 2 DigiFace test and LFW View 2): replicates the result
+(A4 random-patch sFNMR 8.90 % / 8.30 %).
+
+**Exploratory detector-inclusive `6a3c151e18a5`** plus diagnostic `diag-detinc-1`.
+- Detection failures reach 17 % at high-severity random patch.
+- The estimator overestimates visibility after re-alignment.
+
+### Bugs found and fixed
+- `build_table` looked up clean rows for occluded sides as well, then overwrote them. This is
+  value-identical: the p3_val rehearsal output was bit-identical before and after the fix. It
+  crashed only when the clean store was smaller than the occluded store (LFW). Regression test
+  added.
+- `evaluate_visibility.py` was rewritten to load per part with seeded subsampling (memory).
+- Pilot sampling in `lfw_detector_inclusive.py` now takes both classes.
+
+### Documentation
+- New: `docs/phase3_results.md` (16-item report source), `docs/model_card_visibility.md`, and
+  figures `reports/figures/phase3_*.svg`.
+- Updated:
+  - `docs/physical_occlusion_readiness.md`;
+  - statistical audit §3.7;
+  - roadmap §4g;
+  - architecture §4;
+  - real-world benchmark §8;
+  - evidence RES-012…016 and SIM-013;
+  - experiment registry (P3-EXP-001…007);
+  - decision log D-047.
+
+---
+
 ## 2026-10-27 — Phase 3 (in progress): visibility-estimator training, extraction and analysis code
 
 ### Visibility estimator (gate 3B)

@@ -317,6 +317,76 @@ records:
       protocol_version: "0.4.0"
       final_run_log_entry: "e97048b9c65f (post-hoc exploratory, on embeddings of 79331a84f520)"
     caveats: "Exploratory; in-domain threshold from DevTrain, which shares identities with View 2; requires pre-registration in Phase 3."
+  # ------------------------------------------------------------------ measured (Phase 3)
+  - id: RES-012
+    type: real_measured_model_result
+    title: "Phase 3 gate 3B: learned visibility estimator accuracy, seen vs held-out family"
+    statement: "On p3_test renders the learned VisNet reaches IoU 0.90-0.97 on seen families and transfers to held-out mask / sunglasses / hand-object (IoU 0.90 / 0.87 / 0.89, global MAE 0.012-0.053), but fails on held-out random patch (IoU 0.13, MAE 0.344) and extreme lighting (IoU 0.005, MAE 0.491), where the signed bias equals the MAE (visibility overestimated). The appearance-anomaly heuristic reaches IoU 0.00-0.31 everywhere."
+    source: "scripts/evaluate_visibility.py"
+    artefact: "reports/experiments/phase3_visibility_eval.json"
+    created: "2026-11-01"
+    provenance:
+      git_commit: "8e317fb7c2aae316d6512c9c2c103018f1a5e712"
+      dataset_ids: ["digiface1m"]
+      model_ids: ["veilx_visnet_phase3_F1-F5"]
+      split: "p3_test"
+      protocol_version: "0.5.0"
+      final_run_log_entry: "evaluate_visibility.py entries in results/test_runs.jsonl (map accuracy only)"
+    caveats: "Synthetic faces and occluders; 5 held-out families only; <=20,000 seeded renders per cell."
+  - id: RES-013
+    type: real_measured_model_result
+    title: "Phase 3 CONFIRMATORY C3: predicted-visibility vs quality-stratified calibration on unseen families"
+    statement: "Single logged p3_test run: the predicted-visibility-stratified arm (A4) violates the 5% sFNMR target on held-out random patch (8.52%, CI excludes 5%) while quality stratification (A3, 2.12%) and the ground-truth-visibility oracle (A5, 2.76%) do not; A4 is significantly worse than A3 on 3/5 held-out folds (paired identity jackknife, Holm) for +3.0 pp mean coverage. C3 is NOT supported. Clean-only calibration violates on every held-out family (6.0-19.8%)."
+    source: "scripts/evaluate_phase3.py final --final"
+    artefact: "reports/experiments/phase3_final.json"
+    created: "2026-10-27"
+    provenance: &p3_final
+      git_commit: "1b81d53bf4e7caf30884cc81f3fddb85c6e49d74"
+      dataset_ids: ["digiface1m"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m", "veilx_visnet_phase3_F1-F5"]
+      split: "p3_test"
+      protocol_version: "0.5.0"
+      final_run_log_entry: "bb5d9244bb3c"
+    caveats: "Synthetic faces and occluders; empirical OOD rates, no formal OOD guarantee; v2 ordering (v1 comparison reported)."
+  - id: RES-014
+    type: real_measured_model_result
+    title: "Phase 3 CONFIRMATORY C1 and H4: co-visibility value beyond quality; clean margin"
+    statement: "Co-visibility (M4 vs M1) lowers occluded-pair log-loss significantly in 7/10 cells but raises it on held-out random patch (-0.035) and lighting (-0.010), so C1 is NOT supported under the registered rule. The fused model meets the clean 0.5 pp margin in 5/5 folds: clean FNMR 0.68-0.74% (M4) vs 1.12% (M0) at frozen clean-cal FAR-1% thresholds."
+    source: "scripts/evaluate_phase3.py final --final"
+    artefact: "reports/experiments/phase3_final.json"
+    created: "2026-10-27"
+    provenance: *p3_final
+    caveats: "Synthetic data; MLP fusion (val criterion met in 4/5 folds) not evaluated on test (exploratory, D-047)."
+  - id: RES-015
+    type: real_measured_model_result
+    title: "Phase 3 FOLLOW-UP: frozen Phase 3 rules on Phase 2 DigiFace test and LFW derived occlusions"
+    statement: "With no fitting, the confirmatory pattern replicates: on held-out random patch A4 gives sFNMR 8.90% (Phase 2 DigiFace test) and 8.30% (LFW View 2, real photographs with synthetic overlays), versus A3 2.18% / 2.26% and oracle A5 2.77% / 2.20%. On LFW co-visibility features give no log-loss benefit in any family (M1 - M4 = -0.0006 to -0.048)."
+    source: "scripts/evaluate_phase3.py followup --final"
+    artefact: "reports/experiments/phase3_followup.json"
+    created: "2026-11-01"
+    provenance:
+      git_commit: "8e317fb7c2aae316d6512c9c2c103018f1a5e712"
+      dataset_ids: ["digiface1m", "kaggle_jessicali9530_lfw"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m", "veilx_visnet_phase3_F1-F5"]
+      split: "test (Phase 2 test_balanced); lfw_view2"
+      protocol_version: "0.5.0"
+      final_run_log_entry: "9b660f16061a"
+    caveats: "Follow-up evidence (both sets observed in Phase 2; LFW View 2 third use); synthetic occluders."
+  - id: RES-016
+    type: real_measured_model_result
+    title: "Phase 3 EXPLORATORY: detector-inclusive robustness on LFW (occluders composited into photographs)"
+    statement: "On 300 LFW View 2 pairs with synthetic occluders inverse-warped into the original photographs and re-detected by SCRFD, detection fails on up to 17.3% (random patch, high), 7.7% (lighting, high) and 3.7% (hand, high) of faces; A4 still violates on random patch (sFNMR 8.49%) while A3 stays within target (3.53%); forced non-match handling of detection failures raises A4 random-patch sFNMR to 13.8%. The learned visibility estimator overestimates visibility after re-alignment (12-pair diagnostic: global MAE 0.066 -> 0.204 mask, 0.003 -> 0.101 sunglasses)."
+    source: "scripts/lfw_detector_inclusive.py --final"
+    artefact: "reports/experiments/phase3_lfw_detector_inclusive.json"
+    created: "2026-11-01"
+    provenance:
+      git_commit: "8e317fb7c2aae316d6512c9c2c103018f1a5e712"
+      dataset_ids: ["kaggle_jessicali9530_lfw"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m", "veilx_visnet_phase3_F1-F5", "insightface_buffalo_l_det_10g"]
+      split: "lfw_view2"
+      protocol_version: "0.5.0"
+      final_run_log_entry: "6a3c151e18a5; diagnostic diag-detinc-1"
+    caveats: "Exploratory; 300 pairs; synthetic occluders; F5 composite re-lights only the crop footprint."
   # ------------------------------------------------------------------ hypotheses
   - id: HYP-001
     type: unverified_hypothesis
