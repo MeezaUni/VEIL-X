@@ -1,0 +1,60 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Phase 4 computational cost (synthetic inputs; RTX 4060 Laptop GPU; batch 256)",
+ "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+ "results": {
+  "adaface_ir101_webface4m": {
+   "ms_per_image": 2.0137023437882817,
+   "peak_gpu_mib": 2257.39892578125
+  },
+  "arcface_ir101_webface4m": {
+   "ms_per_image": 1.8496082032015693,
+   "peak_gpu_mib": 2256.5458984375
+  },
+  "ve_phase3": {
+   "ms_per_image": 0.2202123047254645,
+   "peak_gpu_mib": 698.41943359375
+  },
+  "ve_phase3_flip_tta": {
+   "ms_per_image": 0.44114687500496075,
+   "peak_gpu_mib": 734.16943359375
+  },
+  "vec_phase4": {
+   "ms_per_image": 0.22074511730352242,
+   "peak_gpu_mib": 697.41943359375
+  },
+  "vec_phase4_flip_tta": {
+   "ms_per_image": 0.44259999992846133,
+   "peak_gpu_mib": 734.16943359375
+  },
+  "mahalanobis_cpu": {
+   "ms_per_image": 0.06601555468932929
+  }
+ },
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-11-01T19:45:51.246867+00:00",
+  "git": {
+   "commit": "9ce3bd294cdf79b853232c1e0ad31ae1f2aedc91",
+   "dirty": true,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.14.1",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts/phase4_cost.py"
+  ],
+  "extra": {}
+ }
+}

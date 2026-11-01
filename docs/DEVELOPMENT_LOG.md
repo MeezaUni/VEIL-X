@@ -6,6 +6,48 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-11-02 — Phase 4 complete (waiting for owner review)
+
+### 4A: audit and freeze
+- Root cause found on development data (`phase4_diagnose.py`): the estimator learned occluder
+  classes; its errors are confident; face-like occluders are undetectable; lighting labels
+  overstate information loss.
+- Owner approved downloading DigiFace 72-image parts 2000–5999 as the untouched p4_test
+  (4,000 identities; 0 decode failures, 0 duplicates).
+- Evaluation-only occluder `E1_hair_strands` added. Protocol v0.6.0 frozen (D-048, `2b76dd7`)
+  before any training or scoring.
+
+### 4B–4E: development
+- VE-C trained on 5 folds (F2/F3/F5 reached the epoch cap).
+- **A first develop pass was stopped:** lighting renders had entered the temperature and shift
+  fit, and the shift ignored clipping. Both were corrected before any test access (D-049).
+- Freeze `bba12900…`; p3_val rehearsal passed.
+
+### Bugs found and fixed
+- `extract_phase4.py --set p4` rebuilt a 96k-element set for each of 288k manifest records
+  (quadratic; GPU idle for 14 min). Stopped (own job), fixed, re-piloted.
+- The `--followup` mode would have reused the `p3_clean` group name, while resume checks only
+  part sizes. It now uses its own group `p3test_clean`.
+- Partial attach for clean stores that also hold images absent from the development
+  extraction, with a hard guard against reading missing rows.
+
+### 4F–4G: runs
+- Detector development on LFW View 1 DevTest selected the fixed-crop fallback; View 2
+  follow-up `d57db3ee8923`.
+- **Confirmatory `903f6a5c7de3`** (p4_test, once): recommend A3. C4 / N4 / H4 are unsafe; VE-C
+  fixes overestimation but visibility does not beat quality. Population-shift finding: every arm
+  violates sFNMR even on seen families.
+- Follow-up on p3_test `db421cf1744d`: C4/N4 remove the Phase 3 random-patch violation, but are
+  still worse than A3 in 3 cells.
+- Cost: backbones ~2 ms/image each; VE-C 0.22 ms.
+
+### Memory
+- Claude Code stopped the Phase 3 follow-up extraction twice under system memory pressure
+  (other applications). It was resumed only on the owner's instruction.
+- All Phase 4 jobs ran under `run_with_memory_monitor` (min free 2.5 GB) with no abort.
+
+---
+
 ## 2026-11-01 — Phase 3 complete (waiting for owner review)
 
 ### Runs (all memory-monitored; test accesses in `results/test_runs.jsonl`)

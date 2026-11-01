@@ -387,6 +387,70 @@ records:
       protocol_version: "0.5.0"
       final_run_log_entry: "6a3c151e18a5; diagnostic diag-detinc-1"
     caveats: "Exploratory; 300 pairs; synthetic occluders; F5 composite re-lights only the crop footprint."
+  # ------------------------------------------------------------------ measured (Phase 4)
+  - id: RES-017
+    type: real_measured_model_result
+    title: "Phase 4A root cause of visibility overestimation (development data)"
+    statement: "On p3_val renders the Phase 3 estimator misses 88% of occluded face cells of the unseen random-patch family with confident predictions (mean P(visible) 0.85, 67% above 0.9), equally inside and outside the zones of seen occluders, for any patch colour; probes show it calls any uniform fill visible unless such patches were in training, and every model calls another identity's face patch visible. Lighting labels weakly track recognition damage (genuine-score drop correlation -0.31 vs -0.43 to -0.70 for physical occluders)."
+    source: "scripts/phase4_diagnose.py"
+    artefact: "reports/experiments/phase4_diagnostics.json"
+    created: "2026-11-01"
+    provenance:
+      git_commit: "9ce3bd294cdf79b853232c1e0ad31ae1f2aedc91"
+      dataset_ids: ["digiface1m"]
+      model_ids: ["veilx_visnet_phase3_F1-F5", "adaface_ir101_webface4m"]
+      split: "p3_val (development)"
+      protocol_version: "0.6.0"
+      final_run_log_entry: "none (development data)"
+    caveats: "Synthetic faces and occluders; diagnostics informed the Phase 4 design, so F4/F5 are design-informed in Phase 4."
+  - id: RES-018
+    type: real_measured_model_result
+    title: "Phase 4 CONFIRMATORY: conservative / novelty-aware / hybrid calibration vs quality stratification"
+    statement: "On the untouched p4_test partition (DigiFace identities 2000-5999, used once), the conservative (C4), novelty-aware (N4) and quality-first hybrid (H4) arms are all unsafe relative to quality-stratified calibration A3: violations 10 / 9 / 9 vs 6 (10 cells x 2 error types) and significantly worse sFNMR in 8 / 9 / 6 cells (paired identity jackknife, Holm), including every never-seen E1 hair cell. The registered recommendation is A3."
+    source: "scripts/evaluate_phase4.py final --final"
+    artefact: "reports/experiments/phase4_final.json"
+    created: "2026-11-02"
+    provenance: &p4_final
+      git_commit: "5571872952b78ae05d1078c451519d2e2ef82045"
+      dataset_ids: ["digiface1m"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m", "veilx_visnet_phase3_F1-F5", "veilx_vec_phase4_F1-F5"]
+      split: "p4_test"
+      protocol_version: "0.6.0"
+      final_run_log_entry: "903f6a5c7de3"
+    caveats: "Synthetic faces and occluders; F4/F5 design-informed; no OOD guarantee."
+  - id: RES-019
+    type: real_measured_model_result
+    title: "Phase 4: conservative visibility estimator and novelty detection on p4_test"
+    statement: "VE-C cuts overestimation on the held-out random patch (share of renders overestimated by >0.10: 94.6% -> 21.9%; bias +0.342 -> +0.065, design-informed) and has negative (conservative) bias on the never-seen E1 hair occluder in 4/5 folds. Mahalanobis novelty reaches AUROC 0.91-0.98 for E1 vs seen-family renders with a realised in-distribution pair flag rate of 4.6-5.2% (registered 5%). Even ground-truth visibility (A5) has higher sFNMR than A3 on every E1 cell."
+    source: "scripts/evaluate_phase4.py final --final"
+    artefact: "reports/experiments/phase4_final.json"
+    created: "2026-11-02"
+    provenance: *p4_final
+    caveats: "Lighting GT in the evaluation store uses the old darkening definition, so F5 bias is not comparable by design."
+  - id: RES-020
+    type: real_measured_model_result
+    title: "Phase 4: population shift between calibration and p4_test; fusion and co-visibility ablations"
+    statement: "Genuine pairs of the 72-image identities in p4_test are ~4x harder than on p3_test (clean FNMR of raw similarity 4.81% vs 1.12%), and every arm, A3 and the oracle included, exceeds the 5% sFNMR target even on seen families (5.4-7.8%), so p3_cal calibration does not transfer to this sub-population. The MLP fused score has lower log-loss than logistic fusion in 9/10 primary cells; removing co-visibility lowers log-loss in 8/10 cells."
+    source: "scripts/evaluate_phase4.py final --final"
+    artefact: "reports/experiments/phase4_final.json"
+    created: "2026-11-02"
+    provenance: *p4_final
+    caveats: "Population differences (accessories, pose, genuine cap 6) are inferred, not isolated."
+  - id: RES-021
+    type: real_measured_model_result
+    title: "Phase 4 FOLLOW-UP and detector policies"
+    statement: "On the calibration-matched p3_test (follow-up), conservative visibility removes the Phase 3 random-patch violation (C4 3.64%, N4 3.14% vs A4 8.52%) but stays significantly worse than A3 on 3 cells. On LFW composites the detector loses up to 32% of high-severity random-patch faces (no face / low quality); the fixed-crop fallback selected on View 1 DevTest keeps every family within target on View 2 (worst sFNMR 3.16%), while forced non-match reaches 14.7-16.1%."
+    source: "scripts/evaluate_phase4.py followup --final; scripts/phase4_detector.py"
+    artefact: "reports/experiments/phase4_followup_p3test.json"
+    created: "2026-11-02"
+    provenance:
+      git_commit: "9ce3bd294cdf79b853232c1e0ad31ae1f2aedc91"
+      dataset_ids: ["digiface1m", "kaggle_jessicali9530_lfw"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m", "veilx_vec_phase4_F1-F5", "insightface_buffalo_l_det_10g"]
+      split: "p3_test; lfw_view1_devtest; lfw_view2"
+      protocol_version: "0.6.0"
+      final_run_log_entry: "db421cf1744d; d57db3ee8923"
+    caveats: "Follow-up evidence (sets observed before); 300 LFW pairs; synthetic occluders."
   # ------------------------------------------------------------------ hypotheses
   - id: HYP-001
     type: unverified_hypothesis

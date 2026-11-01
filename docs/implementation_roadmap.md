@@ -184,6 +184,28 @@ Not done:
 - Detector runs on occluded photographs.
 - Train-role occlusion plans (deferred to Phase 3).
 
+## 4h. Phase 4 status (2026-11-02): complete; waiting for owner review
+
+Protocol v0.6.0 (D-048), corrections D-049, outcome D-050. Results: `docs/phase4_results.md`.
+
+**Recommendation: A3 quality-stratified calibration** (registered rule). No candidate (C4
+conservative, N4 novelty-aware, H4 quality-first hybrid) was safe relative to A3 on the
+untouched p4_test.
+
+**Recommended deployable configuration:**
+- SCRFD with fixed-crop fallback;
+- frozen AdaFace + ArcFace;
+- quality fused score without co-visibility;
+- A3 rules, calibrated on the deployment population.
+
+Visibility is used only as an explanation signal.
+
+**Phase 5 candidates (owner decision):**
+- a demo with no guarantee claims;
+- IJB-C access for physical occlusions;
+- deployment-population calibration;
+- prospective evaluation of the no-co-visibility MLP.
+
 ## 4g. Phase 3 status (2026-11-01): complete; waiting for owner review
 
 Authorised by D-046; protocol v0.5.0; development freeze D-047. Results:

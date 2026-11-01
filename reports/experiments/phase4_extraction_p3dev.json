@@ -3,125 +3,90 @@
  "scope": "Phase 4 feature extraction, set p3dev (throughput only; no scores)",
  "pilot": false,
  "groups": {
-  "p3_clean": {
-   "n": 118415,
-   "parts": 8,
-   "computed": 118415,
-   "seconds": 403.3,
-   "items_per_s": 293.6
-  },
-  "F1_mask__train__p3_train_pairs": {
-   "n": 50000,
+  "p3test_clean": {
+   "n": 65304,
    "parts": 4,
-   "computed": 50000,
-   "seconds": 57.7,
-   "items_per_s": 867.2
+   "computed": 65304,
+   "seconds": 245.1,
+   "items_per_s": 266.5
   },
-  "F2_sunglasses__train__p3_train_pairs": {
-   "n": 50000,
-   "parts": 4,
-   "computed": 50000,
-   "seconds": 56.5,
-   "items_per_s": 885.5
+  "F1_mask__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 80.3,
+   "items_per_s": 943.1
   },
-  "F3_hand_object__train__p3_train_pairs": {
-   "n": 50000,
-   "parts": 4,
-   "computed": 50000,
-   "seconds": 50.1,
-   "items_per_s": 997.2
+  "F2_sunglasses__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 82.0,
+   "items_per_s": 924.2
   },
-  "F4_random_patch__train__p3_train_pairs": {
-   "n": 50000,
-   "parts": 4,
-   "computed": 50000,
-   "seconds": 47.9,
-   "items_per_s": 1043.9
+  "F3_hand_object__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 73.5,
+   "items_per_s": 1030.8
   },
-  "F5_extreme_lighting__train__p3_train_pairs": {
-   "n": 50000,
-   "parts": 4,
-   "computed": 50000,
-   "seconds": 47.9,
-   "items_per_s": 1044.6
+  "F4_random_patch__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 69.6,
+   "items_per_s": 1088.6
   },
-  "F1_mask__val__p3_val_pairs": {
-   "n": 30915,
-   "parts": 2,
-   "computed": 30915,
-   "seconds": 29.9,
-   "items_per_s": 1032.4
+  "F5_extreme_lighting__test_id__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 72.4,
+   "items_per_s": 1046.2
   },
-  "F2_sunglasses__val__p3_val_pairs": {
-   "n": 30915,
-   "parts": 2,
-   "computed": 30915,
-   "seconds": 30.8,
-   "items_per_s": 1003.6
+  "F1_mask__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 63.7,
+   "items_per_s": 1188.1
   },
-  "F3_hand_object__val__p3_val_pairs": {
-   "n": 30915,
-   "parts": 2,
-   "computed": 30915,
-   "seconds": 29.0,
-   "items_per_s": 1067.4
+  "F2_sunglasses__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 61.2,
+   "items_per_s": 1238.1
   },
-  "F4_random_patch__val__p3_val_pairs": {
-   "n": 30915,
-   "parts": 2,
-   "computed": 30915,
-   "seconds": 28.2,
-   "items_per_s": 1096.6
+  "F3_hand_object__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 82.3,
+   "items_per_s": 920.6
   },
-  "F5_extreme_lighting__val__p3_val_pairs": {
-   "n": 30915,
-   "parts": 2,
-   "computed": 30915,
-   "seconds": 29.8,
-   "items_per_s": 1039.0
+  "F4_random_patch__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 81.3,
+   "items_per_s": 931.6
   },
-  "F1_mask__cal__p3_cal_independent": {
-   "n": 7681,
-   "parts": 1,
-   "computed": 7681,
-   "seconds": 8.1,
-   "items_per_s": 946.9
-  },
-  "F2_sunglasses__cal__p3_cal_independent": {
-   "n": 7681,
-   "parts": 1,
-   "computed": 7681,
-   "seconds": 8.0,
-   "items_per_s": 955.7
-  },
-  "F3_hand_object__cal__p3_cal_independent": {
-   "n": 7681,
-   "parts": 1,
-   "computed": 7681,
-   "seconds": 7.2,
-   "items_per_s": 1060.9
-  },
-  "F4_random_patch__cal__p3_cal_independent": {
-   "n": 7681,
-   "parts": 1,
-   "computed": 7681,
-   "seconds": 7.7,
-   "items_per_s": 997.2
-  },
-  "F5_extreme_lighting__cal__p3_cal_independent": {
-   "n": 7681,
-   "parts": 1,
-   "computed": 7681,
-   "seconds": 7.7,
-   "items_per_s": 993.5
+  "F5_extreme_lighting__test_ood__p3_test_pairs": {
+   "n": 75740,
+   "parts": 5,
+   "computed": 75740,
+   "seconds": 66.3,
+   "items_per_s": 1141.7
   }
  },
- "wall_seconds": 850.0,
+ "wall_seconds": 977.7,
  "provenance": {
   "veilx_version": "0.0.1",
-  "timestamp_utc": "2026-11-01T17:40:49.833182+00:00",
+  "timestamp_utc": "2026-11-01T19:30:54.297171+00:00",
   "git": {
-   "commit": "38f336b083a384f7b83abf125db941dab4b16aef",
+   "commit": "5571872952b78ae05d1078c451519d2e2ef82045",
    "dirty": true,
    "repo_is_project_root": true
   },
@@ -142,6 +107,7 @@
    "scripts\\extract_phase4.py",
    "--set",
    "p3dev",
+   "--followup",
    "--workers",
    "6"
   ],

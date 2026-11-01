@@ -57,3 +57,28 @@ of (seen) families.
   never available at deployment.
 - Weights derive from DigiFace-1M renders (non-commercial research licence); they are not
   redistributed.
+
+## 4. Phase 4 conservative estimator VE-C
+
+Same architecture and budget as above, with the following changes
+(`configs/experiments/phase4/vec_<fold>.yaml`; summaries in
+`reports/experiments/phase4_vec_training_<fold>.json`):
+- BCE weight 4.0 on occluded-target cells;
+- 20 % natural-texture blob hard negatives;
+- lighting targets mark only crushed or clipped pixels;
+- seed 20261101.
+
+**Training.** F1 and F4 early-stopped at epochs 16 and 10. F2, F3 and F5 reached the 30-epoch
+cap.
+
+**Calibration on seen physical families.** T = 0.5 (grid edge; the estimator is under-confident
+there) and shift c = 0.
+
+**On p4_test:**
+- Held-out random-patch overestimation (share > 0.10): 94.6 % → 21.9 %.
+- Never-seen hair occluder: negative (conservative) bias in 4/5 folds.
+- The bottleneck feature drives a Mahalanobis novelty flag: E1 AUROC 0.91–0.98, in-distribution
+  flag rate ≈ 5 %.
+
+**Decisions.** VE-C is **not recommended for decisions** (D-050). It is useful as an explanation
+overlay. Face-like occluders remain undetectable.

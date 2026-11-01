@@ -513,6 +513,209 @@
       "created_utc": "2026-11-01T10:45:12.292089+00:00"
     },
     {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P4-EXP-001",
+      "purpose": "Phase 4A root-cause diagnostics (development data: p3_val, fresh renders)",
+      "script": "scripts/phase4_diagnose.py",
+      "artefact": "reports/experiments/phase4_diagnostics.json",
+      "splits": [
+        "p3_val"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "01280074486eb2e5ae813dfe931dc87041425d66",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "11f6fb1d80ecd6d719d8214cc14015d22e01165ffa00c781a8d9892b7cebb31e",
+      "created_utc": "2026-11-01T11:36:35.808642+00:00"
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P4-EXP-002",
+      "purpose": "Conservative VE-C training, 5 folds (p3_train / p3_val)",
+      "script": "scripts/train_visibility.py --config configs/experiments/phase4/vec_<fold>.yaml",
+      "artefact": "reports/experiments/phase4_vec_training_F1_mask.json",
+      "splits": [
+        "p3_train",
+        "p3_val"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": null,
+      "git_dirty": null,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "5482f1ea90727dcc5962051bea9e41975cb87dda72fae4eb7a4b83c1134552da",
+      "created_utc": null
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P4-EXP-003",
+      "purpose": "Phase 4 develop + freeze (T, shift, novelty, fusion, arms; no test)",
+      "script": "scripts/evaluate_phase4.py develop",
+      "artefact": "reports/experiments/phase4_develop.json",
+      "splits": [
+        "p3_train",
+        "p3_val",
+        "p3_cal"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "38f336b083a384f7b83abf125db941dab4b16aef",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "4450dc0c701f3cec95fdc5b97745f5fccd76a4dafd2276063b5d07f035d56cbc",
+      "created_utc": "2026-11-01T17:52:08.629941+00:00"
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P4-EXP-004",
+      "purpose": "CONFIRMATORY single logged run on the untouched p4_test partition",
+      "script": "scripts/evaluate_phase4.py final --final",
+      "artefact": "reports/experiments/phase4_final.json",
+      "splits": [
+        "p4_test"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "5571872952b78ae05d1078c451519d2e2ef82045",
+      "git_dirty": true,
+      "run_id": "903f6a5c7de3",
+      "frozen_config_sha256": null,
+      "artefact_sha256": "b8f9bd91b5c4f5c0ddc40123569b8fc82560d1fd8fd4ba67cbf972817cb3a0c3",
+      "created_utc": "2026-11-01T19:15:07.827498+00:00"
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P4-EXP-005",
+      "purpose": "FOLLOW-UP of frozen Phase 4 rules on p3_test (calibration-matched population)",
+      "script": "scripts/evaluate_phase4.py followup --final",
+      "artefact": "reports/experiments/phase4_followup_p3test.json",
+      "splits": [
+        "p3_test"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "5571872952b78ae05d1078c451519d2e2ef82045",
+      "git_dirty": true,
+      "run_id": "db421cf1744d",
+      "frozen_config_sha256": null,
+      "artefact_sha256": "73e709a8e9d9edcde4b6fd4001b9b8928e236aadbbbdf37d95f1f72d6c685e8b",
+      "created_utc": "2026-11-01T19:39:12.661957+00:00"
+    },
+    {
+      "dataset_ids": [
+        "kaggle_jessicali9530_lfw"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P4-EXP-006",
+      "purpose": "Detector taxonomy/policies: development on LFW View 1 DevTest",
+      "script": "scripts/phase4_detector.py --split dev",
+      "artefact": "reports/experiments/phase4_detector_dev.json",
+      "splits": [
+        "lfw_view1_devtest"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "2b76dd735db674af61caf983c9ec191abaf87160",
+      "git_dirty": true,
+      "run_id": "1c792ba98f5f",
+      "frozen_config_sha256": null,
+      "artefact_sha256": "e797db90b76d109da35d943c1c7686e1985a517521d9f9e6776370b87a1ae3a4",
+      "created_utc": "2026-11-01T11:57:12.095742+00:00"
+    },
+    {
+      "dataset_ids": [
+        "kaggle_jessicali9530_lfw"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P4-EXP-007",
+      "purpose": "Detector taxonomy/policies: FOLLOW-UP on LFW View 2 (dev-selected policy)",
+      "script": "scripts/phase4_detector.py --split view2",
+      "artefact": "reports/experiments/phase4_detector_view2.json",
+      "splits": [
+        "lfw_view2"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "a685c2280e91bdcba24dcfe8f016667223fff01a",
+      "git_dirty": true,
+      "run_id": "d57db3ee8923",
+      "frozen_config_sha256": null,
+      "artefact_sha256": "df665bdfe0cb676add0282aaad51025e0e23866a079b1446860e3eaaf969031f",
+      "created_utc": "2026-11-01T17:56:57.025280+00:00"
+    },
+    {
+      "dataset_ids": [
+        "digiface1m"
+      ],
+      "model_ids": [
+        "adaface_ir101_webface4m",
+        "arcface_ir101_webface4m"
+      ],
+      "id": "P4-EXP-008",
+      "purpose": "Computational cost per component (synthetic inputs)",
+      "script": "scripts/phase4_cost.py",
+      "artefact": "reports/experiments/phase4_cost.json",
+      "splits": [
+        "(none)"
+      ],
+      "status": "complete",
+      "evidence_type": "real_measured_model_result",
+      "protocol_version": null,
+      "git_commit": "9ce3bd294cdf79b853232c1e0ad31ae1f2aedc91",
+      "git_dirty": true,
+      "run_id": null,
+      "frozen_config_sha256": null,
+      "artefact_sha256": "4e787a6117b82267f521cc7dac3f0565f17988409a5cbac3565606e4837d2d51",
+      "created_utc": "2026-11-01T19:45:51.246867+00:00"
+    },
+    {
       "dataset_ids": [],
       "model_ids": [
         "adaface_ir101_webface4m",

@@ -205,6 +205,23 @@
 | F5_extreme_lighting|test_id | +0.0095 [+0.0074, +0.0117] | +0.0098 [+0.0076, +0.0120] | +0.0052 [+0.0032, +0.0072] | 0.9742 / 0.9756 / 0.9785 / 0.9798 |
 | F5_extreme_lighting|test_ood | -0.0475 [-0.0517, -0.0434] | -0.0509 [-0.0552, -0.0466] | +0.0277 [+0.0246, +0.0307] | 0.9904 / 0.9896 / 0.9902 / 0.9916 |
 
+## Follow-up on p3_test `db421cf1744d` (descriptive)
+
+### test_ood: coverage / sFNMR / sFMR, % (primary|v2)
+
+| Arm | mask | sunglasses | hand object | random patch | extreme lighting |
+|---|---|---|---|---|---|
+| B0_raw_global | 94.4 / 2.74 / 4.72 | 92.4 / 1.24 / 2.38 | 95.2 / 2.90 / 3.68 | 95.6 / 11.27 ✗ / 1.67 | 93.1 / 1.69 / 2.66 |
+| B1_quality_global | 100.0 / 3.14 / 5.39 ✗ | 100.0 / 2.79 / 1.87 | 97.3 / 2.07 / 1.45 | 100.0 / 5.65 ✗ / 4.65 | 98.1 / 1.07 / 1.57 |
+| A3_quality | 93.7 / 1.94 / 2.56 | 96.8 / 1.87 / 1.24 | 94.3 / 1.59 / 1.23 | 88.6 / 2.12 / 2.00 | 96.1 / 1.08 / 1.27 |
+| A4_original | 94.8 / 1.75 / 3.14 | 96.8 / 1.28 / 0.89 | 95.4 / 2.36 / 1.22 | 98.5 / 8.52 ✗ / 2.13 | 98.7 / 2.25 / 1.28 |
+| C4_conservative | 93.4 / 1.47 / 2.51 | 96.8 / 1.50 / 1.29 | 94.4 / 2.05 / 1.12 | 91.3 / 3.64 / 1.84 | 99.0 / 2.32 / 1.26 |
+| N4_novelty_aware | 93.4 / 1.47 / 2.51 | 97.5 / 1.54 / 1.31 | 94.5 / 1.81 / 1.12 | 90.1 / 3.14 / 1.60 | 98.3 / 2.07 / 1.21 |
+| H4_quality_first_hybrid | 92.6 / 1.40 / 2.53 | 92.0 / 1.49 / 1.30 | 84.2 / 1.89 / 1.16 | 52.2 / 2.16 / 1.03 | 95.0 / 1.81 / 1.27 |
+| A5_oracle | 92.4 / 1.30 / 2.12 | 98.1 / 2.06 / 1.34 | 97.5 / 2.01 / 2.30 | 90.4 / 2.76 / 1.93 | 93.4 / 0.87 / 1.63 |
+
+Endpoints (Test-OOD only, descriptive): recommendation `A3_quality`; violations {'A3_quality': 0, 'A4_original': 1, 'A5_oracle': 0, 'B0_raw_global': 1, 'B1_quality_global': 2, 'C4_conservative': 0, 'N4_novelty_aware': 0, 'H4_quality_first_hybrid': 0}
+
 ## Detector-inclusive, DEVELOPMENT (LFW View 1 DevTest): run `1c792ba98f5f`
 
 max residual (p99 clean DevTrain) = 7.34; selection: `fallback`

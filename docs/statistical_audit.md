@@ -226,6 +226,23 @@ Explicit non-claims:
 - **Clean margin.** The H4 upper CI is ≤ −0.30 pp in all folds, so M4 is non-inferior and in
   fact better than M0. This needs the SIM-011 paired-interval validity, which holds.
 
+## 3.8 Phase 4 audit (confirmatory run `903f6a5c7de3`, freeze `bba12900…`, protocol v0.6.0)
+
+- **Confirmatory data.** DigiFace parts 2000–5999, never downloaded before Phase 4, used once.
+  Follow-ups (p3_test `db421cf1744d`, LFW View 2 `d57db3ee8923`) are labelled.
+- **Multiplicity.** Per candidate: Holm over 10 primary cells, per error type. The registered
+  P1/P2 rules were applied as written; `endpoints()` is unit-tested.
+- **Design leakage.** Phase 4 design was informed by F4/F5 renders on p3_val (diagnostics), so
+  those families are labelled design-informed. E1 is the clean unseen test and was never
+  rendered in development.
+- **Population shift (new).**
+  - The confirmatory partition is not exchangeable with p3_cal: clean FNMR(M0) 4.81 % vs
+    1.12 %. All arms violate sFNMR even on Test-ID.
+  - LTT certificates are distribution-specific. This is now **measured**, not assumed.
+  - Arm comparisons stay valid because they are paired on identical pairs.
+- **Implementation corrections before test access** (D-049) are documented. The VE-C temperature
+  reached its grid edge; it was not re-tuned.
+
 ## 4. Domain limitations (apply to every Phase 2 number)
 
 1. **Synthetic faces.** DigiFace renders are a different domain from real photographs. Clean
