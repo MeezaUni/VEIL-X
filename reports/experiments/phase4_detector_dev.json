@@ -1,0 +1,330 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Phase 4F DEVELOPMENT (LFW View 1 DevTest): synthetic occluders composited into real photographs; frozen Phase 3 A3 rules",
+ "run_id": "1c792ba98f5f",
+ "results": {
+  "split": "dev",
+  "n_pairs": 300,
+  "n_composites": 4500,
+  "min_score": 0.6,
+  "max_residual_p99_devtrain_clean": 7.335444161413329,
+  "taxonomy": {
+   "F1_mask": {
+    "low": {
+     "no_face": 0,
+     "low_quality": 1,
+     "multiple_faces": 42,
+     "success": 257
+    },
+    "medium": {
+     "no_face": 0,
+     "low_quality": 4,
+     "multiple_faces": 39,
+     "success": 257
+    },
+    "high": {
+     "no_face": 0,
+     "low_quality": 5,
+     "multiple_faces": 40,
+     "success": 255
+    }
+   },
+   "F2_sunglasses": {
+    "low": {
+     "no_face": 0,
+     "low_quality": 2,
+     "multiple_faces": 42,
+     "success": 256
+    },
+    "medium": {
+     "no_face": 0,
+     "low_quality": 3,
+     "multiple_faces": 42,
+     "success": 255
+    },
+    "high": {
+     "no_face": 0,
+     "low_quality": 4,
+     "multiple_faces": 43,
+     "success": 253
+    }
+   },
+   "F3_hand_object": {
+    "low": {
+     "no_face": 0,
+     "low_quality": 2,
+     "multiple_faces": 43,
+     "success": 255
+    },
+    "medium": {
+     "no_face": 0,
+     "low_quality": 3,
+     "multiple_faces": 43,
+     "success": 254
+    },
+    "high": {
+     "no_face": 6,
+     "low_quality": 9,
+     "multiple_faces": 40,
+     "success": 245
+    }
+   },
+   "F4_random_patch": {
+    "low": {
+     "no_face": 0,
+     "low_quality": 2,
+     "multiple_faces": 43,
+     "success": 255
+    },
+    "medium": {
+     "no_face": 3,
+     "low_quality": 10,
+     "multiple_faces": 41,
+     "success": 246
+    },
+    "high": {
+     "no_face": 62,
+     "low_quality": 35,
+     "multiple_faces": 27,
+     "success": 176
+    }
+   },
+   "F5_extreme_lighting": {
+    "low": {
+     "no_face": 0,
+     "low_quality": 2,
+     "multiple_faces": 43,
+     "success": 255
+    },
+    "medium": {
+     "no_face": 6,
+     "low_quality": 3,
+     "multiple_faces": 43,
+     "success": 248
+    },
+    "high": {
+     "no_face": 24,
+     "low_quality": 14,
+     "multiple_faces": 31,
+     "success": 231
+    }
+   }
+  },
+  "policies": {
+   "F1_mask": {
+    "abstain": {
+     "coverage_genuine": 0.9688888888888889,
+     "coverage_impostor": 0.9866666666666667,
+     "sfnmr": 0.011467889908256881,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "non_match": {
+     "coverage_genuine": 0.98,
+     "coverage_impostor": 0.9977777777777778,
+     "sfnmr": 0.022675736961451247,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fallback": {
+     "coverage_genuine": 0.98,
+     "coverage_impostor": 0.9977777777777778,
+     "sfnmr": 0.011337868480725623,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fixed_crop_only": {
+     "coverage_genuine": 0.9733333333333334,
+     "coverage_impostor": 0.9977777777777778,
+     "sfnmr": 0.02054794520547945,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    }
+   },
+   "F2_sunglasses": {
+    "abstain": {
+     "coverage_genuine": 0.9777777777777777,
+     "coverage_impostor": 0.9933333333333333,
+     "sfnmr": 0.00909090909090909,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "non_match": {
+     "coverage_genuine": 0.9911111111111112,
+     "coverage_impostor": 1.0,
+     "sfnmr": 0.02242152466367713,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fallback": {
+     "coverage_genuine": 0.9911111111111112,
+     "coverage_impostor": 1.0,
+     "sfnmr": 0.008968609865470852,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fixed_crop_only": {
+     "coverage_genuine": 0.9866666666666667,
+     "coverage_impostor": 1.0,
+     "sfnmr": 0.015765765765765764,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    }
+   },
+   "F3_hand_object": {
+    "abstain": {
+     "coverage_genuine": 0.9533333333333334,
+     "coverage_impostor": 0.9822222222222222,
+     "sfnmr": 0.011655011655011656,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "non_match": {
+     "coverage_genuine": 0.98,
+     "coverage_impostor": 1.0,
+     "sfnmr": 0.03854875283446712,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fallback": {
+     "coverage_genuine": 0.9755555555555555,
+     "coverage_impostor": 1.0,
+     "sfnmr": 0.011389521640091117,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fixed_crop_only": {
+     "coverage_genuine": 0.9755555555555555,
+     "coverage_impostor": 1.0,
+     "sfnmr": 0.011389521640091117,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    }
+   },
+   "F4_random_patch": {
+    "abstain": {
+     "coverage_genuine": 0.8444444444444444,
+     "coverage_impostor": 0.8711111111111111,
+     "sfnmr": 0.042105263157894736,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "non_match": {
+     "coverage_genuine": 0.9644444444444444,
+     "coverage_impostor": 1.0,
+     "sfnmr": 0.16129032258064516,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fallback": {
+     "coverage_genuine": 0.9244444444444444,
+     "coverage_impostor": 0.9955555555555555,
+     "sfnmr": 0.040865384615384616,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fixed_crop_only": {
+     "coverage_genuine": 0.9177777777777778,
+     "coverage_impostor": 0.9955555555555555,
+     "sfnmr": 0.01694915254237288,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    }
+   },
+   "F5_extreme_lighting": {
+    "abstain": {
+     "coverage_genuine": 0.9488888888888889,
+     "coverage_impostor": 0.9333333333333333,
+     "sfnmr": 0.02107728337236534,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "non_match": {
+     "coverage_genuine": 0.9933333333333333,
+     "coverage_impostor": 0.9977777777777778,
+     "sfnmr": 0.06487695749440715,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fallback": {
+     "coverage_genuine": 0.9866666666666667,
+     "coverage_impostor": 0.9911111111111112,
+     "sfnmr": 0.02027027027027027,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    },
+    "fixed_crop_only": {
+     "coverage_genuine": 0.9822222222222222,
+     "coverage_impostor": 0.9933333333333333,
+     "sfnmr": 0.020361990950226245,
+     "sfmr": 0.0,
+     "n_genuine": 450,
+     "n_impostor": 450
+    }
+   }
+  },
+  "selection": {
+   "rule": "min worst-family sFNMR s.t. all sFMR <= 5 %; ties -> higher mean genuine coverage",
+   "worst_family_sfnmr": {
+    "abstain": 0.042105263157894736,
+    "non_match": 0.16129032258064516,
+    "fallback": 0.040865384615384616
+   },
+   "mean_genuine_coverage": {
+    "abstain": 0.9386666666666666,
+    "non_match": 0.9817777777777777,
+    "fallback": 0.9715555555555554
+   },
+   "selected": "fallback"
+  }
+ },
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-11-01T11:57:12.095742+00:00",
+  "git": {
+   "commit": "2b76dd735db674af61caf983c9ec191abaf87160",
+   "dirty": true,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.14.1",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts\\phase4_detector.py",
+   "--split",
+   "dev",
+   "--workers",
+   "3"
+  ],
+  "extra": {}
+ }
+}

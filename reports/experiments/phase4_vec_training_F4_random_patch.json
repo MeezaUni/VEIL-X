@@ -1,0 +1,186 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "visibility-estimator training on DigiFace p3_train (synthetic occlusions) - Phase 4 conservative VE-C",
+ "visibility_options": {
+  "occluded_weight": 4.0,
+  "hard_negative_fraction": 0.2,
+  "lighting_as_corruption": true
+ },
+ "fold_heldout_family": "F4_random_patch",
+ "seen_families": [
+  "F1_mask",
+  "F2_sunglasses",
+  "F3_hand_object",
+  "F5_extreme_lighting"
+ ],
+ "pilot": false,
+ "n_parameters": 3604385,
+ "samples_per_epoch": 50000,
+ "val_samples": 10000,
+ "epochs_run": 11,
+ "best_val_loss": 0.06729287807941436,
+ "best_epoch": 6,
+ "amp_check": {
+  "val_loss_fp32": 0.06729576337337494,
+  "val_loss_fp16": 0.06729287807941436,
+  "max_abs_prob_diff": 0.017895162105560303
+ },
+ "history": [
+  {
+   "epoch": 0,
+   "train_loss": 0.17195802072763444,
+   "val_loss": 0.1835978319644928,
+   "val_iou": 0.7959502840060483,
+   "val_global_mae": 0.034841988622271954,
+   "val_brier": 0.03132338078566475,
+   "lr": 0.0009972609476841376,
+   "seconds": 57.6,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 1,
+   "train_loss": 0.09650459607839584,
+   "val_loss": 0.24779132158756256,
+   "val_iou": 0.7712328685535806,
+   "val_global_mae": 0.05197505641529179,
+   "val_brier": 0.05315623579450328,
+   "lr": 0.0009890738003669036,
+   "seconds": 59.3,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.0853216349363327,
+   "val_loss": 0.07539765664339065,
+   "val_iou": 0.8883041490846906,
+   "val_global_mae": 0.013472637541121327,
+   "val_brier": 0.015779864242196316,
+   "lr": 0.0009755282581475762,
+   "seconds": 58.8,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.0816318551850319,
+   "val_loss": 0.08457929009199143,
+   "val_iou": 0.8824196122820075,
+   "val_global_mae": 0.01327890001850492,
+   "val_brier": 0.014007707193714206,
+   "lr": 0.0009567727288213,
+   "seconds": 58.6,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 4,
+   "train_loss": 0.08067407208204269,
+   "val_loss": 0.08197752264738083,
+   "val_iou": 0.8880155957834716,
+   "val_global_mae": 0.01615903168613931,
+   "val_brier": 0.017806809958964217,
+   "lr": 0.0009330127018922204,
+   "seconds": 58.3,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.07968406151294709,
+   "val_loss": 0.07811481062173843,
+   "val_iou": 0.9060268056953072,
+   "val_global_mae": 0.015791562856750044,
+   "val_brier": 0.017443034970298754,
+   "lr": 0.0009045084971874736,
+   "seconds": 58.5,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 6,
+   "train_loss": 0.07360079901337624,
+   "val_loss": 0.06729287807941436,
+   "val_iou": 0.9211392337978601,
+   "val_global_mae": 0.00688399950656453,
+   "val_brier": 0.01140140107394101,
+   "lr": 0.0008715724127386968,
+   "seconds": 58.7,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 7,
+   "train_loss": 0.07841589626789093,
+   "val_loss": 0.08131426725387574,
+   "val_iou": 0.8844615321247183,
+   "val_global_mae": 0.010806004954824996,
+   "val_brier": 0.012334502426201276,
+   "lr": 0.0008345653031794288,
+   "seconds": 64.0,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 8,
+   "train_loss": 0.07299657348871232,
+   "val_loss": 0.0711185831785202,
+   "val_iou": 0.9156137959611929,
+   "val_global_mae": 0.010636637662925568,
+   "val_brier": 0.014200605260295632,
+   "lr": 0.0007938926261462363,
+   "seconds": 61.9,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 9,
+   "train_loss": 0.07329027277231216,
+   "val_loss": 0.06752641702890397,
+   "val_iou": 0.9189095689064077,
+   "val_global_mae": 0.008014943498580137,
+   "val_brier": 0.011490925266512478,
+   "lr": 0.0007500000000000004,
+   "seconds": 58.5,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 10,
+   "train_loss": 0.06953310904741287,
+   "val_loss": 0.07373005558252335,
+   "val_iou": 0.9152435260445994,
+   "val_global_mae": 0.010599194649408896,
+   "val_brier": 0.0137217144078139,
+   "lr": 0.0007033683215379015,
+   "seconds": 59.8,
+   "peak_gpu_mib": 1285.9
+  }
+ ],
+ "wall_seconds": 677.0,
+ "config": {
+  "schema_version": 1,
+  "run_id": "p4-vec-f4-random-patch",
+  "phase": "phase4",
+  "authorized": true,
+  "purpose": "Train the conservative visibility estimator VE-C without the held-out family F4_random_patch.",
+  "seed": 20261101,
+  "device": "cuda",
+  "backbone_id": "none-visibility-estimator",
+  "backbone_frozen": true,
+  "heldout_family": "F4_random_patch",
+  "train_pairs": "manifests/phase3/subsplits.json#p3_train",
+  "val_pairs": "manifests/phase3/subsplits.json#p3_val",
+  "batch_size": 128,
+  "grad_accumulation": 1,
+  "max_epochs": 30,
+  "learning_rate": 0.001,
+  "precision": {
+   "mode": "fp16",
+   "allow_tf32": false,
+   "deterministic": true
+  },
+  "checkpoint": {
+   "directory": "models/phase4/vec/F4_random_patch",
+   "keep_last": 2,
+   "save_every_steps": 1
+  },
+  "visibility": {
+   "occluded_weight": 4.0,
+   "hard_negative_fraction": 0.2,
+   "lighting_as_corruption": true
+  }
+ },
+ "best_weights_sha256": "1eeff01fa90b3386b365ec749019db92435a946d4e79aa84cf005fe66850a7e5"
+}

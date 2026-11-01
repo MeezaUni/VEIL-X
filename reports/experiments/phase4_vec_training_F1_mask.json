@@ -1,0 +1,252 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "visibility-estimator training on DigiFace p3_train (synthetic occlusions) - Phase 4 conservative VE-C",
+ "visibility_options": {
+  "occluded_weight": 4.0,
+  "hard_negative_fraction": 0.2,
+  "lighting_as_corruption": true
+ },
+ "fold_heldout_family": "F1_mask",
+ "seen_families": [
+  "F2_sunglasses",
+  "F3_hand_object",
+  "F4_random_patch",
+  "F5_extreme_lighting"
+ ],
+ "pilot": false,
+ "n_parameters": 3604385,
+ "samples_per_epoch": 50000,
+ "val_samples": 10000,
+ "epochs_run": 17,
+ "best_val_loss": 0.07017712618112563,
+ "best_epoch": 12,
+ "amp_check": {
+  "val_loss_fp32": 0.07015443074703216,
+  "val_loss_fp16": 0.07017712618112563,
+  "max_abs_prob_diff": 0.018549680709838867
+ },
+ "history": [
+  {
+   "epoch": 0,
+   "train_loss": 0.19758567259311677,
+   "val_loss": 0.1752937366962433,
+   "val_iou": 0.7983589208110962,
+   "val_global_mae": 0.06497421247454735,
+   "val_brier": 0.055413040126819794,
+   "lr": 0.0009972609476841376,
+   "seconds": 147.1,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 1,
+   "train_loss": 0.1043096820282936,
+   "val_loss": 0.11093868341445923,
+   "val_iou": 0.8575080542699623,
+   "val_global_mae": 0.030233485698526255,
+   "val_brier": 0.029148855520976475,
+   "lr": 0.0009890738003669036,
+   "seconds": 123.3,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.10171750071048737,
+   "val_loss": 0.08278147548437119,
+   "val_iou": 0.8786566589274397,
+   "val_global_mae": 0.014522840600354789,
+   "val_brier": 0.015900528382590283,
+   "lr": 0.0009755282581475762,
+   "seconds": 114.4,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.09048380248308181,
+   "val_loss": 0.21557437062263488,
+   "val_iou": 0.8246141791137828,
+   "val_global_mae": 0.028315957142141586,
+   "val_brier": 0.028026574682522332,
+   "lr": 0.0009567727288213,
+   "seconds": 341.0,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 4,
+   "train_loss": 0.08427625187397003,
+   "val_loss": 0.09900833450555802,
+   "val_iou": 0.8910669841668722,
+   "val_global_mae": 0.02202262452263116,
+   "val_brier": 0.023218947228451296,
+   "lr": 0.0009330127018922204,
+   "seconds": 398.2,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.08630292772769928,
+   "val_loss": 0.09029725961685181,
+   "val_iou": 0.8817249770398509,
+   "val_global_mae": 0.021659489475976307,
+   "val_brier": 0.021499634177792073,
+   "lr": 0.0009045084971874736,
+   "seconds": 395.7,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 6,
+   "train_loss": 0.08149102360248565,
+   "val_loss": 0.07791189172267914,
+   "val_iou": 0.908016896101359,
+   "val_global_mae": 0.009453209035730983,
+   "val_brier": 0.012509431626357372,
+   "lr": 0.0008715724127386968,
+   "seconds": 137.7,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 7,
+   "train_loss": 0.08092470482826233,
+   "val_loss": 0.07586926646232604,
+   "val_iou": 0.9007239087436149,
+   "val_global_mae": 0.012445763346294925,
+   "val_brier": 0.014359612971226648,
+   "lr": 0.0008345653031794288,
+   "seconds": 104.5,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 8,
+   "train_loss": 0.07756474304676056,
+   "val_loss": 0.08455058362483979,
+   "val_iou": 0.9025453058960311,
+   "val_global_mae": 0.016838931220996934,
+   "val_brier": 0.018340572865317525,
+   "lr": 0.0007938926261462363,
+   "seconds": 98.5,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 9,
+   "train_loss": 0.07874420657396317,
+   "val_loss": 0.07389902329444885,
+   "val_iou": 0.9096695615969687,
+   "val_global_mae": 0.010776593206161308,
+   "val_brier": 0.013690095877749279,
+   "lr": 0.0007500000000000004,
+   "seconds": 97.5,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 10,
+   "train_loss": 0.07423027188777924,
+   "val_loss": 0.07832439261674881,
+   "val_iou": 0.9155031384779534,
+   "val_global_mae": 0.014129801248696117,
+   "val_brier": 0.016220411083153058,
+   "lr": 0.0007033683215379015,
+   "seconds": 99.5,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 11,
+   "train_loss": 0.07987912041425704,
+   "val_loss": 0.07867183768749238,
+   "val_iou": 0.9088631470734342,
+   "val_global_mae": 0.00933818075609414,
+   "val_brier": 0.011451567671134383,
+   "lr": 0.000654508497187476,
+   "seconds": 83.2,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 12,
+   "train_loss": 0.0758340320622921,
+   "val_loss": 0.07017712618112563,
+   "val_iou": 0.9296370946485405,
+   "val_global_mae": 0.005986053636529123,
+   "val_brier": 0.010934712706552328,
+   "lr": 0.0006039558454088811,
+   "seconds": 99.9,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 13,
+   "train_loss": 0.07307205960512161,
+   "val_loss": 0.07195061535835266,
+   "val_iou": 0.9226496607675484,
+   "val_global_mae": 0.007579312314655515,
+   "val_brier": 0.011243619389973064,
+   "lr": 0.0005522642316338284,
+   "seconds": 93.1,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 14,
+   "train_loss": 0.07683842455863953,
+   "val_loss": 0.07530029202699662,
+   "val_iou": 0.9023180630896349,
+   "val_global_mae": 0.011711340585685136,
+   "val_brier": 0.01412002517449631,
+   "lr": 0.0005000000000000007,
+   "seconds": 77.7,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 15,
+   "train_loss": 0.0750881305551529,
+   "val_loss": 0.07263515040874481,
+   "val_iou": 0.9238366955914257,
+   "val_global_mae": 0.006853174190521739,
+   "val_brier": 0.010930635514431462,
+   "lr": 0.00044773576836617396,
+   "seconds": 57.8,
+   "peak_gpu_mib": 1285.9
+  },
+  {
+   "epoch": 16,
+   "train_loss": 0.07244520269870758,
+   "val_loss": 0.10006663439273834,
+   "val_iou": 0.8826836710619421,
+   "val_global_mae": 0.023797509771966104,
+   "val_brier": 0.024295604418057865,
+   "lr": 0.00039604415459112117,
+   "seconds": 58.8,
+   "peak_gpu_mib": 1285.9
+  }
+ ],
+ "wall_seconds": 2566.8,
+ "config": {
+  "schema_version": 1,
+  "run_id": "p4-vec-f1-mask",
+  "phase": "phase4",
+  "authorized": true,
+  "purpose": "Train the conservative visibility estimator VE-C without the held-out family F1_mask.",
+  "seed": 20261101,
+  "device": "cuda",
+  "backbone_id": "none-visibility-estimator",
+  "backbone_frozen": true,
+  "heldout_family": "F1_mask",
+  "train_pairs": "manifests/phase3/subsplits.json#p3_train",
+  "val_pairs": "manifests/phase3/subsplits.json#p3_val",
+  "batch_size": 128,
+  "grad_accumulation": 1,
+  "max_epochs": 30,
+  "learning_rate": 0.001,
+  "precision": {
+   "mode": "fp16",
+   "allow_tf32": false,
+   "deterministic": true
+  },
+  "checkpoint": {
+   "directory": "models/phase4/vec/F1_mask",
+   "keep_last": 2,
+   "save_every_steps": 1
+  },
+  "visibility": {
+   "occluded_weight": 4.0,
+   "hard_negative_fraction": 0.2,
+   "lighting_as_corruption": true
+  }
+ },
+ "best_weights_sha256": "193120c7cabcf3eceda49131d1f9c50f118f2ac6999c76450569779fee8a38af"
+}

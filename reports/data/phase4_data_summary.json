@@ -1,0 +1,22 @@
+{
+ "evidence_type": "real_data_statistic",
+ "scope": "Phase 4 untouched partition: DigiFace-1M 72-image parts 2000-3999, 4000-5999",
+ "dedup": {
+  "scanned": 288000,
+  "decode_or_shape_failures": 0,
+  "exact_duplicates_of_existing_digiface": 0,
+  "exact_duplicates_within_new_parts": 0,
+  "kept": 288000,
+  "identities": 4000
+ },
+ "images_per_identity_histogram": {
+  "72": 4000
+ },
+ "p4_test_pairs": {
+  "n_pairs": 48000,
+  "n_genuine": 24000,
+  "n_impostor": 24000,
+  "n_identities": 4000
+ },
+ "plan_seed": 20261101
+}
