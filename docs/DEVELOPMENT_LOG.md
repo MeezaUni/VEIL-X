@@ -26,7 +26,8 @@ explicitly, with its provenance record.
   - report DOCX + PDF, 16 pages;
   - PPTX + PDF, with speaker notes. The deck was redesigned on owner feedback ("looks very basic"): 24 slides, a
     consistent theme, native editable charts (outcomes, latency per stage, quality vs visibility, IoU, low-quality
-    tail), native architecture / threshold diagrams and real app screenshots (`scripts/university_slides.py`);
+    tail), native architecture / threshold diagrams and real app screenshots (`scripts/university_slides.py`).
+    Then condensed to **8 slides** on owner request, keeping the charts, diagrams and screenshots;
   - demo, viva and summary PDFs;
   - previews and a SHA-256 manifest.
   The PDFs are exported by MS Word / PowerPoint, and every page was visually inspected. The

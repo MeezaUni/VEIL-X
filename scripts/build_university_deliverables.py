@@ -644,7 +644,7 @@ def main() -> int:
     build_pptx(pptx, tests_text)
     office_pdf(pptx, OUT / "VEIL-X_University_Presentation.pdf")
     produced += [
-        (pptx, "Presentation: 24 slides, native charts, speaker notes"),
+        (pptx, "Presentation: 8 slides, native charts, speaker notes"),
         (OUT / "VEIL-X_University_Presentation.pdf", "Presentation (PDF export)"),
     ]
     # verification: every file opens; page counts

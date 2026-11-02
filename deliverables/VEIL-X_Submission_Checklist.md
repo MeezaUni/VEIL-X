@@ -12,7 +12,7 @@ in `MANIFEST.md`.
 |---|---|
 | `VEIL-X_University_Project_Report.docx` | Built: editable, 16 pages with title page, table of contents, 12 figures and 19 sections |
 | `VEIL-X_University_Project_Report.pdf` | Built from the DOCX by Microsoft Word |
-| `VEIL-X_University_Presentation.pptx` | Built: 24 slides, native editable charts and diagrams, real app screenshots, speaker notes on every slide |
+| `VEIL-X_University_Presentation.pptx` | Built: 8 slides, native editable charts and diagrams, real app screenshots, speaker notes on every slide |
 | `VEIL-X_University_Presentation.pdf` | Built from the PPTX by Microsoft PowerPoint |
 | `VEIL-X_Demo_Guide.pdf` | Built: 3–5 minute demo, script, backup plan, troubleshooting |
 | `VEIL-X_Viva_Questions.pdf` | Built: one-page revision sheet and 35 questions with answers |
