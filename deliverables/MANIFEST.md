@@ -1,6 +1,6 @@
 # VEIL-X University Deliverables: Manifest
 
-Built 2026-11-02 by `scripts/build_university_deliverables.py` from the sources in
+Built 2026-11-03 by `scripts/build_university_deliverables.py` from the sources in
 `docs/university/`.
 
 **Storage.** The files are kept locally in `deliverables/` and are not pushed: the repository
@@ -11,10 +11,10 @@ DigiFace faces generated locally; no real person appears.
 
 | File | Purpose | Check | Size | SHA-256 |
 |---|---|---|---|---|
-| `VEIL-X_University_Project_Report.docx` | University project report (editable) | 268 paragraphs | 1006 KB | `bdd101e140b9d0b43fd6e67a33e9a10099ab005d54d7b24055b4586b3f004912` |
-| `VEIL-X_University_Project_Report.pdf` | University project report (PDF) | 18 pages | 1000 KB | `59a7684213c7f6f5be846a5e4402699afe05ce36afc51b406e86f2af3a0268a2` |
-| `VEIL-X_Demo_Guide.pdf` | 3-5 minute demo guide + backup plan | 4 pages | 343 KB | `447924eac84fb1a1a826ca202747b47dc3755f489fb8e22be55c7ba8f97774de` |
-| `VEIL-X_Viva_Questions.pdf` | Viva Q&A (35) + one-page revision sheet | 5 pages | 314 KB | `3a754496c21ea7c274ade4ae2ccfd56c953300a289504509ab500197a60cbe8a` |
-| `VEIL-X_Project_Summary.pdf` | One-page project summary | 1 pages | 251 KB | `3b4752c7123e9e0bf37a7dc5bc0ab36a52dfc60d954e1a7e595f4e0053790756` |
-| `VEIL-X_University_Presentation.pptx` | Presentation: 8 slides, native charts, speaker notes | 8 slides | 573 KB | `63bacc9dad57056cfea38d0e4a45d92278cd84e8a22545c7d0fcd2a83b6693ea` |
-| `VEIL-X_University_Presentation.pdf` | Presentation (PDF export) | 8 pages | 231 KB | `7e5365054afc7802acee5bdd840d7acad32259da9267766b0025cde08c997e3e` |
+| `VEIL-X_University_Project_Report.docx` | University project report (editable) | 581 paragraphs | 3284 KB | `2de7358bebf1471443df93a357373c6f7171d014031eb5d73cc119b06cfeb2b0` |
+| `VEIL-X_University_Project_Report.pdf` | University project report (PDF) | 62 pages | 2693 KB | `8051799525137e7bea4f4ad0dc72fc2a793801806f73f5af460a415593a55398` |
+| `VEIL-X_Demo_Guide.pdf` | 3-5 minute demo guide + backup plan | 4 pages | 343 KB | `53dcfcf7cfa1f0cf83f33ebc3cce49e8d8f08fccad9dc0dae5b47f096d813b67` |
+| `VEIL-X_Viva_Questions.pdf` | Viva Q&A (35) + one-page revision sheet | 5 pages | 314 KB | `f73e78fa8b501bf358aeb02a1f12cf380de1bfec0f2cc6321935c3ae88062605` |
+| `VEIL-X_Project_Summary.pdf` | One-page project summary | 1 pages | 251 KB | `b067ca41f0c0323f0fcfd61787c17249913b22fe48cc2af9dfdbbef415358bae` |
+| `VEIL-X_University_Presentation.pptx` | Presentation: 8 slides, native charts, speaker notes | 8 slides | 573 KB | `9f08a5bceaccdbc8e50b5d406bc53c11e73831df4e3272edbb8ac7f8357d01cb` |
+| `VEIL-X_University_Presentation.pdf` | Presentation (PDF export) | 8 pages | 231 KB | `2c89d7338ef898870de60065827dc6e81f645464a9ef7d2f583ef6152798748f` |

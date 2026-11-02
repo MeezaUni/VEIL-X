@@ -6,6 +6,43 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-11-03 — University report rewritten as a full formal report (no research change)
+
+- **Content** (`docs/university/report.md`). 11 chapters plus appendices, about 62 pages.
+  - *Front matter:* declaration, acknowledgements, abstract, contents, lists of figures and
+    tables, abbreviations.
+  - *Chapters:* introduction, literature survey, requirements and feasibility, system design
+    (architecture, modules, use case, sequence, workflow), methodology and algorithms (formulas,
+    M1 coefficients, LTT, A3 thresholds of all five systems, support guard, explanation engine),
+    datasets, implementation, testing, results and discussion, advantages and limitations,
+    conclusion.
+  - *Testing and results:* test cases TC-01…TC-18, defects found, and test counts per area
+    (sum 430).
+  - *Sources of the numbers:* the committed research records, the frozen configuration, and the
+    running application (values read from the screen).
+  - The title page is unchanged.
+- **Builder** (`scripts/build_university_deliverables.py`). New report mode:
+  - Times New Roman 12 pt, 1.5 spacing, justified text;
+  - every chapter on a new page;
+  - roman page numbers in the front matter and arabic page numbers in the chapters;
+  - running header;
+  - Word fields for the table of contents and the lists of figures and tables;
+  - numbered captions (SEQ), with `@fig:` / `@tab:` references resolved at build time;
+  - tables: header rows repeat across pages, rows never split, column widths set by content;
+  - figure height caps;
+  - non-breaking spaces before `%` and after figure, table and section numbers.
+- **New diagrams:** use case, sequence and decision rule; the architecture and workflow diagrams
+  were redrawn for portrait pages.
+- **Screenshots:** all recaptured at 2× resolution.
+- **Checks:**
+  - every page inspected visually;
+  - a PyMuPDF check found no text or image outside the margins;
+  - Word reports no unresolved references.
+- **App:** the upload status classes were renamed (`vx-upl-ok` / `vx-upl-err`). They no longer
+  collide with the explanation's ok/stop step classes; no behaviour change.
+
+---
+
 ## 2026-11-02 — Redesigned app interface with step-by-step explanations (no research change)
 
 - **Scope.** Interface and explanation layer only. The frozen decision function, thresholds,

@@ -362,8 +362,8 @@ CSS = """
 .vx-badges span {font-size:12px; padding:3px 10px; border-radius:999px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3);}
 .vx-h {font-size:16px; font-weight:700; margin:2px 0 4px;}
 .vx-hint {font-size:13px; color: var(--body-text-color-subdued);}
-.vx-ok {font-size:13px; color:#1b7f5a; min-height:18px;}
-.vx-err {font-size:13px; color:#b3261e; font-weight:600;}
+.vx-upl-ok {font-size:13px; color:#1b7f5a; min-height:18px;}
+.vx-upl-err {font-size:13px; color:#b3261e; font-weight:600;}
 .vx-ex-btn {min-height:58px !important; white-space:pre-line !important; line-height:1.25 !important; font-size:13px !important;}
 .vx-compare {font-size:17px !important; min-height:50px !important;}
 .vx-empty {border:2px dashed var(--border-color-primary); border-radius:14px; padding:26px; color: var(--body-text-color-subdued);}
@@ -545,7 +545,7 @@ def build_app(
 
     def ready_text(which: str, st: dict[str, Any]) -> str:
         crop = " · looks like an aligned 112×112 face crop" if is_crop(st) else ""
-        return f"<div class='vx-ok'>✓ Image {which} ready ({st['origin']}, {st['w']}×{st['h']}){crop}</div>"
+        return f"<div class='vx-upl-ok'>✓ Image {which} ready ({st['origin']}, {st['w']}×{st['h']}){crop}</div>"
 
     def auto_pre(a: dict[str, Any] | None, b: dict[str, Any] | None) -> bool:
         present = [s for s in (a, b) if s is not None]
@@ -560,10 +560,10 @@ def build_app(
                 return None, "", gr.update(), gr.update(), *stale()
             img = load_image_bytes(raw, cfg.inputs)
         except InputRejectedError as exc:
-            msg = f"<div class='vx-err'>✕ Image {which} not accepted: {exc}. Use a JPEG, PNG, BMP or WebP photo.</div>"
+            msg = f"<div class='vx-upl-err'>✕ Image {which} not accepted: {exc}. Use a JPEG, PNG, BMP or WebP photo.</div>"
             return None, msg, gr.update(value=None), gr.update(), *stale()
         except OSError:
-            msg = f"<div class='vx-err'>✕ Image {which} could not be read. Please upload it again.</div>"
+            msg = f"<div class='vx-upl-err'>✕ Image {which} could not be read. Please upload it again.</div>"
             return None, msg, gr.update(value=None), gr.update(), *stale()
         st = loaded(img, raw, "uploaded")
         pair = (st, this_other) if which == "A" else (this_other, st)
