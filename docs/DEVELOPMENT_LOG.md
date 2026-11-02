@@ -6,6 +6,33 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-11-02 — One-click launcher, runtime pack and GitHub README (no research change)
+
+- **`run_veilx.bat`** (Windows; CRLF via `.gitattributes`). It runs four steps:
+  1. extract `VEIL-X_runtime_pack.zip`;
+  2. get uv, with consent;
+  3. on the first run, create a Python 3.12 venv in `.venv-app`, install a CUDA or CPU torch
+     wheel (chosen by `nvidia-smi`), then `-e ".[gpu,app]"`;
+  4. download the AdaFace / ArcFace weights with `fetch_models.py` (SHA-256 checked), then
+     start the app with `--open-browser`.
+- **Clean-copy test.** Tested in a clean copy made with `git archive`, so no data and no venv:
+  setup, weight download and launch all succeeded. MATCH 1.000 / NON-MATCH 0.001 /
+  ABSTAIN 0.542 were reproduced on the bundled examples.
+- **`scripts/make_runtime_pack.py`.** Builds a private ~82 MB pack: frozen configs, 5 VE-C
+  weights, SCRFD and the 4 synthetic demo pairs, all hash-verified. `run_app.py` uses the pack's
+  `demo_examples/` when present.
+- **Data-root guard.** It now applies only inside a git repository. An extracted ZIP has no
+  repository to leak into; tested. `veilx_data/` is git-ignored.
+- **README.** Rewritten as a GitHub project page: quick start, troubleshooting, how it works,
+  results and limitations. Face-free screenshots and charts go in `docs/img/`. The privacy
+  scanner allows only PNGs ≤ 300 KB there (tested).
+- **Checks.**
+  - Quality gate: PASS.
+  - CPU suite: 405 passed, 4 skipped.
+  - GPU suite: 419 passed.
+
+---
+
 ## 2026-11-02 — University course project deliverables (no research change)
 
 - **Scope.** Owner re-scoped the closeout to a university course project. The research record,

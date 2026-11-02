@@ -21,7 +21,7 @@ in `MANIFEST.md`.
 **Sources.** The Markdown sources are in `docs/university/`. To rebuild:
 
 ```
-.venv-docs\Scripts\python.exe scripts\build_university_deliverables.py "403 CPU + 417 GPU tests passing"
+.venv-docs\Scripts\python.exe scripts\build_university_deliverables.py "405 + 419"
 ```
 
 ## 2. You must fill in before submitting
@@ -66,8 +66,8 @@ in `MANIFEST.md`.
   guard abstains on noise images. Screenshots were taken from this run.
 - **Tests.**
   - Quality gate PASS: lint, format, strict typing, config, privacy scan, doc links, smoke test.
-  - CPU suite: 403 passed, 4 skipped.
-  - GPU suite: 417 passed.
+  - CPU suite: 405 passed, 4 skipped.
+  - GPU suite: 419 passed.
   - Smoke test: 8/8.
 - **Numbers.** Every figure in the report and slides comes from committed result files:
   - parity: `reports/experiments/phase5_parity.json`;

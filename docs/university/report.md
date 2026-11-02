@@ -274,8 +274,8 @@ synthetic DigiFace faces generated locally from the data folder.
 
 | Test | Result |
 |---|---|
-| Automated tests, CPU environment | 403 passed, 4 skipped (model tests that need the GPU environment) |
-| Automated tests, GPU environment (models present) | 417 passed |
+| Automated tests, CPU environment | 405 passed, 4 skipped (model tests that need the GPU environment) |
+| Automated tests, GPU environment (models present) | 419 passed |
 | Quality gate | PASS: Ruff lint and format, strict mypy, configuration validation, privacy/secret scan, documentation links, smoke test |
 | Offline parity (same decisions as the research code) | **1,000 / 1,000** synthetic development pairs identical; largest score difference 0.0025 |
 | Detector parity on real photographs (LFW development images) | 244 / 244 single-face crops pixel-identical to the offline crops |

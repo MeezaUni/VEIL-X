@@ -141,3 +141,11 @@ desktop.ini
 
 # Local browser-automation snapshots (UI checks; may contain local paths)
 .playwright-mcp/
+
+# Local data folder used by run_veilx.bat (runtime pack + downloaded weights; never commit)
+veilx_data/
+VEIL-X_runtime_pack.zip
+
+# README screenshots and charts (face-free; see scripts/scan_sensitive.py)
+!docs/img/
+!docs/img/*.png

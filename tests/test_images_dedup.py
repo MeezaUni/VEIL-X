@@ -183,3 +183,19 @@ def test_data_root_must_not_be_tracked(tmp_path: Path, monkeypatch: pytest.Monke
     with pytest.raises(DataAccessError):
         resolve_data_root(paths.PROJECT_ROOT / "src")  # inside the repo, not ignored
     assert resolve_data_root(paths.PROJECT_ROOT / "data").root.name == "data"
+    assert (
+        resolve_data_root(paths.PROJECT_ROOT / "veilx_data").root.name == "veilx_data"
+    )  # launcher
+
+
+def test_data_root_inside_extracted_zip_is_allowed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A downloaded release ZIP has no .git: there is no repository the data could leak into."""
+    from veilx.data import paths
+
+    monkeypatch.setattr(paths, "PROJECT_ROOT", tmp_path)
+    assert resolve_data_root(tmp_path / "anything").root == (tmp_path / "anything").resolve()
+    (tmp_path / ".git").mkdir()  # inside a git repository the guard applies again
+    with pytest.raises(DataAccessError):
+        resolve_data_root(tmp_path / "anything")

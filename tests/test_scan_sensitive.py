@@ -134,3 +134,16 @@ def test_repository_root_is_project_folder() -> None:
         check=True,
     ).stdout.strip()
     assert Path(top).resolve() == ROOT.resolve()
+
+
+def test_scanner_allows_only_small_png_in_docs_img(tmp_path: Path) -> None:
+    """README screenshots: small PNGs under docs/img/ only; images elsewhere stay forbidden."""
+    (tmp_path / "docs" / "img").mkdir(parents=True)
+    (tmp_path / "docs" / "img" / "ui.png").write_bytes(b"x" * 1000)
+    (tmp_path / "docs" / "img" / "big.png").write_bytes(b"x" * (SCAN.DOC_IMAGE_MAX_BYTES + 1))
+    (tmp_path / "docs" / "img" / "face.jpg").write_bytes(b"x")
+    (tmp_path / "docs" / "ui.png").write_bytes(b"x")
+    assert SCAN.check_file("docs/img/ui.png", root=tmp_path) == []
+    assert SCAN.check_file("docs/img/big.png", root=tmp_path)
+    assert SCAN.check_file("docs/img/face.jpg", root=tmp_path)
+    assert SCAN.check_file("docs/ui.png", root=tmp_path)

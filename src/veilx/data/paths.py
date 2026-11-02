@@ -80,8 +80,11 @@ def resolve_data_root(explicit: Path | None = None) -> DataLayout:
     except ValueError:
         inside = False
     # Probe with an extension-less name so that only *directory* rules count (a name such as
-    # "x.png" would be ignored anywhere by the image-extension rules).
-    if inside and not _is_git_ignored(root / "veilx_data_root_probe"):
+    # "x.png" would be ignored anywhere by the image-extension rules). The guard protects a git
+    # repository from tracking private data; an extracted release ZIP (no .git) has nothing to
+    # leak into, so it may keep its data folder (``veilx_data``) next to the code.
+    is_repo = (PROJECT_ROOT / ".git").exists()
+    if inside and is_repo and not _is_git_ignored(root / "veilx_data_root_probe"):
         raise DataAccessError(
             "data root lies inside the repository but is not git-ignored; refusing to use it"
         )

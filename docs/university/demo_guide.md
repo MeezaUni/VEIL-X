@@ -26,7 +26,9 @@ subtitle: 3–5 minute live demo for the university evaluation
 # 2. Before the demo (10 minutes earlier)
 
 1. Plug the laptop into power and close heavy GPU programs.
-2. Open PowerShell in the project folder and launch:
+2. **Easiest:** double-click `run_veilx.bat` in the project folder. It sets everything up on
+   the first run and opens the browser; see the README *Quick start*. **Or** open PowerShell in
+   the project folder and launch:
 
 ```
 $env:VEILX_DATA_ROOT = "C:\path\to\veilx_data"

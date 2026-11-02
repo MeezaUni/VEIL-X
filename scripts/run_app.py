@@ -23,7 +23,24 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def make_examples(data_root: Path, out: Path, n: int = 4) -> list[tuple[str, str]]:
     """Synthetic DigiFace example pairs (p3_val: development identities; pre-aligned crops), plus
-    one pair with a synthetic mask occluder on image B. Written to the session temp dir only."""
+    one pair with a synthetic mask occluder on image B. Written to the session temp dir only.
+
+    If the data root holds a ``demo_examples/`` folder (from the runtime pack built by
+    ``scripts/make_runtime_pack.py``), those pre-generated example images are used instead, so no
+    dataset or manifest is needed."""
+    import shutil
+
+    pack = data_root / "demo_examples"
+    if (pack / "example1_a.png").exists():
+        out.mkdir(parents=True, exist_ok=True)
+        found = []
+        for k in range(1, n + 1):
+            a, b = pack / f"example{k}_a.png", pack / f"example{k}_b.png"
+            if a.exists() and b.exists():
+                shutil.copyfile(a, out / a.name)
+                shutil.copyfile(b, out / b.name)
+                found.append((str(out / a.name), str(out / b.name)))
+        return found
     from veilx.data.images import encode_png_rgb, load_rgb, pixel_sha256
     from veilx.data.manifest import ImageRecord, PairRecord, read_jsonl
     from veilx.occlusion.engine import apply_occlusion
@@ -63,6 +80,7 @@ def main() -> int:
     ap.add_argument("--device", choices=["cuda", "cpu"], default=None)
     ap.add_argument("--no-examples", action="store_true")
     ap.add_argument("--no-warmup", action="store_true")
+    ap.add_argument("--open-browser", action="store_true", help="open the local page when ready")
     args = ap.parse_args()
     from veilx.app.tempfiles import cleanup_stale, create_session_dir, remove_session_dir
 
@@ -101,6 +119,12 @@ def main() -> int:
         f"VEIL-X research demo: http://{cfg.server.host}:{args.port}  (local only; Ctrl+C to stop)",
         flush=True,
     )
+    if args.open_browser:
+        import threading
+        import webbrowser
+
+        url = f"http://{cfg.server.host}:{args.port}"
+        threading.Timer(2.5, webbrowser.open, args=(url,)).start()
     uvicorn.run(app, host=cfg.server.host, port=args.port, log_level="warning", access_log=False)
     return 0
 

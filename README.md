@@ -1,139 +1,305 @@
 # VEIL-X
 
-Research code for **risk-controlled two-image (1:1) face verification under occlusion**.
-Non-commercial academic research only. **Not an identity-verification product.**
+### An AI-Based Face Verification System with Quality Assessment and Intelligent Abstention
 
-> **Status: Phase 6 (final phase) complete. Waiting for owner review.**
-> - Phase 6 (`docs/phase6_results.md`, audit `docs/phase6_audit.md`, paper
->   `docs/paper/veilx_paper.md`): a pre-registered replication on 4,000 untouched identities
->   **reproduced the population-shift failure** and again recommended A3. A new finding: the
->   frozen fused score is unreliable below the calibration support of quality (the app abstains
->   there; D-055). Reproduction guide: `docs/reproducibility.md`.
-> - Frozen AdaFace IR-101 and ArcFace IR-101 (WebFace4M); no recognition training.
-> - Phase 3 (`docs/phase3_results.md`): learned-visibility calibration did **not** beat
->   quality-stratified calibration on unseen occluders.
-> - Phase 4 (`docs/phase4_results.md`): conservative visibility fixed the overestimation, but no
->   visibility-based rule beat **A3 quality-stratified calibration**, which is recommended (D-050).
-> - On an untouched DigiFace population, **every rule exceeded the 5 % selective-error target**
->   (population shift). The guarantees are calibration-population-specific.
-> - Phase 5 (`docs/phase5_results.md`): a local Gradio demonstration of the frozen pipeline with
->   explanatory diagnostics (`docs/app_user_guide.md`).
->
-> All occluders are **synthetic**; physical occlusions are unvalidated. There is no formal
-> out-of-distribution risk guarantee. LFW and DigiFace results do not establish deployment
-> readiness.
+[![CI](https://github.com/MeezaUni/VEIL-X/actions/workflows/ci.yml/badge.svg)](https://github.com/MeezaUni/VEIL-X/actions/workflows/ci.yml)
+![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
+![Runs locally](https://img.shields.io/badge/runs-100%25%20locally-success)
+![Platform Windows](https://img.shields.io/badge/platform-Windows%2010%2F11-informational)
 
-## University course project deliverables
+VEIL-X is a **local AI application that compares two face images** and reports whether they
+are likely to show the same person. Unlike a basic face matcher, it can answer in three ways:
 
-The course-project title is **"VEIL-X: An AI-Based Face Verification System with Quality
-Assessment and Intelligent Abstention"**.
+| **MATCH** | **NON-MATCH** | **ABSTAIN** |
+|---|---|---|
+| Strong evidence of the same person | Strong evidence of different people | Not enough reliable evidence, so the system declines and explains why |
 
-**Sources** (`docs/university/`):
-- `report.md`;
-- `demo_guide.md`;
-- `viva_questions.md`;
-- `project_summary.md`.
+It measures **image quality**, uses **calibrated thresholds** and shows **diagnostics and
+visibility heat maps** for every comparison. Everything runs on your own computer: no cloud and
+no stored images.
 
-**Built files** (DOCX / PDF / PPTX) are generated locally into `deliverables/` by
-`scripts/build_university_deliverables.py`. They are not pushed, because the repository refuses
-binary documents and images. See `deliverables/MANIFEST.md` (checksums) and
-`deliverables/VEIL-X_Submission_Checklist.md` (placeholders to fill in).
+> **Academic demonstration only.** VEIL-X is a university course project, not a certified
+> identity-verification product. Do not use it for identification, access control, surveillance
+> or any decision affecting people. Use only images you are authorised to process.
 
-The detailed research record below is unchanged.
+![VEIL-X main screen](docs/img/app_home.png)
 
-## Research questions
+---
 
-- **C3 (primary):** do risk-controlled decisions (Learn-then-Test) keep their target error on
-  **held-out occlusion families**, and does visibility-aware calibration help? **Answer so far:
-  no.** Quality stratification is more reliable, and guarantees do not transfer under population
-  shift.
-- **C1 (secondary):** does pair-level co-visibility add information beyond quality? Only for some
-  seen families; it is harmful on never-seen occluders, so it is excluded from the recommended
-  system.
+## Contents
 
-## The local research application (Phase 5)
+- [Features](#features)
+- [Quick start (Windows, one click)](#quick-start-windows-one-click)
+- [Screenshots](#screenshots)
+- [How it works](#how-it-works)
+- [Results](#results)
+- [Limitations](#limitations)
+- [Manual installation (developers)](#manual-installation-developers)
+- [Repository structure](#repository-structure)
+- [Documentation](#documentation)
+- [Privacy, ethics and licences](#privacy-ethics-and-licences)
+
+---
+
+## Features
+
+- **Two-image verification.** Pretrained deep face models: SCRFD detection and AdaFace IR-101
+  embeddings.
+- **Quality assessment.** The embedding's feature norm measures image quality and selects the
+  decision thresholds.
+- **Three-way decisions.** MATCH / NON-MATCH / ABSTAIN, with thresholds calibrated on separate
+  data.
+- **Explanations.** Similarity and quality numbers, the threshold region, the abstention reason,
+  visibility heat maps and an "unusual input" flag.
+- **Safe defaults.**
+  - Several faces are refused unless you choose one.
+  - Unsuitable photos are refused.
+  - Very low-quality inputs abstain (the support guard).
+- **Private.** Runs only on `127.0.0.1`, blocks third-party requests, deletes uploads after
+  reading and stores no faces or embeddings.
+- **Tested.** 400+ automated tests. The app reproduces the research pipeline exactly
+  (1,000 / 1,000 decisions).
+
+---
+
+## Quick start (Windows, one click)
+
+**Requirements:**
+- Windows 10 or 11, about **6 GB** of free disk space;
+- an internet connection for the first run only;
+- an NVIDIA GPU is optional; without one VEIL-X runs on the CPU, a little slower.
+
+1. **Download the code.** On GitHub, click **Code → Download ZIP**, then extract the ZIP to a
+   folder, for example `C:\VEIL-X`.
+2. **Add the runtime pack.**
+   - Get **`VEIL-X_runtime_pack.zip`** (about 80 MB) from the project owner.
+   - Put it, still zipped, **next to `run_veilx.bat`** in the extracted folder.
+   - It contains the frozen decision files and demo images that are not published on GitHub.
+3. **Double-click `run_veilx.bat`.**
+   - **First run** (5–15 minutes): it unpacks the runtime pack and installs Python 3.12 and all
+     libraries in a private `.venv-app` folder. Your system Python is not touched. It then
+     downloads the two face-recognition models (about 520 MB) and checks their fingerprints.
+   - **Later runs** start in a few seconds.
+   - Your browser opens at **http://127.0.0.1:7860**. Keep the black window open while you use
+     the app.
+4. **Try it.**
+   - Open the **Synthetic examples** tab, choose **example 2** and click **Load into the
+     comparison tab**.
+   - Under **Options**, tick **Inputs are pre-aligned**.
+   - Tick both confirmation boxes, then click **Compare locally with the frozen rule**.
+
+   | Example | Expected result |
+   |---|---|
+   | 2 | **MATCH** |
+   | 1 | **NON-MATCH** |
+   | 4 | **ABSTAIN** |
+
+`run_veilx.bat` uses [uv](https://docs.astral.sh/uv/) to install Python. If uv is missing, it
+asks before installing it.
+
+| Problem | Fix |
+|---|---|
+| "The VEIL-X runtime pack was not found" | Put `VEIL-X_runtime_pack.zip` next to `run_veilx.bat` |
+| Port 7860 already in use | `run_veilx.bat --port 7861`, then open `http://127.0.0.1:7861` |
+| No NVIDIA GPU, or GPU errors | `run_veilx.bat --device cpu` |
+| Setup interrupted or broken | Delete the `.venv-app` folder and run `run_veilx.bat` again |
+| Windows SmartScreen warning | Click *More info → Run anyway*. The script is plain text; you can open it in Notepad to read it first |
+
+A five-minute demonstration script is in [`docs/university/demo_guide.md`](docs/university/demo_guide.md).
+
+---
+
+## Screenshots
+
+The face examples in the app are synthetic, computer-generated DigiFace-1M faces, not real
+people. The screenshots below show only interface elements, so no faces appear.
+
+**Three decision outcomes** (real outputs of the app on the built-in examples):
+
+![MATCH, NON-MATCH and ABSTAIN panels](docs/img/app_decisions.png)
+
+**Support guard.** Two random-noise images are refused (ABSTAIN), and the app states that the
+unguarded rule would have said MATCH:
+
+![Support guard on noise images](docs/img/app_support_guard.png)
+
+---
+
+## How it works
+
+![VEIL-X architecture](docs/img/architecture.png)
+
+1. **Check the files:** format, size, corruption.
+2. **Find and align the face.**
+   - SCRFD detects the face and five landmarks, and the face is aligned to a standard 112×112
+     crop.
+   - Several faces → you must choose one.
+   - No reliable face → refused.
+3. **Embed.** AdaFace IR-101 (pretrained) turns each face into 512 numbers. The length of that
+   vector, the *feature norm*, is a built-in **quality** score.
+4. **Compare.** Cosine similarity *s* between the two faces; pair quality *q* is the weaker image's
+   norm.
+5. **Score.** A small logistic formula combines *s*, *q* and *s·q* into a score between 0 and 1.
+   The score is **not** a probability of identity.
+6. **Decide.**
+   - The pair's quality selects low, medium or high thresholds, calibrated with the
+     Learn-then-Test method.
+   - Low-quality pairs have an **abstention band**.
+   - Below the calibrated quality range the app always abstains (the support guard).
+7. **Explain.** Diagnostics, abstention reasons and visibility heat maps. ArcFace similarity and
+   the visibility network are shown as **explanations only**; they never change the decision.
+
+![User workflow](docs/img/workflow.png)
+
+**Pretrained versus built here:**
+- **Pretrained:** AdaFace, ArcFace (WebFace4M) and SCRFD.
+- **Built or trained in this project:**
+  - the visibility network (a small U-Net);
+  - the logistic fusion and the calibrated thresholds;
+  - the application, server and test suite.
+
+**Technology:**
+- Python 3.12, PyTorch (CUDA), ONNX Runtime, OpenCV;
+- Gradio + FastAPI (localhost only);
+- pytest, Ruff, strict mypy and GitHub Actions.
+
+---
+
+## Results
+
+All numbers come from committed result files in `reports/experiments/`.
+
+| Check | Result |
+|---|---|
+| App vs research pipeline | **1,000 / 1,000** identical decisions; CPU vs GPU 100 / 100 |
+| Speed (RTX 4060 Laptop, warm, median) | **226 ms** per photo pair; 43 ms per pre-aligned pair; CPU-only 0.3–0.5 s |
+| Automated tests | 405 (CPU) + 419 (GPU) passing, plus lint, strict typing and a privacy scan |
+| Unseen occluder, data like the calibration data | Selective errors 1.1–2.6 % at 89–97 % coverage (target ≤ 5 %) |
+
+The parity figure means the app reproduces the research system exactly. It is **not** a
+recognition-accuracy figure.
+
+**Population shift.** The 5 % target held on data like the calibration data. On a harder group
+of synthetic identities it did not. A pre-registered repeat on 4,000 new identities confirmed this
+(4 of 5 configurations above target):
+
+![A3 miss rate by population](docs/img/population_shift.png)
+
+**Low-quality inputs.**
+- Below the calibrated quality range (about 1 % of pairs), the research rule produced 22.97 %
+  false matches on new test data, against 1.50 % above it.
+- Even random noise scored 1.000.
+- This is why the app abstains there. It is an application safeguard, not a proven universal
+  fix.
+
+![False matches by quality](docs/img/low_quality_tail.png)
+
+---
+
+## Limitations
+
+- **Synthetic test data.** Main tests used synthetic faces and synthetic occlusions. Real
+  physical occlusions were not evaluated.
+- **Population-dependent calibration.** Thresholds must be re-calibrated for each new population
+  and camera.
+- **Low-quality inputs.** These are guarded only in the app.
+- **No single calibration.** Five calibration configurations exist; none is universal.
+- **Learned visibility** failed on unseen occluder types, so it is used only as an explanation.
+- **Not certified.** Not suitable for real identity decisions.
+
+---
+
+## Manual installation (developers)
 
 ```powershell
-uv pip install --python .venv-gpu\Scripts\python.exe -e ".[gpu,app]"      # torch: CUDA wheel index, see pyproject
-$env:VEILX_DATA_ROOT = "C:\path\to\veilx_data"                              # private models + frozen configs
-.venv-gpu\Scripts\python.exe scripts\run_app.py                             # http://127.0.0.1:7860 (local only)
+# environments (uv: https://docs.astral.sh/uv/)
+uv venv --python 3.12 .venv-gpu
+uv pip install --python .venv-gpu\Scripts\python.exe torch --index-url https://download.pytorch.org/whl/cu128
+uv pip install --python .venv-gpu\Scripts\python.exe -e ".[gpu,app]" pytest
+
+# data folder: runtime pack extracted as .\veilx_data (or any folder), plus the public models
+$env:VEILX_DATA_ROOT = "$PWD\veilx_data"
+.venv-gpu\Scripts\python.exe scripts\fetch_models.py
+.venv-gpu\Scripts\python.exe scripts\run_app.py --open-browser    # http://127.0.0.1:7860
+
+# checks
+.venv-gpu\Scripts\python.exe scripts\smoke_test.py                 # no biometric data needed
+uv venv --python 3.12 .venv; uv pip install --python .venv\Scripts\python.exe -e . pytest ruff mypy types-PyYAML
+.venv\Scripts\python.exe scripts\quality_gate.py                   # lint, types, tests, privacy scan
 ```
 
-**Pipeline:**
-- SCRFD detection + 5-point alignment, with the registered fixed-crop **fallback**. It is always
-  labelled, and multiple faces are refused unless the user selects one.
-- Frozen AdaFace (decision) and ArcFace (diagnostic).
-- Fused score M1 = logistic(cosine, min feature norm, product).
-- **A3 quality-stratified MATCH / NON-MATCH / ABSTAIN** rule (frozen Phase 3 system; D-051).
-  Five fold-specific systems exist; none is a deployment calibration (`docs/calibration_systems.md`).
-- App-only safety (D-054, D-055): the fixed-crop fallback only for declared LFW-style portraits;
-  abstention below the calibration support of quality; two required confirmations.
-
-Visibility maps and novelty flags (Phase 4 VE-C) are shown as **explanations only** and never
-enter the decision.
-
-**Privacy:**
-- loopback only; no share link, no analytics, no third-party requests (strict CSP);
-- uploads deleted after reading; no embedding storage; no identity search.
-
-The app verifies SHA-256 of every frozen file. Parity with the offline evaluation and measured
-latency are in `docs/phase5_results.md`.
-
-## Repository layout
-
-```
-configs/   research_protocol.yaml (v0.6.0), datasets.yaml, experiments/, app/veilx_app.yaml
-docs/      protocols (phase3/phase4), results (phase3/phase4/phase5), audit, model cards,
-           app_user_guide, decision log, development log
-reports/   experiments/*.json (MEASURED, with provenance), simulations/ (SIMULATED),
-           data/ (aggregated statistics), figures/, evidence_registry.yaml
-scripts/   data preparation, extraction, training, evaluation (phase2-4), app (run_app,
-           phase5_parity, phase5_benchmark), quality_gate, scan_sensitive
-src/veilx/ data, occlusion, detect, models, embeddings, vis, fusion, selective, stats,
-           metrics, sim, training, evidence, app (config, inputs, face, decision, pipeline,
-           diagnostics, report, server, tempfiles, ui)
-tests/     unit, property, integrity and pipeline tests (synthetic fixtures; model tests skip
-           without the private data root)
-```
-
-## Setup and checks (Windows PowerShell, uv)
+**For the project owner: building the runtime pack.** This uses the private data folder:
 
 ```powershell
-uv venv --python 3.12 .venv
-uv pip install --python .venv\Scripts\python.exe -e . pytest ruff mypy types-PyYAML
-.venv\Scripts\python.exe scripts\quality_gate.py          # ruff, format, mypy, pytest, config, privacy scan
-.venv-gpu\Scripts\python.exe -m pytest tests\test_app_models.py tests\test_models_torch.py   # GPU / model tests
+$env:VEILX_DATA_ROOT = "C:\path\to\veilx_data"
+.venv-gpu\Scripts\python.exe scripts\make_runtime_pack.py   # -> deliverables\VEIL-X_runtime_pack.zip
 ```
 
-Run `scripts\scan_sensitive.py` before every commit. It refuses images, arrays, manifests,
-archives, weights, documents, secrets, large files and absolute user paths.
+- The script verifies every file against the frozen SHA-256 fingerprints before packing.
+- Share the pack **privately**: it contains research-licensed model files and synthetic demo
+  images. Never commit it.
 
-**Reproducibility.**
-- Every measured number traces to a script, a frozen configuration (SHA-256), a seed and, for test
-  data, a logged run in `results/test_runs.jsonl`. See `reports/experiments/registry.json` and the
-  per-phase result documents.
-- Data preparation: `scripts/fetch_digiface.py`, `prepare_digiface.py`, `prepare_phase3.py`,
-  `prepare_phase4.py`, `prepare_lfw.py`.
-- Evaluation: `scripts/evaluate_phase3.py`, `evaluate_phase4.py`.
+Full reproduction of the experiments is described in
+[`docs/reproducibility.md`](docs/reproducibility.md).
 
-## Privacy and licensing
+---
 
-- **No biometric data in git:** no images, embeddings, real-data manifests, weights or
-  credentials.
-- Scope is **1:1 verification of two images only**. There is no 1:N search, gallery, scraping
-  or surveillance functionality.
-- Pretrained weights (InsightFace, AdaFace/ArcFace on WebFace) and datasets (DigiFace-1M under
-  R-UDA; LFW under user-reported academic authorisation) are **non-commercial research only**.
+## Repository structure
 
-## Key documents
+```
+run_veilx.bat        one-click launcher (Windows)
+configs/             frozen app configuration, research protocol, experiment configs
+src/veilx/           package: app (UI, pipeline, decision, diagnostics), models, data, stats ...
+scripts/             app launcher, runtime pack, experiments, evaluation, quality gate
+tests/               400+ unit, integration and privacy tests
+docs/                user guide, university deliverables, research record, images
+reports/             committed result files (aggregates only) and figures
+```
 
-- **Results:** `docs/phase3_results.md`, `docs/phase4_results.md`, `docs/phase5_results.md`,
-  `docs/phase6_results.md`.
-- **Final audit, paper and presentation:** `docs/phase6_audit.md`, `docs/paper/veilx_paper.md`,
-  `docs/presentation/slides.md`, `docs/presentation/demo_and_viva.md`.
-- **Reproducing:** `docs/reproducibility.md` (`scripts/smoke_test.py` needs no data).
-- **Protocols:** `docs/phase3_protocol.md`, `docs/phase4_protocol.md`, `docs/phase6_protocol.md`.
-- **Using the app:** `docs/app_user_guide.md`.
-- **Model cards:** `docs/model_card_backbones.md`, `docs/model_card_visibility.md`.
-- **Audit and records:** `docs/statistical_audit.md`, `docs/decision_log.md`,
-  `docs/DEVELOPMENT_LOG.md`, `docs/implementation_roadmap.md`.
+---
+
+## Documentation
+
+**University course project** ([`docs/university/`](docs/university/)):
+- [report](docs/university/report.md);
+- [demo guide](docs/university/demo_guide.md);
+- [viva questions](docs/university/viva_questions.md);
+- [one-page summary](docs/university/project_summary.md).
+
+The formatted DOCX / PDF / PPTX versions are built by `scripts/build_university_deliverables.py`.
+
+**Using the app:** [`docs/app_user_guide.md`](docs/app_user_guide.md),
+[`docs/calibration_systems.md`](docs/calibration_systems.md).
+
+**Research record** (full detail, including negative findings):
+- [`docs/paper/veilx_paper.md`](docs/paper/veilx_paper.md);
+- results for each phase, from [`docs/phase3_results.md`](docs/phase3_results.md) to
+  [`docs/phase6_results.md`](docs/phase6_results.md);
+- the claim-to-evidence audit [`docs/phase6_audit.md`](docs/phase6_audit.md);
+- the decisions in [`docs/decision_log.md`](docs/decision_log.md).
+
+---
+
+## Privacy, ethics and licences
+
+**Scope and privacy:**
+- 1:1 verification of two images only. There is no database, no search and no identification
+  feature.
+- No face images, embeddings, identity lists, model weights or credentials are stored in this
+  repository; a privacy scanner enforces this on every commit.
+- The app runs only on `127.0.0.1` and deletes uploads after reading.
+
+**Data and model licences** (all non-commercial research use):
+- DigiFace-1M (synthetic faces): research licence.
+- LFW: used only for follow-up research checks, under academic authorisation; not
+  redistributed.
+- Pretrained models: AdaFace / ArcFace (CVLface releases) and SCRFD (InsightFace).
+
+**Code:** MIT.
+
+**Key references:**
+- Kim et al., *AdaFace*, CVPR 2022;
+- Deng et al., *ArcFace*, CVPR 2019;
+- Guo et al., *SCRFD*, ICLR 2022;
+- Bae et al., *DigiFace-1M*, WACV 2023;
+- Angelopoulos et al., *Learn then Test*, arXiv:2110.01052.

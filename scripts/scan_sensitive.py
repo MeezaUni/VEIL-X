@@ -75,6 +75,10 @@ FORBIDDEN_SUFFIXES = {
 }
 FORBIDDEN_NAMES = re.compile(r"(^|/)(\.env(\..*)?|kaggle\.json|credentials.*|secrets.*)$", re.I)
 ALLOWED_PREFIXES = ("tests/fixtures/synthetic/",)
+# README screenshots and charts: face-free PNGs only (UI, decision panels, noise inputs, diagrams,
+# charts). Never put a face image here, synthetic or real.
+DOC_IMAGE_PREFIX = "docs/img/"
+DOC_IMAGE_MAX_BYTES = 300_000
 TEXT_PATTERNS = {
     "absolute user path": re.compile(
         r"[A-Za-z]:\\\\?Users\\\\?[^\\\s\"']+|/home/[a-z_][a-z0-9_-]*/", re.I
@@ -103,6 +107,11 @@ def candidate_files() -> list[str]:
 def check_file(rel: str, root: Path = ROOT) -> list[str]:
     findings: list[str] = []
     if rel.startswith(ALLOWED_PREFIXES):
+        return findings
+    if rel.startswith(DOC_IMAGE_PREFIX) and Path(rel).suffix.lower() == ".png":
+        size = (root / rel).stat().st_size if (root / rel).is_file() else 0
+        if size > DOC_IMAGE_MAX_BYTES:
+            findings.append(f"{rel}: documentation image larger than {DOC_IMAGE_MAX_BYTES:,} bytes")
         return findings
     path = root / rel
     if Path(rel).suffix.lower() in FORBIDDEN_SUFFIXES:
