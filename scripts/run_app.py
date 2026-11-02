@@ -108,7 +108,7 @@ def main() -> int:
         try:
             examples = make_examples(data_root, temp_root / "examples")
         except (OSError, KeyError, StopIteration):
-            examples = None
+            examples = []  # no synthetic pairs; the noise example is still offered
     demo = build_app(pipe, temp_root, examples).queue(max_size=8)
     import uvicorn
 

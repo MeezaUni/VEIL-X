@@ -6,6 +6,65 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-11-02 — Redesigned app interface with step-by-step explanations (no research change)
+
+- **Scope.** Interface and explanation layer only. The frozen decision function, thresholds,
+  models and support guard are unchanged; the explanation is computed from the same numbers
+  after the decision and cannot change it.
+- **Explanation engine** (`src/veilx/app/explain.py`). Builds a numbered "Why this result?"
+  panel from a `VerificationResult`:
+  - images checked, and faces found per image;
+  - similarity placed against typical same-person and different-person values;
+  - quality group and the weaker image; the score;
+  - **the exact comparison that decided** (`p ≥ τ_high` → MATCH, `p ≤ τ_low` → NON-MATCH,
+    in between → ABSTAIN), or the support guard with the unguarded output;
+  - ArcFace second opinion and visibility notes;
+  - **What would change the result?**
+  It also renders the result card, the metric cards and an HTML score bar. Reference ranges
+  come from 24,732 development pairs (`p3_val`, fold F1 plan), written by
+  `scripts/make_explain_reference.py` to `configs/app/explain_reference.json` (aggregate
+  quantiles only). Tests (`tests/test_app_explain.py`) check, over a grid of scores and all
+  three quality groups, that the stated comparison matches the frozen decision.
+- **New interface** (`src/veilx/app/ui.py`):
+  - header, *Verify faces* / *How it works* / *Limitations* / *Privacy & about* tabs;
+  - one-click example buttons, including a noise pair that shows the support guard;
+  - uploads checked on arrival with a clear message; the bytes are kept in session memory, so
+    **Compare** works again with other options (previously a second press said "Please
+    provide two images", because the uploads had been deleted);
+  - *already aligned* is switched on automatically for 112×112 inputs;
+  - **Compare faces** is enabled only when both confirmations are ticked (still re-checked on
+    the server); **Clear** button;
+  - Advanced options opens by itself when an image holds several faces;
+  - system fonts only (CSP), light and dark themes, phone-width layout without sideways
+    scrolling.
+- **Bugs found with Playwright and fixed:**
+  - `delete_cache` emptied the whole session temp directory, including `owner.pid` and the
+    example files. Example buttons failed after about 2 minutes, and a killed session's
+    leftovers would no longer be cleaned up at the next start. Gradio now uses its own
+    `gradio_cache/` sub-folder, and the examples are read into memory at start-up.
+  - A corrupt upload failed inside Gradio's own PIL decode with a generic "Error" badge. The
+    upload components now pass the raw path to the app's validator. A `gr.Image` subclass was
+    rejected for this, because Gradio writes a `.pyi` stub next to the module of every
+    component subclass.
+  - At phone width the tab bar forced sideways scrolling; it now wraps.
+- **Playwright run** (local app, port 7873). Every control was exercised:
+  - all five example buttons; MATCH / NON-MATCH / ABSTAIN / guard reproduced (1.000 / 0.001 /
+    0.542 / guard at q = 6.78);
+  - re-compare, consent gating, Clear, the × on one image, compare with a missing image;
+  - real photo upload (MATCH, temp files deleted);
+  - two-face image: refused, then faces 0, 1 and a non-existent 5;
+  - no-face image with and without the fallback; corrupt PNG and `.txt` rejected;
+  - calibration-system change, diagnostics off and on, all tabs and accordions;
+  - dark theme and 390 px width.
+- **Docs.** README (quick start and screenshots), user guide, demo guide, demo-and-viva script,
+  university report and summary updated; face-free screenshots refreshed in `docs/img/`.
+- **Checks.**
+  - Quality gate: PASS.
+  - CPU suite: 415 passed, 4 skipped.
+  - GPU suite: 430 passed.
+
+---
+
 ## 2026-11-02 — One-click launcher, runtime pack and GitHub README (no research change)
 
 - **`run_veilx.bat`** (Windows; CRLF via `.gitattributes`). It runs four steps:

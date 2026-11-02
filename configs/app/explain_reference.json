@@ -1,0 +1,36 @@
+{
+ "scope": "Development data (p3_val, fold F1 plan: clean + synthetic occlusions; DigiFace-1M synthetic faces). Aggregates only. Used for plain-language context in the app, never for decisions.",
+ "n_pairs": 24732,
+ "similarity_same_person": {
+  "p10": 0.2977,
+  "p25": 0.4085,
+  "p50": 0.5177,
+  "p75": 0.6152,
+  "p90": 0.6881
+ },
+ "similarity_different_people": {
+  "p10": 0.0026,
+  "p25": 0.0479,
+  "p50": 0.0979,
+  "p75": 0.1509,
+  "p90": 0.2022
+ },
+ "quality": {
+  "p10": 16.2173,
+  "p25": 19.0496,
+  "p50": 21.0263,
+  "p75": 22.4512,
+  "p90": 23.5428
+ },
+ "provenance": {
+  "timestamp_utc": "2026-11-02T14:17:52.198616+00:00",
+  "git": {
+   "commit": "fef4b055e8f7ea2423bba5de6303d9bac367df2c",
+   "dirty": true,
+   "repo_is_project_root": true
+  },
+  "argv": [
+   "scripts\\make_explain_reference.py"
+  ]
+ }
+}

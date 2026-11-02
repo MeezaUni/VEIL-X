@@ -11,10 +11,10 @@ DigiFace faces generated locally; no real person appears.
 
 | File | Purpose | Check | Size | SHA-256 |
 |---|---|---|---|---|
-| `VEIL-X_University_Project_Report.docx` | University project report (editable) | 267 paragraphs | 907 KB | `cb88c1bc03153be2a8426a3b3550cd85bd206376cabb90c55f1a92b762a815c6` |
-| `VEIL-X_University_Project_Report.pdf` | University project report (PDF) | 16 pages | 948 KB | `83d17f6b826b62ae70524d6f6e846bf08d3afedfa169cca9d9a7687e0a96da5d` |
-| `VEIL-X_Demo_Guide.pdf` | 3-5 minute demo guide + backup plan | 4 pages | 348 KB | `cd23824063996c3f79f79c8254751b01d1023d9cbc0241fccd904b43a77dee07` |
-| `VEIL-X_Viva_Questions.pdf` | Viva Q&A (35) + one-page revision sheet | 5 pages | 314 KB | `a1f4bcb0b32452e18982da4d365f9905a96f0503ab948686be5f1b248bb1b3f2` |
-| `VEIL-X_Project_Summary.pdf` | One-page project summary | 1 pages | 250 KB | `b84f8133f28af11ba135df9aa389493e7a14c73fcd95e8e97105f80f64f2c598` |
-| `VEIL-X_University_Presentation.pptx` | Presentation: 8 slides, native charts, speaker notes | 8 slides | 591 KB | `3846a0ceb34b89888b7e16cbd048d144365367a1e0a3e665e9df73b7e4fb5432` |
-| `VEIL-X_University_Presentation.pdf` | Presentation (PDF export) | 8 pages | 243 KB | `d048ff763b39cc6ccf71ef97b5d69d5afce0df191eaf532d6264f95b47775683` |
+| `VEIL-X_University_Project_Report.docx` | University project report (editable) | 268 paragraphs | 1006 KB | `bdd101e140b9d0b43fd6e67a33e9a10099ab005d54d7b24055b4586b3f004912` |
+| `VEIL-X_University_Project_Report.pdf` | University project report (PDF) | 18 pages | 1000 KB | `59a7684213c7f6f5be846a5e4402699afe05ce36afc51b406e86f2af3a0268a2` |
+| `VEIL-X_Demo_Guide.pdf` | 3-5 minute demo guide + backup plan | 4 pages | 343 KB | `447924eac84fb1a1a826ca202747b47dc3755f489fb8e22be55c7ba8f97774de` |
+| `VEIL-X_Viva_Questions.pdf` | Viva Q&A (35) + one-page revision sheet | 5 pages | 314 KB | `3a754496c21ea7c274ade4ae2ccfd56c953300a289504509ab500197a60cbe8a` |
+| `VEIL-X_Project_Summary.pdf` | One-page project summary | 1 pages | 251 KB | `3b4752c7123e9e0bf37a7dc5bc0ab36a52dfc60d954e1a7e595f4e0053790756` |
+| `VEIL-X_University_Presentation.pptx` | Presentation: 8 slides, native charts, speaker notes | 8 slides | 573 KB | `63bacc9dad57056cfea38d0e4a45d92278cd84e8a22545c7d0fcd2a83b6693ea` |
+| `VEIL-X_University_Presentation.pdf` | Presentation (PDF export) | 8 pages | 231 KB | `7e5365054afc7802acee5bdd840d7acad32259da9267766b0025cde08c997e3e` |

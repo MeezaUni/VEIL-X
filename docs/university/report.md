@@ -22,10 +22,12 @@ whether they are likely to show the same person.
 - NON-MATCH;
 - **ABSTAIN**, when the evidence is not strong enough for a reliable decision.
 
-**Explanations.** For every comparison the application explains itself. It shows similarity and
-quality diagnostics, the decision threshold region, the reason for any abstention, and
-predicted-visibility heat maps that highlight where a face may be covered. The heat maps are
-explanatory only and never change the decision.
+**Explanations.** For every comparison the application explains itself. A step-by-step "Why
+this result?" panel states, in plain language and with the exact numbers, how similar the faces
+are compared with typical same-person and different-person pairs, how good the images are, the
+exact threshold comparison that decided, and what would change the result. The application also
+shows predicted-visibility heat maps that highlight where a face may be covered. The heat maps
+are explanatory only and never change the decision.
 
 **Engineering results:**
 - The application reproduces the offline research pipeline exactly (1,000 of 1,000 decisions
@@ -129,6 +131,8 @@ The proposed system has six parts:
 - **Support guard.** Inputs whose quality is below the range seen during calibration are refused
   with ABSTAIN. This is explained in Section 14.
 - **Explanations.** The interface shows:
+  - a step-by-step "Why this result?" panel, generated from the same numbers the rule used,
+    including the exact threshold comparison and what would change the result;
   - similarity and quality numbers;
   - the threshold region;
   - the abstention reason;
@@ -274,8 +278,8 @@ synthetic DigiFace faces generated locally from the data folder.
 
 | Test | Result |
 |---|---|
-| Automated tests, CPU environment | 405 passed, 4 skipped (model tests that need the GPU environment) |
-| Automated tests, GPU environment (models present) | 419 passed |
+| Automated tests, CPU environment | 415 passed, 4 skipped (model tests that need the GPU environment) |
+| Automated tests, GPU environment (models present) | 430 passed |
 | Quality gate | PASS: Ruff lint and format, strict mypy, configuration validation, privacy/secret scan, documentation links, smoke test |
 | Offline parity (same decisions as the research code) | **1,000 / 1,000** synthetic development pairs identical; largest score difference 0.0025 |
 | Detector parity on real photographs (LFW development images) | 244 / 244 single-face crops pixel-identical to the offline crops |
@@ -317,15 +321,15 @@ Face detection runs on the CPU (about 174 ms) and is the slowest step in the GPU
 
 The examples are synthetic DigiFace faces generated locally. They are not real people.
 
-![Figure 4. Main screen: two uploads, the active configuration card, options and the two required confirmations.](assets/shot_home.png)
+![Figure 4. Main screen: two uploads, one-click example buttons, and the result area that guides the user through the three steps.](assets/shot_home.png)
 
-![Figure 5. MATCH result (synthetic same-identity pair): decision, threshold region and fused score.](assets/shot_match_result.png)
+![Figure 5. MATCH result (synthetic same-identity pair): the result card, the similarity, quality, score and rule cards, and the score bar against the high-quality cut-off.](assets/shot_match_result.png)
 
 ![Figure 6. NON-MATCH result (synthetic different-identity pair).](assets/shot_nonmatch_result.png)
 
-![Figure 7. ABSTAIN result (same identity, one face covered by a synthetic mask): the score falls inside the low-quality abstention band, and the reason is stated.](assets/shot_abstain_result.png)
+![Figure 7. ABSTAIN result (same identity, one face covered by a synthetic mask): the score falls inside the low-quality uncertain zone.](assets/shot_abstain_result.png)
 
-![Figure 8. Similarity and quality diagnostics for the ABSTAIN example.](assets/shot_abstain_table.png)
+![Figure 8. "Why this result?" for the ABSTAIN example: each step with its exact numbers, the exact comparison that decided, and what would change the result.](assets/shot_abstain_why.png)
 
 ![Figure 9. Predicted-visibility heat maps (blue visible, orange covered). The masked lower face is highlighted. These maps are explanatory only.](assets/shot_abstain_vis.png)
 
@@ -411,7 +415,7 @@ used in the final decision.
 
 **Result.** VEIL-X is a complete, working, local face verification application. It combines
 pretrained deep-learning embeddings, image-quality assessment and calibrated three-way decisions.
-It explains its outputs with diagnostics and visibility heat maps, runs privately on a laptop,
+It explains every output step by step, with the exact numbers and threshold that decided, and with visibility heat maps, runs privately on a laptop,
 reproduces its research pipeline exactly, and is backed by an extensive automated test suite.
 
 **Main lesson.** Saying "I don't know" is valuable, but a confidence threshold is only as reliable

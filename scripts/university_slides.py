@@ -876,7 +876,7 @@ def build(path: Path, assets: Path, tests_text: str) -> None:
     s = d.slide(
         "04 · Working application",
         "MATCH, NON-MATCH and ABSTAIN in the live app",
-        "Real outputs of the running application on the built-in synthetic examples (computer-generated faces), frozen thresholds unchanged. Example 2: MATCH, score 1.000, high-quality group (threshold 0.673). Example 1: NON-MATCH, 0.001, medium-quality group (threshold 0.452). Example 4: ABSTAIN, 0.542 inside the low-quality band; image A is dark and rotated, image B is masked. Bottom: the visibility heat map of example 4 (blue visible, orange covered). It explains the occlusion but is never used for the decision, because learned visibility failed on unseen occluder types.",
+        "Real outputs of the running application on the built-in synthetic examples (computer-generated faces), frozen thresholds unchanged. 'Same person': MATCH, score 1.000, high-quality group (threshold 0.673). 'Different people': NON-MATCH, 0.001, medium-quality group (threshold 0.452). 'Same person, masked': ABSTAIN, 0.542 inside the low-quality uncertain zone; image A is dark and rotated, image B is masked. Under every result, a 'Why this result?' panel lists each step with its exact numbers, the threshold comparison that decided, and what would change the result. Bottom: the visibility heat map of the masked example (blue visible, orange covered). It explains the occlusion but is never used for the decision, because learned visibility failed on unseen occluder types.",
     )
     rows = [
         ("pair_match.png", "box_match.png", "MATCH", BLUE, "1.000 ≥ 0.673  (high quality)"),

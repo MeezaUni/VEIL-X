@@ -9,8 +9,8 @@ subtitle: An AI-Based Face Verification System with Quality Assessment and Intel
 # What it is
 
 VEIL-X is a local AI application that compares two face images. It returns **MATCH**,
-**NON-MATCH** or **ABSTAIN**, and explains the result with similarity and quality diagnostics,
-the decision threshold region, the abstention reason, and visibility heat maps. It runs entirely
+**NON-MATCH** or **ABSTAIN**, and explains the result step by step: similarity and quality,
+the exact threshold comparison that decided, what would change it, and visibility heat maps. It runs entirely
 on the user's computer.
 
 # How it works
@@ -21,7 +21,7 @@ on the user's computer.
    similarity, and a logistic score combining similarity and quality.
 3. **Decision:** calibrated, quality-dependent thresholds give MATCH / NON-MATCH / ABSTAIN; a
    support guard abstains below the calibrated quality range.
-4. **Explanation:** visibility heat maps and a novelty flag, explanatory only.
+4. **Explanation:** a plain-language "Why this result?" panel; visibility heat maps and a novelty flag are explanatory only.
 
 # Technologies
 

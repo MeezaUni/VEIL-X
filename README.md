@@ -49,8 +49,11 @@ no stored images.
   decision thresholds.
 - **Three-way decisions.** MATCH / NON-MATCH / ABSTAIN, with thresholds calibrated on separate
   data.
-- **Explanations.** Similarity and quality numbers, the threshold region, the abstention reason,
-  visibility heat maps and an "unusual input" flag.
+- **Explains every decision.** A plain-language **Why this result?** panel walks through each
+  step with the exact numbers: faces found, similarity (compared with typical same-person and
+  different-person values), image quality group, the score, the exact threshold comparison that
+  decided, and **what would change the result**. Visibility heat maps, an "unusual input" flag
+  and a second-model opinion are shown for context only.
 - **Safe defaults.**
   - Several faces are refused unless you choose one.
   - Unsuitable photos are refused.
@@ -83,16 +86,19 @@ no stored images.
    - Your browser opens at **http://127.0.0.1:7860**. Keep the black window open while you use
      the app.
 4. **Try it.**
-   - Open the **Synthetic examples** tab, choose **example 2** and click **Load into the
-     comparison tab**.
-   - Under **Options**, tick **Inputs are pre-aligned**.
-   - Tick both confirmation boxes, then click **Compare locally with the frozen rule**.
+   - Click an example button under the upload boxes, for example **Same person**.
+   - Tick both confirmation boxes, then click **Compare faces**.
+   - Read the result card and the **Why this result?** steps underneath.
 
-   | Example | Expected result |
+   | Example button | Expected result |
    |---|---|
-   | 2 | **MATCH** |
-   | 1 | **NON-MATCH** |
-   | 4 | **ABSTAIN** |
+   | Same person | **MATCH** |
+   | Different people | **NON-MATCH** |
+   | Same person, masked | **ABSTAIN** (low quality, uncertain zone) |
+   | Not a face (noise) | **ABSTAIN** (support guard) |
+
+   To use your own photos, drop two images into **Image A** and **Image B**. Each upload is
+   checked at once, and you can compare again with other options without re-uploading.
 
 `run_veilx.bat` uses [uv](https://docs.astral.sh/uv/) to install Python. If uv is missing, it
 asks before installing it.
@@ -116,7 +122,12 @@ people. The screenshots below show only interface elements, so no faces appear.
 
 **Three decision outcomes** (real outputs of the app on the built-in examples):
 
-![MATCH, NON-MATCH and ABSTAIN panels](docs/img/app_decisions.png)
+![MATCH, NON-MATCH and ABSTAIN result cards](docs/img/app_decisions.png)
+
+**Why this result?** The full explanation for the masked example: the quality is low, so the
+low-quality rule applies, and the score falls inside its uncertain zone:
+
+![Step-by-step explanation of an ABSTAIN decision](docs/img/app_explanation.png)
 
 **Support guard.** Two random-noise images are refused (ABSTAIN), and the app states that the
 unguarded rule would have said MATCH:
@@ -173,7 +184,7 @@ All numbers come from committed result files in `reports/experiments/`.
 |---|---|
 | App vs research pipeline | **1,000 / 1,000** identical decisions; CPU vs GPU 100 / 100 |
 | Speed (RTX 4060 Laptop, warm, median) | **226 ms** per photo pair; 43 ms per pre-aligned pair; CPU-only 0.3–0.5 s |
-| Automated tests | 405 (CPU) + 419 (GPU) passing, plus lint, strict typing and a privacy scan |
+| Automated tests | 415 (CPU) + 430 (GPU) passing, plus lint, strict typing and a privacy scan |
 | Unseen occluder, data like the calibration data | Selective errors 1.1–2.6 % at 89–97 % coverage (target ≤ 5 %) |
 
 The parity figure means the app reproduces the research system exactly. It is **not** a

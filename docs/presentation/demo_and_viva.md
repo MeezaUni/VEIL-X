@@ -13,13 +13,13 @@
 
 | Step | Action | What to say (no overclaiming) |
 |---|---|---|
-| 1 | Show the disclaimer and the **active configuration** card (`F1_mask`) | "This is one of five frozen research calibrations. It was calibrated on synthetic faces and occluders, and its 5 % target did not hold under population shift. This is not a certified decision." |
-| 2 | Synthetic examples tab → example 1 (clean genuine), tick *pre-aligned*, both confirmations → Compare | "MATCH means the frozen rule's score lies above its frozen threshold. The fused score is *not* a probability that these are the same person." |
-| 3 | Example 4 (mask occluder on image B) | Expected **ABSTAIN** (q-low band). "The rule declines to decide. Here is the recorded reason. The visibility map shows the mask in orange, but that map is explanatory only. It never enters the decision." |
-| 4 | An impostor example | "NON-MATCH. Note the neutral colours: there is no 'safe' state." |
-| 5 | Upload two plain-noise images, pre-aligned | Expected **ABSTAIN: below calibration support**. "The frozen research system would have said MATCH here, with score 1.0. We found this failure in the final audit, and the app now refuses instead." |
-| 6 | (Optional, consenting volunteer) A group photo | "Several faces: the app refuses to choose a person until you select one." |
-| 7 | Calibration & limitations tab | Read the first two bullets aloud |
+| 1 | Show the disclaimer, then Advanced options → *About this calibration system* (`F1_mask`) | "This is one of five frozen research calibrations. It was calibrated on synthetic faces and occluders, and its 5 % target did not hold under population shift. This is not a certified decision." |
+| 2 | Example button **Same person**, both confirmations → **Compare faces** | "MATCH means the frozen rule's score lies above its frozen threshold. The score is *not* a probability that these are the same person. *Why this result?* shows the exact comparison: p = 1.000 ≥ 0.673." |
+| 3 | Example button **Same person, masked** → Compare | Expected **ABSTAIN** (low-quality uncertain zone). "The rule declines to decide. Step 6 states the exact condition, and *What would change the result?* gives the score a decision would need. The visibility map shows the mask in orange, but that map is explanatory only. It never enters the decision." |
+| 4 | Example button **Different people** → Compare | "NON-MATCH. Note the neutral colours: there is no 'safe' state." |
+| 5 | Example button **Not a face (noise)** → Compare | Expected **ABSTAIN** from the support guard. "The frozen research system would have said MATCH here, with score 1.0. We found this failure in the final audit, and the app now refuses instead, and says so." |
+| 6 | (Optional, consenting volunteer) A group photo | "Several faces: the app refuses to choose a person until you select one; the face numbers appear under *Faces used*." |
+| 7 | *Limitations* tab | Read the first two bullets aloud |
 
 **Never:**
 - say "verified", "certified", "guaranteed" or "X % sure";
