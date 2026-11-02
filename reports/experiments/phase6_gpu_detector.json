@@ -1,0 +1,56 @@
+{
+ "evidence_type": "real_measured_model_result",
+ "scope": "Phase 6 GPU vs CPU SCRFD parity and latency (LFW View 1 DevTrain; development data)",
+ "results": {
+  "n_images": 300,
+  "gpu_session_providers": [
+   "CPUExecutionProvider"
+  ],
+  "count_mismatch": 0,
+  "status_mismatch": 0,
+  "aligned_compared": 248,
+  "crop_identical": 248,
+  "crop_max_diff_le_2": 248,
+  "crop_max_abs_diff": 0,
+  "max_box_diff_px": 0.0,
+  "max_landmark_diff_px": 0.0,
+  "max_score_diff": 0.0,
+  "pairs_compared": 173,
+  "decision_agreement": 1.0,
+  "max_abs_adaface_cosine_diff": 0.0,
+  "latency_ms_per_image": {
+   "cpu_median": 141.61424999474548,
+   "cpu_p95": 190.6518199772109,
+   "cuda_median": 144.3182000075467,
+   "cuda_p95": 208.88942002493425
+  },
+  "gpu_memory_delta_mib_nvidia_smi": -1.0,
+  "adoption_rule_met": false
+ },
+ "provenance": {
+  "veilx_version": "0.0.1",
+  "timestamp_utc": "2026-11-02T03:58:13.114610+00:00",
+  "git": {
+   "commit": "168b59b676632b81ed09464efb10a3c8dced1c8f",
+   "dirty": true,
+   "repo_is_project_root": true
+  },
+  "python": "3.12.14",
+  "implementation": "CPython",
+  "os": "Windows",
+  "packages": {
+   "numpy": "2.5.4",
+   "pydantic": "2.12.3",
+   "PyYAML": "6.0.3",
+   "torch": "2.11.0+cu128",
+   "onnxruntime": null,
+   "insightface": null
+  },
+  "configs": {},
+  "seed": null,
+  "argv": [
+   "scripts\\phase6_gpu_detector.py"
+  ],
+  "extra": {}
+ }
+}
