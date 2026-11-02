@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import yaml
 
 from veilx.config import load_protocol
 from veilx.data.manifest import ImageRecord, PairRecord, read_jsonl
@@ -776,6 +777,25 @@ def _p4_group(directory: Path, name: str, cols: tuple[str, ...], fold: str | Non
     return g
 
 
+def low_q_tail(d: Any, t: dict[str, Any], floor: float) -> dict[str, Any]:
+    """Descriptive A3 errors below / above the calibration-support floor of q (D-055)."""
+    d = np.asarray(d)
+    y = np.asarray(t["label"]).astype(int)
+    out: dict[str, Any] = {"floor": floor}
+    for name, m in (("below_floor", t["q"] < floor), ("at_or_above_floor", t["q"] >= floor)):
+        g, i = m & (y == 1), m & (y == 0)
+        out[name] = {
+            "n_genuine": int(g.sum()),
+            "n_impostor": int(i.sum()),
+            "impostor_match": int((i & (d == 1)).sum()),
+            "genuine_nonmatch": int((g & (d == 0)).sum()),
+            "accepted_impostor": int((i & (d != -1)).sum()),
+            "accepted_genuine": int((g & (d != -1)).sum()),
+            "abstain": int((m & (d == -1)).sum()),
+        }
+    return out
+
+
 def final(args: argparse.Namespace) -> int:
     lay = resolve_data_root()
     fz4 = json.loads((lay.private_reports / "phase4_frozen.json").read_text("utf-8"))
@@ -787,6 +807,13 @@ def final(args: argparse.Namespace) -> int:
     if ctx.fz3["sha256"] != fz4["phase3_frozen_sha256"]:
         raise RuntimeError("phase3 freeze changed since phase4 develop")
     part = PARTITIONS[args.partition]
+    q_floors: dict[str, float] = {}
+    if part.key == "p6":  # registered support floors (development data; docs/phase6_protocol.md)
+        q_floors = dict(
+            yaml.safe_load((ROOT / "configs" / "app" / "veilx_app.yaml").read_text("utf-8"))[
+                "decision"
+            ]["q_support_floor"]
+        )
     if args.rehearse and part.key != "p4":
         raise RuntimeError("--rehearse is defined for the Phase 4 code path only")
     run_id = uuid.uuid4().hex[:12]
@@ -876,6 +903,10 @@ def final(args: argparse.Namespace) -> int:
                 extend_table(t, pairs, plans[role], clean, occ, f4["temperature"], f4["shift"], nov)
                 c = evaluate_cell(t, f3, f4)
                 c["paired_vs_a3"] = paired_vs_a3(c, t)
+                if part.key == "p6":  # Amendment 1 (exploratory; registered before the run)
+                    c["a3_low_quality_tail"] = low_q_tail(
+                        c["decisions"]["A3_quality|primary|v2"], t, q_floors[fold]
+                    )
                 c.pop("decisions")
                 cells[f"{fold}|{role}"] = c
                 # visibility bias of Phase 3 VE and VE-C on this group's occluded renders (image level)

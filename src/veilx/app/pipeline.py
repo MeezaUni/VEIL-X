@@ -115,12 +115,18 @@ class VerificationPipeline:
         select_a: int | None = None,
         select_b: int | None = None,
         with_diagnostics: bool = True,
+        allow_fallback: bool = False,
+        apply_support_floor: bool = True,
     ) -> VerificationResult:
         fold = fold or self.cfg.decision.default_fold
         t: dict[str, float] = {}
         t0 = time.perf_counter()
-        fa = self.faces.prepare(img_a, pre_aligned=pre_aligned, select=select_a)
-        fb = self.faces.prepare(img_b, pre_aligned=pre_aligned, select=select_b)
+        fa = self.faces.prepare(
+            img_a, pre_aligned=pre_aligned, select=select_a, allow_fallback=allow_fallback
+        )
+        fb = self.faces.prepare(
+            img_b, pre_aligned=pre_aligned, select=select_b, allow_fallback=allow_fallback
+        )
         t["detect_align"] = 1000 * (time.perf_counter() - t0)
         rule = self.rule(fold)
         unusable = [
@@ -144,8 +150,28 @@ class VerificationPipeline:
         q = min(na, nb)
         t3 = time.perf_counter()
         dec = decide(rule, s_ada, q)
+        floor = (self.cfg.decision.q_support_floor or {}).get(fold)
+        guard_note = None
+        if apply_support_floor and floor is not None and q < floor:
+            guard_note = (
+                f"support guard: pair quality q = {q:.2f} is below this system's calibration "
+                f"support (1st percentile of calibration quality = {floor:.2f}); the frozen rule "
+                f"alone would have output {dec.label} (fused score {dec.fused_score:.3f})"
+            )
+            dec = decide(
+                rule,
+                s_ada,
+                q,
+                forced_reasons=(
+                    f"pair quality q = {q:.2f} is below the calibration support ({floor:.2f}): "
+                    "the frozen score extrapolates there and is unreliable (e.g. non-face or "
+                    "severely degraded images)",
+                ),
+            )
         t["decide"] = 1000 * (time.perf_counter() - t3)
         res = VerificationResult(dec, fa, fb, fold, self.device, s_ada, s_arc, na, nb, q, t)
+        if guard_note:
+            res.notes.append(guard_note)
         if fa.is_fallback or fb.is_fallback:
             res.notes.append(
                 "at least one image used the registered fixed-crop FALLBACK (not a detected face)"

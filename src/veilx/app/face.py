@@ -7,9 +7,16 @@ The status of every image is one of:
 * ``selected_face``        several faces; the user explicitly selected one by index;
 * ``multiple_faces``       several faces and no selection. **REFUSED**: the app never picks a person
                            on its own (the decision becomes ABSTAIN);
-* ``fallback_fixed_crop``  no face, or low score / large residual: the registered Phase 4F policy.
-                           Detector-free fixed crop after resizing to the LFW reference size.
-                           This is **not** a successful detection; always labelled a fallback;
+* ``fallback_fixed_crop``  no face, or one low-quality face, AND the user declared LFW-style framing
+                           (loosely cropped, centred, single-face portrait) AND the image is
+                           near-square: the registered Phase 4F policy. Detector-free fixed crop
+                           after resizing to the LFW reference size. **Not** a successful detection;
+                           always labelled a fallback;
+* ``no_reliable_face``     no face, or one low-quality face, and the fallback is not applicable (no
+                           framing declaration, non-square image, or a face selected in a
+                           multi-face image). **REFUSED**: a fixed crop of an arbitrary photograph
+                           is not a face (Phase 6, D-054; the offline evaluation always applied the
+                           fallback to LFW images, which is ``allow_fallback=True``);
 * ``pre_aligned``          the user declares the input an already aligned 112x112 crop (DigiFace
                            format); no detection is run;
 * ``rejected``             invalid input (see :mod:`veilx.app.inputs`).
@@ -87,8 +94,42 @@ class FacePreparer:
             )
         return warp(np.ascontiguousarray(img), self.m_fixed)
 
+    def fallback_applicable(self, rgb: U8) -> bool:
+        """Geometric precondition of the fixed crop: a near-square image (LFW is 250x250)."""
+        h, w = rgb.shape[:2]
+        lo, hi = self.cfg.fallback.aspect_ratio_range
+        return bool(lo <= w / h <= hi)
+
+    def _refuse_or_fallback(
+        self, rgb: U8, faces: list[FaceBox], chosen: int | None, why: str, allow: bool
+    ) -> PreparedFace:
+        multi = len(faces) > 1
+        if allow and not multi and self.fallback_applicable(rgb):
+            return PreparedFace(
+                "fallback_fixed_crop",
+                self.fixed_crop(rgb),
+                faces,
+                chosen=chosen,
+                is_fallback=True,
+                notes=[f"{why}; registered fixed-crop fallback used (NOT a detection)"],
+            )
+        if multi:
+            cause = "the fallback never applies to a face selected in a multi-face image"
+        elif not allow:
+            cause = "fixed-crop fallback not enabled (LFW-style framing not declared)"
+        else:
+            cause = "fixed-crop fallback not applicable: image is not near-square"
+        return PreparedFace(
+            "no_reliable_face", None, faces, chosen=chosen, notes=[f"{why}; {cause}"]
+        )
+
     def prepare(
-        self, rgb: U8, *, pre_aligned: bool = False, select: int | None = None
+        self,
+        rgb: U8,
+        *,
+        pre_aligned: bool = False,
+        select: int | None = None,
+        allow_fallback: bool = False,
     ) -> PreparedFace:
         if pre_aligned:
             if rgb.shape[:2] != (112, 112):
@@ -133,18 +174,7 @@ class FacePreparer:
                 if f.score < self.cfg.detector.min_score
                 else f"alignment residual {f.residual:.2f} > {self.cfg.detector.max_residual:.2f}"
             )
-            return PreparedFace(
-                "fallback_fixed_crop",
-                self.fixed_crop(rgb),
-                faces,
-                chosen=k,
-                is_fallback=True,
-                notes=[f"low-quality detection ({reason}); registered fixed-crop fallback used"],
+            return self._refuse_or_fallback(
+                rgb, faces, k, f"low-quality detection ({reason})", allow_fallback
             )
-        return PreparedFace(
-            "fallback_fixed_crop",
-            self.fixed_crop(rgb),
-            faces,
-            is_fallback=True,
-            notes=["no face detected; registered fixed-crop fallback used (NOT a detection)"],
-        )
+        return self._refuse_or_fallback(rgb, faces, None, "no face detected", allow_fallback)

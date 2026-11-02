@@ -294,7 +294,8 @@ levels). The setup:
 2. **Keep quality-stratified calibration (A3) as the deployable default.** It was the only
    deployable arm with no violations on any held-out family, at either target.
 3. **Use dual-backbone fusion (M5)**; evaluate MLP fusion prospectively (criterion met in 4/5
-   folds).
+   folds). *[Erratum, Phase 6, D-052: M5 was better in log-loss and AUC only. It was never
+   calibrated as a decision system; A3, the recommended rule, uses M1 (AdaFace only).]*
 4. **Physical-occlusion evaluation**, gated on the authorisations in
    `docs/physical_occlusion_readiness.md`.
 5. **In-domain calibration on real photographs** (pending decision 7).

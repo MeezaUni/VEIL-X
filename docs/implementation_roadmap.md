@@ -216,8 +216,8 @@ untouched p4_test.
 
 **Recommended deployable configuration:**
 - SCRFD with fixed-crop fallback;
-- frozen AdaFace + ArcFace;
-- quality fused score without co-visibility;
+- frozen AdaFace (decision) + ArcFace (diagnostic only; erratum D-052);
+- quality fused score M1 (AdaFace cosine + AdaFace feature norm), without co-visibility;
 - A3 rules, calibrated on the deployment population.
 
 Visibility is used only as an explanation signal.

@@ -111,3 +111,26 @@ identity-jackknife CI, as in Phase 4.
   identities with synthetic occluders". It does not mean "validated for real photographs or
   physical occlusions".
 - No formal out-of-distribution or population-shift guarantee is claimed, whatever R1 shows.
+
+## 7. Amendment 1 (2026-11-02; registered before any p6 extraction or score)
+
+**Why.** A Phase 6 development audit found a failure mode of the frozen M1 score below the
+calibration support of quality (`scripts/phase6_lowq_audit.py`;
+`reports/experiments/phase6_lowq_audit.json`). Development data only:
+- **Synthetic non-face probes.** Pairs of random-noise, constant or gradient images get q of
+  5–10 and are decided **MATCH** with p ≈ 1.000.
+- **p3_val.** The ~1 % of pairs with q below the 1st percentile of calibration quality show A3
+  sFMR of 18–42 %, against 1.1–1.5 % above it.
+
+**What is added.** One **exploratory, descriptive** quantity is added to the single p6 run. Per
+cell, A3's counts are tallied below and at-or-above the registered floors:
+- genuine and impostor pairs;
+- false matches and false non-matches;
+- accepted pairs and abstentions.
+
+The floors are fixed from development data in `configs/app/veilx_app.yaml`
+(`decision.q_support_floor`: F1 10.82, F2 10.87, F3 10.86, F4 12.45, F5 11.01).
+
+**What does not change.** The registered endpoints R1–R3, every frozen system and every decision
+are unchanged. The tally is not a decision rule. It does not enter R1–R3, and it is labelled
+exploratory wherever reported.

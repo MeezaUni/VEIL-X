@@ -29,6 +29,7 @@ from veilx.app.report import (
     abstention_text,
     annotate_faces,
     decision_html,
+    fold_card_md,
     rule_bar,
     visibility_overlay,
 )
@@ -37,16 +38,29 @@ STATUS_TEXT = {
     "aligned": "one face detected and aligned (detector score and alignment residual acceptable)",
     "selected_face": "several faces detected; the face you selected was aligned",
     "multiple_faces": "several faces detected and none selected: REFUSED (the app does not choose a person)",
-    "fallback_fixed_crop": "FALLBACK: no reliable detection; detector-free fixed crop used (not a detected face)",
+    "fallback_fixed_crop": "FALLBACK: no reliable detection; detector-free fixed crop used because you declared LFW-style framing (not a detected face)",
+    "no_reliable_face": "no reliable face (none detected, or detection quality too low) and the fixed-crop fallback is not applicable: REFUSED",
     "pre_aligned": "declared pre-aligned 112×112 crop; detection skipped",
     "rejected": "rejected",
 }
 
 
 CONSENT_REQUIRED = (
-    "<b>Please confirm</b> that you are authorised to process both images and that you understand "
-    "this is a research demonstration. The uploaded files were discarded; upload them again."
+    "<b>Please confirm both statements</b> (authorisation to process the images, and the calibration "
+    "limitations of the active experimental configuration). The uploaded files were discarded; "
+    "upload them again."
 )
+
+
+def safe_error_html(exc: BaseException) -> str:
+    """User-facing message for an unexpected failure: no stack trace, no file paths."""
+    name = type(exc).__name__
+    if "OutOfMemory" in name or isinstance(exc, MemoryError):
+        return (
+            "<b>No decision: resources exhausted</b> (out of memory). Close other GPU programs or "
+            "restart with <code>--device cpu</code>."
+        )
+    return f"<b>No decision: internal processing error</b> ({name}). Details are not shown."
 
 
 def read_and_discard(path: str | None, temp_root: Path | None) -> bytes | None:
@@ -126,13 +140,15 @@ def run_comparison(
     sel_b: float,
     diag: bool,
     authorised: bool,
+    calibration_ack: bool = False,
+    allow_fallback: bool = False,
 ) -> tuple[Any, ...]:
     """One comparison request: read and discard the uploads, then verify (or refuse)."""
     cfg = pipe.cfg
     empty = (None,) * 7
     try:
         raw_a, raw_b = read_and_discard(path_a, temp_root), read_and_discard(path_b, temp_root)
-        if not authorised:
+        if not (authorised and calibration_ack):
             return (
                 CONSENT_REQUIRED,
                 None,
@@ -158,15 +174,28 @@ def run_comparison(
             "",
             *empty,
         )
-    res = pipe.verify(
-        a.rgb,
-        b.rgb,
-        fold=fold,
-        pre_aligned=pre,
-        select_a=None if sel_a is None or sel_a < 0 else int(sel_a),
-        select_b=None if sel_b is None or sel_b < 0 else int(sel_b),
-        with_diagnostics=diag,
-    )
+    try:
+        res = pipe.verify(
+            a.rgb,
+            b.rgb,
+            fold=fold,
+            pre_aligned=pre,
+            select_a=None if sel_a is None or sel_a < 0 else int(sel_a),
+            select_b=None if sel_b is None or sel_b < 0 else int(sel_b),
+            with_diagnostics=diag,
+            allow_fallback=allow_fallback,
+        )
+    except Exception as exc:  # safe message; no stack trace or paths in the page
+        return (
+            safe_error_html(exc),
+            None,
+            "No decision: processing error.",
+            "",
+            None,
+            None,
+            "",
+            *empty,
+        )
     dec = res.decision
     status = []
     for name, f, img in (("A", res.face_a, a), ("B", res.face_b, b)):
@@ -282,11 +311,19 @@ def build_app(
             with gr.Row():
                 in_a = gr.Image(label="Image A", type="filepath", sources=["upload"], height=280)
                 in_b = gr.Image(label="Image B", type="filepath", sources=["upload"], height=280)
+            fold_card = gr.Markdown(
+                fold_card_md(cfg.decision.default_fold, cfg.decision.phase3_frozen_sha256)
+            )
             with gr.Accordion("Options", open=False):
                 fold = gr.Dropdown(
                     list(cfg.decision.folds),
                     value=cfg.decision.default_fold,
                     label="Frozen A3 system (Phase 3 fold; default per D-051)",
+                )
+                fold.change(
+                    lambda f: fold_card_md(f, cfg.decision.phase3_frozen_sha256),
+                    [fold],
+                    [fold_card],
                 )
                 pre = gr.Checkbox(
                     False,
@@ -299,6 +336,10 @@ def build_app(
                         label="Face index to use in image A (-1 = none; needed if several faces)",
                     )
                     sel_b = gr.Number(-1, precision=0, label="Face index to use in image B")
+                allow_fb = gr.Checkbox(
+                    False,
+                    label="Both images are loosely cropped, centred single-face portraits (LFW-style framing): allow the registered fixed-crop FALLBACK when no reliable face is detected",
+                )
                 diag = gr.Checkbox(
                     True,
                     label="Compute explanatory diagnostics (visibility map, novelty) — never used in the decision",
@@ -306,6 +347,10 @@ def build_app(
             authorised = gr.Checkbox(
                 False,
                 label="I am authorised to process these two images, and I understand this is a research demonstration (not identity verification)",
+            )
+            calib_ack = gr.Checkbox(
+                False,
+                label="I understand that the active configuration is an experimental calibration on synthetic faces and synthetic occluders, that its 5 % error target was not maintained under population shift, and that its output is not a certified or deployment-ready decision",
             )
             go = gr.Button("Compare locally with the frozen rule", variant="primary")
             out_decision = gr.HTML()
@@ -344,7 +389,7 @@ def build_app(
             out_timing = gr.Markdown()
             go.click(
                 run,
-                [in_a, in_b, fold, pre, sel_a, sel_b, diag, authorised],
+                [in_a, in_b, fold, pre, sel_a, sel_b, diag, authorised, calib_ack, allow_fb],
                 [
                     out_decision,
                     out_rule,

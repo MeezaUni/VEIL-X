@@ -81,7 +81,7 @@ def bench_device(
     cold["load_rule_and_diagnostics_ms"] = 1000 * (time.perf_counter() - t)
     a, b = lfw_pairs[0]
     t = time.perf_counter()
-    first = pipe.verify(a, b)
+    first = pipe.verify(a, b, allow_fallback=True)  # LFW framing (Phase 4F policy)
     cold["first_comparison_ms"] = 1000 * (time.perf_counter() - t)
     out: dict[str, Any] = {"cold": cold, "first_comparison_stages_ms": first.timings_ms}
     for path, pairs, pre in (
@@ -91,7 +91,7 @@ def bench_device(
         rec: dict[str, list[float]] = {}
         statuses: dict[str, int] = {}
         for a, b in pairs:
-            r = pipe.verify(a, b, pre_aligned=pre)
+            r = pipe.verify(a, b, pre_aligned=pre, allow_fallback=True)
             for k, v in r.timings_ms.items():
                 rec.setdefault(k, []).append(v)
             for f in (r.face_a, r.face_b):

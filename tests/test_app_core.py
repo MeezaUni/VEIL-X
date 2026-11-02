@@ -224,7 +224,7 @@ def _prep(cfg: AppConfig, dets: list[Any]) -> FacePreparer:
 
 def test_face_statuses(cfg: AppConfig) -> None:
     img = np.random.default_rng(3).integers(0, 255, (250, 250, 3), dtype=np.uint8)
-    none = _prep(cfg, []).prepare(img)
+    none = _prep(cfg, []).prepare(img, allow_fallback=True)  # offline LFW policy (Phase 4F)
     assert (
         none.status == "fallback_fixed_crop"
         and none.is_fallback
@@ -232,7 +232,7 @@ def test_face_statuses(cfg: AppConfig) -> None:
     )  # type: ignore[union-attr]
     one = _prep(cfg, [_det(0.9)]).prepare(img)
     assert one.status == "aligned" and not one.is_fallback and one.crop is not None
-    low = _prep(cfg, [_det(0.4)]).prepare(img)
+    low = _prep(cfg, [_det(0.4)]).prepare(img, allow_fallback=True)
     assert low.status == "fallback_fixed_crop" and low.is_fallback
     two = _prep(cfg, [_det(0.9), _det(0.9, 60)])
     refused = two.prepare(img)
@@ -240,6 +240,26 @@ def test_face_statuses(cfg: AppConfig) -> None:
     chosen = two.prepare(img, select=1)
     assert chosen.status == "selected_face" and chosen.chosen == 1
     assert two.prepare(img, select=5).status == "rejected"
+
+
+def test_fallback_is_restricted_in_the_app(cfg: AppConfig) -> None:
+    """6D: the fixed crop is never applied silently to an arbitrary photograph."""
+    square = np.random.default_rng(3).integers(0, 255, (250, 250, 3), dtype=np.uint8)
+    wide = np.random.default_rng(3).integers(0, 255, (250, 500, 3), dtype=np.uint8)
+    for dets in ([], [_det(0.4)]):
+        default = _prep(cfg, dets).prepare(square)  # app default: no framing declaration
+        assert default.status == "no_reliable_face" and default.crop is None
+        assert "not enabled" in default.notes[0]
+        nonsq = _prep(cfg, dets).prepare(wide, allow_fallback=True)
+        assert nonsq.status == "no_reliable_face" and "not near-square" in nonsq.notes[0]
+    # a low-quality face SELECTED in a multi-face image never gets a whole-image fixed crop
+    multi = _prep(cfg, [_det(0.9), _det(0.4, 60)]).prepare(square, select=1, allow_fallback=True)
+    assert multi.status == "no_reliable_face" and multi.crop is None
+    assert "multi-face" in multi.notes[0]
+    # the offline LFW geometry (250x250, declared) is unchanged
+    fp = _prep(cfg, [])
+    ok = fp.prepare(square, allow_fallback=True)
+    assert ok.crop is not None and np.array_equal(ok.crop, fp.fixed_crop(square))
 
 
 def test_pre_aligned_mode(cfg: AppConfig) -> None:
@@ -302,8 +322,10 @@ def test_multiple_faces_abstain_with_reason_and_fallback_is_flagged(cfg: AppConf
     img = np.random.default_rng(5).integers(0, 255, (250, 250, 3), dtype=np.uint8)
     multi = _pipeline(cfg, [_det(0.9), _det(0.9, 60)]).verify(img, img)
     assert multi.decision.label == "ABSTAIN" and "multiple faces" in multi.decision.reasons[0]
-    fb = _pipeline(cfg, []).verify(img, img, with_diagnostics=False)
+    fb = _pipeline(cfg, []).verify(img, img, with_diagnostics=False, allow_fallback=True)
     assert fb.face_a.is_fallback and any("FALLBACK" in n for n in fb.notes)
+    refused = _pipeline(cfg, []).verify(img, img, with_diagnostics=False)
+    assert refused.decision.label == "ABSTAIN" and "no reliable face" in refused.decision.reasons[0]
 
 
 # ----------------------------------------------------------------- wording, privacy, local-only
@@ -378,12 +400,16 @@ def test_comparison_requires_authorisation_and_discards_uploads(
     for n in ("a.png", "b.png"):
         Image.fromarray(img).save(tmp_path / n)
         paths.append(str(tmp_path / n))
-    out = run_comparison(p, tmp_path, *paths, "F1_mask", True, -1, -1, False, False)
+    out = run_comparison(p, tmp_path, *paths, "F1_mask", True, -1, -1, False, False, True)
     assert out[0] == CONSENT_REQUIRED and out[1] is None  # refused, no decision
     assert not any(Path(x).exists() for x in paths)  # uploads deleted even when refused
     for n in ("a.png", "b.png"):
         Image.fromarray(img).save(tmp_path / n)
-    out = run_comparison(p, tmp_path, *paths, "F1_mask", True, -1, -1, False, True)
+    out = run_comparison(p, tmp_path, *paths, "F1_mask", True, -1, -1, False, True, False)
+    assert out[0] == CONSENT_REQUIRED  # the calibration acknowledgement is required too
+    for n in ("a.png", "b.png"):
+        Image.fromarray(img).save(tmp_path / n)
+    out = run_comparison(p, tmp_path, *paths, "F1_mask", True, -1, -1, False, True, True)
     assert any(lab in out[0] for lab in ("MATCH", "NON-MATCH", "ABSTAIN"))
     assert not any(Path(x).exists() for x in paths)
 
@@ -398,5 +424,59 @@ def test_examples_survive_a_comparison(cfg: AppConfig, tmp_path: Path) -> None:
     for s in srcs:
         Image.fromarray(img).save(s)
     a, b = disposable_copies(srcs, tmp_path)
-    run_comparison(_pipeline(cfg, []), tmp_path, a, b, "F1_mask", True, -1, -1, False, True)
+    run_comparison(_pipeline(cfg, []), tmp_path, a, b, "F1_mask", True, -1, -1, False, True, True)
     assert all(Path(s).exists() for s in srcs) and not Path(a).exists() and not Path(b).exists()
+
+
+def test_unexpected_errors_are_reported_safely(cfg: AppConfig, tmp_path: Path) -> None:
+    from veilx.app.ui import run_comparison
+
+    p = _pipeline(cfg, [])
+    img = np.random.default_rng(7).integers(0, 255, (112, 112, 3), dtype=np.uint8)
+    paths = []
+    for n in ("a.png", "b.png"):
+        Image.fromarray(img).save(tmp_path / n)
+        paths.append(str(tmp_path / n))
+    out = run_comparison(p, tmp_path, *paths, "NOT_A_FOLD", True, -1, -1, False, True, True)
+    assert "internal processing error" in out[0] and "Traceback" not in out[0]
+    assert str(tmp_path) not in out[0] and out[1] is None
+
+
+def test_fold_card_names_calibration_and_limits() -> None:
+    from veilx.app.report import fold_card_md
+
+    for fold in (
+        "F1_mask",
+        "F2_sunglasses",
+        "F3_hand_object",
+        "F4_random_patch",
+        "F5_extreme_lighting",
+    ):
+        md = fold_card_md(fold, "34409779ae8f69f3")
+        assert fold in md and "not a deployment calibration" in md and "held out" in md
+        assert "was **not** held" in md and "certified" not in md.lower().replace(
+            "not certified", ""
+        )
+
+
+def test_support_floor_guard_abstains_below_calibration_quality(cfg: AppConfig) -> None:
+    """D-055: below the 1st percentile of calibration quality the frozen M1 extrapolates."""
+    from veilx.app.decision import decide
+
+    assert set(cfg.decision.q_support_floor or {}) == set(cfg.decision.folds)
+    assert all(9.0 < v < 14.0 for v in (cfg.decision.q_support_floor or {}).values())
+    strict = cfg.model_copy(
+        update={"decision": cfg.decision.model_copy(update={"q_support_floor": {"F1_mask": 20.0}})}
+    )
+    img = np.random.default_rng(8).integers(0, 255, (112, 112, 3), dtype=np.uint8)
+    guarded = _pipeline(strict, []).verify(
+        img, img.copy(), pre_aligned=True, with_diagnostics=False
+    )
+    assert guarded.quality == 18.0 and guarded.decision.label == "ABSTAIN"
+    assert "calibration support" in guarded.decision.reasons[0]
+    assert any("frozen rule alone would have output" in n for n in guarded.notes)
+    research = _pipeline(strict, []).verify(
+        img, img.copy(), pre_aligned=True, with_diagnostics=False, apply_support_floor=False
+    )
+    frozen = decide(_rule(), research.s_adaface, research.quality)  # type: ignore[arg-type]
+    assert research.decision == frozen  # research mode = frozen rule, exactly

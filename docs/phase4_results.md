@@ -272,6 +272,18 @@ still requires separate approval (pickles; licence conflict).
 
 ## 13. Recommended deployable architecture (research recommendation; not a product)
 
+> **Erratum (Phase 6, D-052).** Items 2–3 below mix a *validated* component with an
+> *unvalidated* one:
+> - **Validated:** the A3 decision system evaluated in Phases 3–4 uses **M1 only**, built from
+>   the AdaFace cosine and the AdaFace feature norm.
+> - **Unvalidated:** ArcFace and the "dual-backbone + quality" fused score were compared only in
+>   log-loss and AUC. They were **never calibrated or evaluated as a three-way decision system**.
+>
+> The validated configuration is therefore: SCRFD (+ fallback) → AdaFace → M1 → A3. A
+> dual-backbone fused score remains a hypothesis for future, prospectively evaluated work. The
+> per-pair cost "~8 ms with both backbones" below is batch throughput, not end-to-end latency
+> (see `docs/phase5_results.md` §6).
+
 1. **Detection:** SCRFD. On no face / low-quality alignment, fall back to a **detector-free fixed
    crop**, scored by the same quality-stratified rule. Never force non-match; never silently
    drop.

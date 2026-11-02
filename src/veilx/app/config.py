@@ -33,12 +33,16 @@ class DecisionSection(_Strict):
     fused_score: Literal["M1"]
     phase3_frozen_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     phase3_frozen_file: str
+    # App-only safety guard (Phase 6, D-055): 1st percentile of each fold's calibration q.
+    # Below it the frozen M1 score extrapolates (p -> 1 for non-faces); the app abstains.
+    q_support_floor: dict[str, float] | None = None
 
 
 class DiagnosticsSection(_Strict):
     phase4_frozen_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     phase4_frozen_file: str
     vec_dir: str
+    vec_sha256: dict[str, str]
 
 
 class DetectorSection(_Strict):
@@ -51,6 +55,7 @@ class DetectorSection(_Strict):
 
 
 class FallbackSection(_Strict):
+    aspect_ratio_range: tuple[float, float]
     reference_size: int = Field(ge=112)
     matrix: tuple[tuple[float, float, float], tuple[float, float, float]]
 

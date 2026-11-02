@@ -146,3 +146,69 @@ def abstention_text(reasons: tuple[str, ...], label: str) -> str:
         "**Recorded abstention reasons** (descriptive; they state which rule condition applied, not a causal "
         f"explanation of the images):\n{items}"
     )
+
+
+# Phase 6 (6C): what each frozen A3 system is. A3 cells: coverage / sFNMR / sFMR in %;
+# x = 95 % identity-jackknife CI excludes the 5 % target; + = point estimate above target.
+# Sources: docs/phase3_results.md §5 (run bb5d9244bb3c), reports/experiments/phase4_tables.md
+# (run 903f6a5c7de3).
+FAMILY_NAMES = {
+    "F1_mask": "mask",
+    "F2_sunglasses": "sunglasses",
+    "F3_hand_object": "hand / object",
+    "F4_random_patch": "random patch",
+    "F5_extreme_lighting": "extreme lighting",
+}
+A3_EVIDENCE = {
+    "F1_mask": (
+        "93.7 / 1.94 / 2.56",
+        "94.0 / 5.89 x / 1.27",
+        "90.9 / 7.55 x / 2.59",
+        "93.2 / 5.76 x / 1.11",
+    ),
+    "F2_sunglasses": (
+        "96.8 / 1.87 / 1.24",
+        "89.7 / 6.34 x / 1.67",
+        "95.7 / 5.72 x / 1.27",
+        "91.1 / 5.46 x / 1.08",
+    ),
+    "F3_hand_object": (
+        "94.3 / 1.59 / 1.23",
+        "90.2 / 6.16 x / 1.59",
+        "92.4 / 5.84 x / 1.24",
+        "90.6 / 5.09 + / 1.03",
+    ),
+    "F4_random_patch": (
+        "88.6 / 2.12 / 2.00",
+        "93.2 / 5.36 x / 1.63",
+        "86.0 / 7.26 x / 2.04",
+        "91.1 / 4.65 / 1.15",
+    ),
+    "F5_extreme_lighting": (
+        "96.1 / 1.08 / 1.27",
+        "89.4 / 6.05 x / 2.00",
+        "94.7 / 4.33 / 1.47",
+        "90.7 / 4.65 / 1.26",
+    ),
+}
+
+
+def fold_card_md(fold: str, freeze_sha: str) -> str:
+    """User-facing description of the ACTIVE experimental configuration (one frozen A3 system)."""
+    held = FAMILY_NAMES[fold]
+    seen = ", ".join(v for k, v in FAMILY_NAMES.items() if k != fold)
+    p3, p4id, p4ood, p4e1 = A3_EVIDENCE[fold]
+    return f"""**Active experimental configuration: frozen A3 system `{fold}`** (Phase 3 freeze `{freeze_sha[:12]}…`). Research configuration; **not a deployment calibration.**
+
+- **Calibrated on:** 6,146 identity-disjoint pairs (3,073 genuine) of *synthetic* DigiFace-1M identities (`p3_cal_independent`; 9,219 identities, of which 9,033 are 5-image and only 186 are 72-image identities), clean and occluded with the four *seen* synthetic occluder families ({seen}). The **{held}** family was held out of this system's calibration.
+- **Score and rule:** fused score M1 from the AdaFace cosine and AdaFace feature norm; three quality tertiles (edges from `p3_val`); Learn-then-Test, target selective FNMR ≤ 5 % and selective FMR ≤ 5 % at δ = 0.05.
+- **Why it is not universal:** it is one of five leave-one-family-out systems that exist only to test generalisation to an unseen occluder; none was fitted on all families, on real photographs or on any deployment population. `F1_mask` is the default only because it is the first registered fold (D-051).
+
+| Measured A3 result (coverage / sFNMR / sFMR, %) | Value |
+|---|---|
+| Phase 3 confirmatory, held-out {held} (`bb5d9244bb3c`) | {p3} |
+| Phase 4 new population, seen families (`903f6a5c7de3`) | {p4id} |
+| Phase 4 new population, held-out {held} | {p4ood} |
+| Phase 4 new population, never-seen hair occluder | {p4e1} |
+
+x = 95 % CI excludes the 5 % target; + = point estimate above target. On the Phase 4 population the miss-rate target was **not** held."""

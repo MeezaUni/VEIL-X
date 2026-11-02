@@ -100,7 +100,9 @@ def main() -> int:
         a, b = render(p.image_a, r["a"]), render(p.image_b, r["b"])
         if k < args.n_cpu:
             imgs_for_cpu.append((a, b))
-        res = pipe.verify(a, b, fold=fold, pre_aligned=True, with_diagnostics=False)
+        res = pipe.verify(
+            a, b, fold=fold, pre_aligned=True, with_diagnostics=False, apply_support_floor=False
+        )  # research parity: the frozen rule exactly (D-055 guard off)
         p_app.append(res.decision.fused_score)
         d_app.append(res.decision.code)
         s_diff.append(abs(res.s_adaface - t["s"][k]))  # type: ignore[operator]
@@ -137,7 +139,10 @@ def main() -> int:
             lab: int((d_app_a == c).sum())
             for lab, c in (("MATCH", 1), ("NON-MATCH", 0), ("ABSTAIN", -1))
         },
-        "note": "offline embeddings were stored as float16; the app computes them fresh (fp16 autocast on GPU)",
+        "n_below_app_support_floor": int(
+            (np.asarray(t["q"]) < (cfg.decision.q_support_floor or {}).get(fold, -np.inf)).sum()
+        ),
+        "note": "offline embeddings were stored as float16; the app computes them fresh (fp16 autocast on GPU). Parity is computed with the D-055 support guard OFF (frozen rule exactly); n_below_app_support_floor pairs would be ABSTAIN in the app's default mode",
     }
     print("DigiFace", out["digiface_pre_aligned_path"], flush=True)
 
@@ -163,7 +168,7 @@ def main() -> int:
     }
     for i in ids:
         im = load_rgb(lay.extracted / "lfw_kaggle_v4" / imgs[i])
-        prep = pipe.faces.prepare(im)
+        prep = pipe.faces.prepare(im, allow_fallback=True)  # LFW framing: offline Phase 4F policy
         off_ok = dets[i]["ok"]
         stats["offline_ok"] += int(off_ok)
         stats["app_aligned"] += int(prep.status == "aligned")
@@ -202,8 +207,12 @@ def main() -> int:
     cpu = VerificationPipeline(cfg, lay.root, device="cpu")
     cos, agree, dp = [], 0, []
     for a, b in imgs_for_cpu:
-        rg = pipe.verify(a, b, fold=fold, pre_aligned=True, with_diagnostics=False)
-        rc = cpu.verify(a, b, fold=fold, pre_aligned=True, with_diagnostics=False)
+        rg = pipe.verify(
+            a, b, fold=fold, pre_aligned=True, with_diagnostics=False, apply_support_floor=False
+        )
+        rc = cpu.verify(
+            a, b, fold=fold, pre_aligned=True, with_diagnostics=False, apply_support_floor=False
+        )
         eg = pipe.backbone("adaface_ir101_webface4m").embed(np.stack([a, b])).embeddings
         ec = cpu.backbone("adaface_ir101_webface4m").embed(np.stack([a, b])).embeddings
         cos += [

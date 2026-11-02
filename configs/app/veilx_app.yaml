@@ -16,12 +16,29 @@ decision:
   fused_score: M1            # logistic(s, q, s*q): AdaFace cosine, feature-norm quality (Phase 3)
   phase3_frozen_sha256: 34409779ae8f69f35218f4b7dca050f29525a9a163c4105b2758d182e3a782c3
   phase3_frozen_file: reports/phase3_frozen.json       # private, under VEILX_DATA_ROOT
+  # App-only safety guard (Phase 6, D-055; reports/experiments/phase6_lowq_audit.json): the 1st
+  # percentile of each fold's CALIBRATION quality (development data). Below it the frozen M1 score
+  # extrapolates (non-face inputs reach p = 1.000) and the app ABSTAINS. Research parity mode
+  # (apply_support_floor=False) reproduces the frozen rule exactly.
+  q_support_floor:
+    F1_mask: 10.819224
+    F2_sunglasses: 10.871412
+    F3_hand_object: 10.862231
+    F4_random_patch: 12.454560
+    F5_extreme_lighting: 11.007144
 
 diagnostics:
   # Explanatory only: never enter the decision (tested). Phase 4 VE-C + Mahalanobis novelty.
   phase4_frozen_sha256: bba129002cf8fa067f6823db7c118c4e68649a92b5187ce1b48c7ce5cfff84cc
   phase4_frozen_file: reports/phase4_frozen.json
   vec_dir: models/phase4/vec
+  # SHA-256 of each fold's VE-C weights (as recorded in reports/experiments/phase4_vec_training_<fold>.json)
+  vec_sha256:
+    F1_mask: 193120c7cabcf3eceda49131d1f9c50f118f2ac6999c76450569779fee8a38af
+    F2_sunglasses: 5f922a4c85edc0cc5c9b671d0fecd33b2b0830cdf9f79721e71e3a216a64627d
+    F3_hand_object: 11ab8363fde3fbb135571d18852db50a545c49cc29485a98eeb85b93fbe75b48
+    F4_random_patch: 1eeff01fa90b3386b365ec749019db92435a946d4e79aa84cf005fe66850a7e5
+    F5_extreme_lighting: 25b875f6d3a6f5712df8b6ccbb502b994c2a5ddc1cea54ead9bdde29d8590b27
 
 detector:
   # SCRFD det_10g (InsightFace buffalo_l v0.7), as in Phase 2 / Phase 4F.
@@ -36,6 +53,9 @@ fallback:
   # Detector-free fixed crop (Phase 2 fixed transform from LFW View-1 DevTrain mean landmarks;
   # aggregate geometry, no identity data). Registered Phase 4F policy for no-face / low-quality.
   # Assumes LFW-like framing: the image is resized to reference_size x reference_size first.
+  # App-only safety rule (Phase 6, D-054): the fixed crop is applied only when the user declares
+  # LFW-style framing and the image is near-square (LFW: 250x250); otherwise the image is refused.
+  aspect_ratio_range: [0.8, 1.25]
   reference_size: 250
   matrix: [[0.8631705563203315, -0.009020340790117288, -51.4118899759529],
            [0.00902034079011729, 0.8631705563203315, -46.16445069608585]]

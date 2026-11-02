@@ -81,3 +81,51 @@ stated by the sources and must be re-verified before any request.
 3. Before any of these, check the identity overlap with WebFace4M (backbone training), as was done
    for LFW in Phase 2.
 4. The never-deserialise-pickles rule stays.
+
+## 7. Phase 6 status and actionable access checklist (2026-11-02)
+
+**Status: real physical-occlusion validation is FUTURE WORK, not completed evidence.**
+- No physical-occlusion dataset was requested, downloaded or evaluated in any phase.
+- Every VEIL-X occlusion result is on synthetic occluders: DigiFace renders, LFW composites, and
+  the evaluation-only E1 hair-strand renders.
+- Nothing here was re-verified online in Phase 6. Access terms must be checked at the source
+  when the request is made.
+
+**Checklist for an IJB-C request**, the preferred benchmark. The owner or supervisor carries it
+out; Claude does not submit requests.
+
+1. **Eligibility and terms.** Read the current NIST / IARPA Janus distribution page and its
+   licence. Record:
+   - who may request it (institutional affiliation; individual vs lab);
+   - permitted uses (non-commercial research);
+   - redistribution limits (no images, crops or embeddings outside the lab);
+   - publication and citation requirements;
+   - retention and deletion obligations.
+2. **Institutional approval.** Obtain the supervisor's written approval naming IJB-C and the
+   purpose: occlusion-stratified 1:1 evaluation of frozen systems. Add the institutional ethics
+   or data-protection review if the university requires it for face data. Record it in
+   `docs/decision_log.md`, as was done for LFW (D-043).
+3. **Request content.** Include:
+   - the project summary (non-commercial academic research);
+   - the exact use: frozen-model evaluation only, no training;
+   - storage: an encrypted local disk, outside any repository;
+   - who has access;
+   - the retention period;
+   - the commitment to publish aggregates only.
+4. **Before any score is computed:**
+   - **file safety:** verify archive integrity and file formats (images and CSV / text metadata
+     only; no pickles or executables);
+   - **training-data overlap:** IJB-C subjects are public figures, and an overlap with WebFace4M
+     (backbone training data) is likely. It must be stated as a limitation, as for LFW;
+   - **pre-registration:** pre-register a protocol, as `docs/phase6_protocol.md` did. It should
+     cover:
+     - a 1:1 template or image-pair protocol;
+     - strata from IJB-C's occlusion annotations;
+     - the frozen A3 systems with no re-tuning;
+     - sFMR and sFNMR, coverage, identity-clustered intervals;
+     - a single logged access.
+5. **Alternatives if IJB-C is unavailable:**
+   - **RMFRD** (masks): only after the authors confirm terms.
+   - **MFR2:** a smoke test only, too small for claims.
+   - **ROF:** only via original JPEGs or a reviewed restricted unpickler; never `pickle.load`.
+   - None of these replaces a licensed, annotated benchmark.

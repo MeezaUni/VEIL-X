@@ -27,6 +27,7 @@ class DiagnosticsEngine:
             raise RuntimeError("Phase 4 frozen configuration does not match the registered SHA-256")
         self.frozen = frozen
         self.vec_dir = data_root / cfg.diagnostics.vec_dir
+        self.vec_sha256 = dict(cfg.diagnostics.vec_sha256)
         self.device = device
         self._models: dict[str, Any] = {}
 
@@ -34,12 +35,14 @@ class DiagnosticsEngine:
         if fold not in self._models:
             from safetensors.torch import load_file
 
+            from veilx.data.archive import sha256_file
             from veilx.vis.model import VisNet
 
+            path = self.vec_dir / fold / "best.safetensors"
+            if sha256_file(path) != self.vec_sha256.get(fold):
+                raise RuntimeError(f"VE-C weights of {fold} differ from the registered SHA-256")
             m = VisNet().to(self.device).eval()
-            m.load_state_dict(
-                load_file(str(self.vec_dir / fold / "best.safetensors"), device=self.device)
-            )
+            m.load_state_dict(load_file(str(path), device=self.device))
             self._models[fold] = m
         return self._models[fold]
 
