@@ -20,6 +20,8 @@ STEPS: list[tuple[str, list[str]]] = [
     ("pytest", [PY, "-m", "pytest", "-q"]),
     ("config", [PY, "scripts/validate_config.py"]),
     ("privacy scan", [PY, "scripts/scan_sensitive.py"]),
+    ("doc links", [PY, "scripts/check_docs.py"]),
+    ("smoke test (no data)", [PY, "scripts/smoke_test.py", "--level", "1"]),
 ]
 
 # torch-dependent tests are skipped in the CPU-only environment (and in CI); when the local
@@ -37,7 +39,18 @@ _GPU_PY = next(
 )
 if _GPU_PY is not None:
     STEPS.append(
-        ("pytest (torch)", [str(_GPU_PY), "-m", "pytest", "-q", "tests/test_models_torch.py"])
+        (
+            "pytest (torch, app)",
+            [
+                str(_GPU_PY),
+                "-m",
+                "pytest",
+                "-q",
+                "tests/test_models_torch.py",
+                "tests/test_app_models.py",
+                "tests/test_app_ui.py",
+            ],
+        )
     )
 
 

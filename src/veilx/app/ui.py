@@ -303,14 +303,26 @@ def build_app(
         title="VEIL-X research demo (local)",
         theme=theme,
         analytics_enabled=False,
-        delete_cache=(600, 900),
+        delete_cache=(60, 120),  # leftovers (e.g. a failed upload) live at most ~3 min
     ) as demo:
         gr.Markdown("# VEIL-X — occlusion-aware face verification (research demonstration)")
         gr.Markdown(DISCLAIMER)
         with gr.Tab("Compare two images"):
             with gr.Row():
-                in_a = gr.Image(label="Image A", type="filepath", sources=["upload"], height=280)
-                in_b = gr.Image(label="Image B", type="filepath", sources=["upload"], height=280)
+                in_a = gr.Image(
+                    label="Image A",
+                    type="filepath",
+                    image_mode=None,
+                    sources=["upload"],
+                    height=280,
+                )
+                in_b = gr.Image(
+                    label="Image B",
+                    type="filepath",
+                    image_mode=None,
+                    sources=["upload"],
+                    height=280,
+                )
             fold_card = gr.Markdown(
                 fold_card_md(cfg.decision.default_fold, cfg.decision.phase3_frozen_sha256)
             )

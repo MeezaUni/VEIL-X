@@ -28,7 +28,8 @@ LIMITATIONS_MD = """
 - **The 5 % selective-error target was NOT maintained on the new Phase 4 population.** On the untouched
   Phase 4 partition (DigiFace identities 2000–5999, run `903f6a5c7de3`) every decision rule, including the one
   used here (A3), exceeded the 5 % selective false-non-match target even on occlusion types seen during
-  calibration (A3: 5.4–6.3 % on seen families; up to 7.6 % on held-out families).
+  calibration (A3: 5.4–6.3 % on seen families; up to 7.6 % on held-out families). A pre-registered
+  replication on 4,000 new identities (Phase 6, run `1c291322aa27`) reproduced the failure (4 of 5 folds).
 - **A3 was selected because it performed better than the alternatives** (fewest violations; no candidate was
   safe relative to it, D-050), **not because it is universally safe.**
 - **Calibration depends on the population and on preprocessing.** The rule was calibrated on synthetic DigiFace
@@ -41,6 +42,9 @@ LIMITATIONS_MD = """
   calibration distribution.
 - **LFW and DigiFace results do not establish deployment readiness.** LFW was used under academic authorisation
   for research evaluation only; DigiFace faces are synthetic.
+- **The frozen score is unreliable for very low-quality inputs.** Below the calibration support of quality it
+  extrapolates (non-face images reach a score of 1.000; the false-match rate there was 18–42 % on development data
+  and 23 % on new data). This app therefore abstains below that support (support guard); the research rule does not.
 - **A numerical score never proves that two images show the same person.** The fused score is a logistic output
   fitted on synthetic data — not a probability of identity and not a guaranteed confidence.
 """
@@ -151,7 +155,7 @@ def abstention_text(reasons: tuple[str, ...], label: str) -> str:
 # Phase 6 (6C): what each frozen A3 system is. A3 cells: coverage / sFNMR / sFMR in %;
 # x = 95 % identity-jackknife CI excludes the 5 % target; + = point estimate above target.
 # Sources: docs/phase3_results.md §5 (run bb5d9244bb3c), reports/experiments/phase4_tables.md
-# (run 903f6a5c7de3).
+# (run 903f6a5c7de3); Phase 6 replication run 1c291322aa27 (docs/phase6_results.md).
 FAMILY_NAMES = {
     "F1_mask": "mask",
     "F2_sunglasses": "sunglasses",
@@ -165,30 +169,35 @@ A3_EVIDENCE = {
         "94.0 / 5.89 x / 1.27",
         "90.9 / 7.55 x / 2.59",
         "93.2 / 5.76 x / 1.11",
+        "93.8 / 5.90 x / 1.40",
     ),
     "F2_sunglasses": (
         "96.8 / 1.87 / 1.24",
         "89.7 / 6.34 x / 1.67",
         "95.7 / 5.72 x / 1.27",
         "91.1 / 5.46 x / 1.08",
+        "89.8 / 6.49 x / 1.73",
     ),
     "F3_hand_object": (
         "94.3 / 1.59 / 1.23",
         "90.2 / 6.16 x / 1.59",
         "92.4 / 5.84 x / 1.24",
         "90.6 / 5.09 + / 1.03",
+        "90.0 / 6.41 x / 1.77",
     ),
     "F4_random_patch": (
         "88.6 / 2.12 / 2.00",
         "93.2 / 5.36 x / 1.63",
         "86.0 / 7.26 x / 2.04",
         "91.1 / 4.65 / 1.15",
+        "93.0 / 5.15 + / 1.75",
     ),
     "F5_extreme_lighting": (
         "96.1 / 1.08 / 1.27",
         "89.4 / 6.05 x / 2.00",
         "94.7 / 4.33 / 1.47",
         "90.7 / 4.65 / 1.26",
+        "89.6 / 6.39 x / 2.02",
     ),
 }
 
@@ -197,7 +206,7 @@ def fold_card_md(fold: str, freeze_sha: str) -> str:
     """User-facing description of the ACTIVE experimental configuration (one frozen A3 system)."""
     held = FAMILY_NAMES[fold]
     seen = ", ".join(v for k, v in FAMILY_NAMES.items() if k != fold)
-    p3, p4id, p4ood, p4e1 = A3_EVIDENCE[fold]
+    p3, p4id, p4ood, p4e1, p6id = A3_EVIDENCE[fold]
     return f"""**Active experimental configuration: frozen A3 system `{fold}`** (Phase 3 freeze `{freeze_sha[:12]}…`). Research configuration; **not a deployment calibration.**
 
 - **Calibrated on:** 6,146 identity-disjoint pairs (3,073 genuine) of *synthetic* DigiFace-1M identities (`p3_cal_independent`; 9,219 identities, of which 9,033 are 5-image and only 186 are 72-image identities), clean and occluded with the four *seen* synthetic occluder families ({seen}). The **{held}** family was held out of this system's calibration.
@@ -210,5 +219,6 @@ def fold_card_md(fold: str, freeze_sha: str) -> str:
 | Phase 4 new population, seen families (`903f6a5c7de3`) | {p4id} |
 | Phase 4 new population, held-out {held} | {p4ood} |
 | Phase 4 new population, never-seen hair occluder | {p4e1} |
+| Phase 6 replication, new identities, seen families (`1c291322aa27`) | {p6id} |
 
-x = 95 % CI excludes the 5 % target; + = point estimate above target. On the Phase 4 population the miss-rate target was **not** held."""
+x = 95 % CI excludes the 5 % target; + = point estimate above target. On the 72-image population the miss-rate target was **not** held, in Phase 4 and again in the Phase 6 replication."""

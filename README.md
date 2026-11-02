@@ -3,7 +3,12 @@
 Research code for **risk-controlled two-image (1:1) face verification under occlusion**.
 Non-commercial academic research only. **Not an identity-verification product.**
 
-> **Status: Phase 5 complete (local research application). Waiting for owner review.**
+> **Status: Phase 6 (final phase) complete. Waiting for owner review.**
+> - Phase 6 (`docs/phase6_results.md`, audit `docs/phase6_audit.md`, paper
+>   `docs/paper/veilx_paper.md`): a pre-registered replication on 4,000 untouched identities
+>   **reproduced the population-shift failure** and again recommended A3. A new finding: the
+>   frozen fused score is unreliable below the calibration support of quality (the app abstains
+>   there; D-055). Reproduction guide: `docs/reproducibility.md`.
 > - Frozen AdaFace IR-101 and ArcFace IR-101 (WebFace4M); no recognition training.
 > - Phase 3 (`docs/phase3_results.md`): learned-visibility calibration did **not** beat
 >   quality-stratified calibration on unseen occluders.
@@ -42,6 +47,9 @@ $env:VEILX_DATA_ROOT = "C:\path\to\veilx_data"                              # pr
 - Frozen AdaFace (decision) and ArcFace (diagnostic).
 - Fused score M1 = logistic(cosine, min feature norm, product).
 - **A3 quality-stratified MATCH / NON-MATCH / ABSTAIN** rule (frozen Phase 3 system; D-051).
+  Five fold-specific systems exist; none is a deployment calibration (`docs/calibration_systems.md`).
+- App-only safety (D-054, D-055): the fixed-crop fallback only for declared LFW-style portraits;
+  abstention below the calibration support of quality; two required confirmations.
 
 Visibility maps and novelty flags (Phase 4 VE-C) are shown as **explanations only** and never
 enter the decision.
@@ -101,8 +109,12 @@ archives, weights, documents, secrets, large files and absolute user paths.
 
 ## Key documents
 
-- **Results:** `docs/phase3_results.md`, `docs/phase4_results.md`, `docs/phase5_results.md`.
-- **Protocols:** `docs/phase3_protocol.md`, `docs/phase4_protocol.md`.
+- **Results:** `docs/phase3_results.md`, `docs/phase4_results.md`, `docs/phase5_results.md`,
+  `docs/phase6_results.md`.
+- **Final audit, paper and presentation:** `docs/phase6_audit.md`, `docs/paper/veilx_paper.md`,
+  `docs/presentation/slides.md`, `docs/presentation/demo_and_viva.md`.
+- **Reproducing:** `docs/reproducibility.md` (`scripts/smoke_test.py` needs no data).
+- **Protocols:** `docs/phase3_protocol.md`, `docs/phase4_protocol.md`, `docs/phase6_protocol.md`.
 - **Using the app:** `docs/app_user_guide.md`.
 - **Model cards:** `docs/model_card_backbones.md`, `docs/model_card_visibility.md`.
 - **Audit and records:** `docs/statistical_audit.md`, `docs/decision_log.md`,

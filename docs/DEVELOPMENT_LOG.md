@@ -6,6 +6,64 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-11-02 — Phase 6 complete (final phase): audit, replication, hardening, delivery
+
+### Audit (6A, 6B)
+- **Verified:**
+  - frozen hashes: backbones, SCRFD, 10 VE / VE-C weight files, both freezes;
+  - access logs and partitions.
+- **Claim-to-evidence matrix:** `docs/phase6_audit.md` (25 claims).
+- **6B.** The evaluated A3 uses AdaFace-only M1. ArcFace was never part of a calibrated decision
+  system. Earlier "dual-backbone" recommendations were corrected in place (D-052): a
+  documentation issue, not an implementation defect.
+
+### Replication (6E)
+- **Authorisation.** The owner authorised DigiFace 72-image parts 6000–9999 (D-053).
+- **Pre-registration.** The protocol was pushed before the download (`ed1bf1e`), and
+  Amendment 1 before any score (`168b59b`).
+- **Scripts.** The Phase 4 scripts were parameterised by partition; the p4 path was verified
+  bit-identical (pairs and plans rebuilt).
+- **Preparation:** 288,000 images, 0 failures, 0 duplicates; 48,000 pairs.
+- **Extraction:** 73 min, peak 3.0 GB RAM.
+- **Run `1c291322aa27`:**
+  - R1 replicates (4/5);
+  - R2 replicates (A3);
+  - R3 holds (15/15).
+
+### Findings and fixes
+- **Low-quality tail (D-055).** The smoke test found two noise images decided MATCH, p = 1.000.
+  - Cause: M1 extrapolation below the calibration quality support.
+  - Development tail sFMR is 18–42 %; on p6 it is 22.97 %.
+  - The frozen system is unchanged; the app support guard abstains.
+- **Fallback defect (D-054).** A low-quality *selected* face in a multi-face image received a
+  whole-image fixed crop. It is now refused. The fallback now requires declared LFW framing
+  and a near-square image.
+- **Upload retention (D-056).** Gradio converted non-RGB uploads into copies, so originals stayed
+  for 15–25 min, and uploads abandoned by a Gradio-level decode failure stayed too. Now the
+  originals are passed through and the cache expires in ≤ 3 min. Verified live: removed after
+  149 s.
+- **VE-C weights** were not hash-checked by the app. They are now pinned.
+- **Safe error messages** for unexpected exceptions and OOM.
+- **GPU detection** was not adopted: the CUDA 13 runtime is missing (RES-026).
+
+### Deliverables
+- **Paper:** `docs/paper/veilx_paper.md`, with 3 new figures and verified citations
+  (`docs/lit_search_log.md`).
+- **Presentation, demo and viva:** `docs/presentation/`.
+- **Reproducibility:** `docs/reproducibility.md`, `scripts/smoke_test.py`,
+  `scripts/check_docs.py`.
+- **Calibration systems:** `docs/calibration_systems.md`.
+- **Physical-occlusion access checklist:** `docs/physical_occlusion_readiness.md` §7.
+
+### Checks
+See the final commit (CPU and GPU suites, quality gate, smoke test, doc links, privacy scan).
+
+### Next steps
+None planned: this is the final phase, and it is waiting for owner review. Future work is in
+`docs/phase5_results.md` §11 and `docs/paper/veilx_paper.md` §15.
+
+---
+
 ## 2026-11-02 — Phase 5 complete: local research application (waiting for owner review)
 
 ### What was built

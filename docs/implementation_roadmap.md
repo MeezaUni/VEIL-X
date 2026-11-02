@@ -185,6 +185,29 @@ Not done:
 - Detector runs on occluded photographs.
 - Train-role occlusion plans (deferred to Phase 3).
 
+## 4j. Phase 6 status (2026-11-02): final phase complete; waiting for owner review
+
+Final audit, replication, hardening and delivery (D-052 to D-056). Results:
+`docs/phase6_results.md`.
+
+**Replication.** The pre-registered replication on untouched DigiFace identities 6000–9999
+reproduced:
+- the population-shift failure: A3 sFNMR above 5 % in 4/5 seen-family cells;
+- the A3 recommendation.
+
+**Corrections and findings:**
+- the decision is AdaFace-only M1 + A3 (documentation corrected);
+- a low-quality-tail failure of the frozen score (reported; the app guards against it);
+- the app fallback restricted, uploads expire quickly.
+
+**Deliverables:**
+- the paper: `docs/paper/veilx_paper.md`;
+- the presentation, demo and viva material: `docs/presentation/`;
+- the reproducibility guide: `docs/reproducibility.md`.
+
+No further research phase is planned. Future work: deployment-population calibration,
+physical-occlusion evaluation (IJB-C), support-aware fused scores.
+
 ## 4i. Phase 5 status (2026-11-02): complete; waiting for owner review
 
 Local research application (D-051). Results: `docs/phase5_results.md`; user guide:

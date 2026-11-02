@@ -31,7 +31,18 @@ Cells are A3 coverage / sFNMR / sFMR in %:
 | F4_random_patch | random patch | 19.824 / 21.866 | [0.072, 0.854) | 0.426 | 0.426 | 88.6 / 2.12 / 2.00 | 93.2 / 5.36 ✗ / 1.63 | 86.0 / 7.26 ✗ / 2.04 | 91.1 / 4.65 / 1.15 |
 | F5_extreme_lighting | extreme lighting | 19.126 / 21.533 | [0.060, 0.862) | 0.421 | 0.595 | 96.1 / 1.08 / 1.27 | 89.4 / 6.05 ✗ / 2.00 | 94.7 / 4.33 / 1.47 | 90.7 / 4.65 / 1.26 |
 
-The Phase 6 replication results for the same systems are in `docs/phase6_results.md`.
+**Phase 6 pre-registered replication** (`1c291322aa27`; 4,000 untouched 72-image identities),
+A3 on seen families (Test-ID):
+
+| System | Coverage / sFNMR / sFMR, % |
+|---|---|
+| F1_mask | 93.8 / 5.90 ✗ / 1.40 |
+| F2_sunglasses | 89.8 / 6.49 ✗ / 1.73 |
+| F3_hand_object | 90.0 / 6.41 ✗ / 1.77 |
+| F4_random_patch | 93.0 / 5.15 † / 1.75 |
+| F5_extreme_lighting | 89.6 / 6.39 ✗ / 2.02 |
+
+The population-shift failure replicated (`docs/phase6_results.md`).
 
 ## 3. What the calibration population represents, and why no system is universal
 
@@ -39,8 +50,9 @@ The Phase 6 replication results for the same systems are in `docs/phase6_results
    - About 98 % of the calibration identities are DigiFace 5-image identities.
    - The Phase 4 partition (72-image identities only) had about 4× harder genuine pairs: clean
      FNMR of raw similarity 4.81 % vs 1.12 %.
-   - **On that population every A3 system violated the sFNMR target even on seen families.**
-     The guarantee is specific to the calibration population.
+   - **On that population every A3 system violated the sFNMR target even on seen families**,
+     and 4/5 did so again on 4,000 new identities (Phase 6). The guarantee is specific to the
+     calibration population.
 2. **Each system saw only four occluder families.** A system is tested on its fifth family as
    an unseen occluder. A deployment would meet occluders that none of the five families
    represent, such as real scarves, hair, glasses or physical objects.

@@ -237,9 +237,19 @@ def detector_section(dev: dict[str, Any] | None, v2: dict[str, Any] | None) -> N
 
 
 def main() -> int:
-    d = load("phase4_final")
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--final-report", default="phase4_final", help="e.g. phase6_final (replication)"
+    )
+    ap.add_argument("--final-only", action="store_true")
+    args = ap.parse_args()
+    d = load(args.final_report)
     if d:
         final_section(d)
+    if args.final_only:
+        return 0
     fu = load("phase4_followup_p3test")
     if fu:
         print(f"## Follow-up on p3_test `{fu['run_id']}` (descriptive)\n")

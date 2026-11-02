@@ -481,6 +481,51 @@ records:
       protocol_version: "0.6.0"
       final_run_log_entry: "none (development data; no test partition used)"
     caveats: "Single laptop; 40 GPU / 10 CPU pairs; totals over completed comparisons (multi-face refusals excluded)."
+  - id: RES-024
+    type: real_measured_model_result
+    title: "Phase 6 pre-registered replication of the population-shift failure and of the A3 recommendation"
+    statement: "On 4,000 untouched 72-image DigiFace identities (parts 6000-9999), the frozen Phase 3/4 systems reproduced the Phase 4 findings: A3's sFNMR 95 % CI excluded the 5 % target in 4/5 seen-family (Test-ID) cells (5.15-6.49 %; R1, criterion >= 3); no candidate was safe relative to A3 (violations A3 7, C4 10, N4 10, H4 9; R2, recommendation A3); A3 sFMR was within target in all 15 cells (1.20-2.77 %; R3). Clean FNMR of raw similarity 4.60 % (p4 4.81 %, p3_test 1.12 %)."
+    source: "scripts/evaluate_phase4.py final --final --partition p6"
+    artefact: "reports/experiments/phase6_final.json"
+    created: "2026-11-02"
+    provenance:
+      git_commit: "a05246b"
+      dataset_ids: ["digiface1m"]
+      model_ids: ["adaface_ir101_webface4m", "arcface_ir101_webface4m", "veilx_vec_phase4_F1-F5", "veilx_ve_phase3_F1-F5"]
+      split: "p6_test"
+      protocol_version: "0.6.0"
+      final_run_log_entry: "1c291322aa27"
+    caveats: "Same population type as p4_test (72-image identities); synthetic occluders; replication, not a new population."
+  - id: RES-025
+    type: real_measured_model_result
+    title: "Frozen M1/A3 unreliable below the calibration support of quality"
+    statement: "Below the 1st percentile of each fold's calibration quality (~1 % of pairs), the frozen A3 systems have sFMR 18-42 % on p3_val (development) vs 1.1-1.5 % above; synthetic non-face pairs (q 5-10) are decided MATCH with p ~ 1.000 because the logistic M1 extrapolates. On the untouched p6_test (exploratory Amendment 1) the tail (0.9 % of pairs) had A3 sFMR 22.97 % (289/1,258) vs 1.50 % above."
+    source: "scripts/phase6_lowq_audit.py; scripts/evaluate_phase4.py final --final --partition p6 (Amendment 1)"
+    artefact: "reports/experiments/phase6_lowq_audit.json"
+    created: "2026-11-02"
+    provenance:
+      git_commit: "168b59b"
+      dataset_ids: ["digiface1m"]
+      model_ids: ["adaface_ir101_webface4m"]
+      split: "p3_cal; p3_val; p6_test (tally)"
+      protocol_version: "0.6.0"
+      final_run_log_entry: "none for the development audit; 1c291322aa27 for the p6 tally"
+    caveats: "Post hoc (found by the Phase 6 smoke test); development-data rates on ~120 impostors per fold; p6 tally exploratory."
+  - id: RES-026
+    type: real_measured_model_result
+    title: "GPU face detection not available in the project environment"
+    statement: "The onnxruntime CUDA execution provider could not be created (onnxruntime-gpu 1.31 needs the CUDA 13 runtime; the environment has CUDA 12.8 via torch); SCRFD fell back to the CPU provider, so the registered adoption rule was not met and the CPU detector (used for every published result) remains the only supported path."
+    source: "scripts/phase6_gpu_detector.py"
+    artefact: "reports/experiments/phase6_gpu_detector.json"
+    created: "2026-11-02"
+    provenance:
+      git_commit: "168b59b"
+      dataset_ids: ["kaggle_jessicali9530_lfw"]
+      model_ids: ["insightface_buffalo_l_det_10g", "adaface_ir101_webface4m"]
+      split: "lfw_view1_devtrain"
+      protocol_version: "0.6.0"
+      final_run_log_entry: "none (development data)"
+    caveats: "Environment-specific; provenance dirty only by an untracked report file written just before."
   # ------------------------------------------------------------------ hypotheses
   - id: HYP-001
     type: unverified_hypothesis
