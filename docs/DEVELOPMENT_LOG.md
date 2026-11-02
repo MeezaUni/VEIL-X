@@ -24,7 +24,9 @@ explicitly, with its provenance record.
   13.00), not from the mask on image B (norm 18.48). The demo text was corrected.
 - **Build.** `scripts/build_university_deliverables.py` (new `docs` extra) produces:
   - report DOCX + PDF, 16 pages;
-  - 15-slide PPTX + PDF, with speaker notes;
+  - PPTX + PDF, with speaker notes. The deck was redesigned on owner feedback ("looks very basic"): 24 slides, a
+    consistent theme, native editable charts (outcomes, latency per stage, quality vs visibility, IoU, low-quality
+    tail), native architecture / threshold diagrams and real app screenshots (`scripts/university_slides.py`);
   - demo, viva and summary PDFs;
   - previews and a SHA-256 manifest.
   The PDFs are exported by MS Word / PowerPoint, and every page was visually inspected. The
