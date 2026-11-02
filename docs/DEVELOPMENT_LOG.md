@@ -6,6 +6,37 @@ explicitly, with its provenance record.
 
 ---
 
+## 2026-11-02 — University course project deliverables (no research change)
+
+- **Scope.** Owner re-scoped the closeout to a university course project. The research record,
+  the frozen pipeline and every result are unchanged. No training, re-calibration or new
+  experiment was run.
+- **Application check.** Verified the app end to end:
+  - local-only binding and CSP;
+  - MATCH, NON-MATCH and ABSTAIN reproduced on the built-in synthetic examples, with the frozen
+    thresholds;
+  - diagnostics and visibility maps;
+  - the support guard abstains on noise.
+  Real screenshots were captured (local only).
+- **Sources.** `docs/university/`: report, demo guide, viva (35 Q&A + revision sheet), one-page
+  summary. All numbers were checked against the committed reports.
+- **Fact check.** Example 4's low pair quality comes from the dark, rotated image A (norm
+  13.00), not from the mask on image B (norm 18.48). The demo text was corrected.
+- **Build.** `scripts/build_university_deliverables.py` (new `docs` extra) produces:
+  - report DOCX + PDF, 16 pages;
+  - 15-slide PPTX + PDF, with speaker notes;
+  - demo, viva and summary PDFs;
+  - previews and a SHA-256 manifest.
+  The PDFs are exported by MS Word / PowerPoint, and every page was visually inspected. The
+  binaries stay local, in the git-ignored `deliverables/`.
+- **Checks.**
+  - Quality gate: PASS.
+  - CPU suite: 403 passed, 4 skipped.
+  - GPU suite: 417 passed.
+  - Smoke test: 8/8.
+
+---
+
 ## 2026-11-02 — Phase 6 complete (final phase): audit, replication, hardening, delivery
 
 ### Audit (6A, 6B)

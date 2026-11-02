@@ -21,6 +21,8 @@ gpu = ["torch>=2.4", "safetensors>=0.4", "huggingface_hub>=0.24"]
 viz = ["matplotlib>=3.8"]
 # Phase 5 local research application (scripts/run_app.py); install together with [gpu].
 app = ["gradio>=5,<6", "onnxruntime>=1.17", "opencv-python-headless>=4.8", "psutil>=5.9"]
+# University deliverables (scripts/build_university_deliverables.py; PDF export also needs MS Office).
+docs = ["python-pptx>=1.0", "python-docx>=1.1", "pymupdf>=1.24", "matplotlib>=3.8"]
 
 [dependency-groups]
 dev = [

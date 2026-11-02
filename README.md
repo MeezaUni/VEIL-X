@@ -23,6 +23,24 @@ Non-commercial academic research only. **Not an identity-verification product.**
 > out-of-distribution risk guarantee. LFW and DigiFace results do not establish deployment
 > readiness.
 
+## University course project deliverables
+
+The course-project title is **"VEIL-X: An AI-Based Face Verification System with Quality
+Assessment and Intelligent Abstention"**.
+
+**Sources** (`docs/university/`):
+- `report.md`;
+- `demo_guide.md`;
+- `viva_questions.md`;
+- `project_summary.md`.
+
+**Built files** (DOCX / PDF / PPTX) are generated locally into `deliverables/` by
+`scripts/build_university_deliverables.py`. They are not pushed, because the repository refuses
+binary documents and images. See `deliverables/MANIFEST.md` (checksums) and
+`deliverables/VEIL-X_Submission_Checklist.md` (placeholders to fill in).
+
+The detailed research record below is unchanged.
+
 ## Research questions
 
 - **C3 (primary):** do risk-controlled decisions (Learn-then-Test) keep their target error on
